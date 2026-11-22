@@ -42,8 +42,9 @@ create table if not exists public.direct_messages (
     (message_type = 'audio' and media_path is not null
       and body is null and latitude is null and longitude is null)
     or
-    (message_type = 'location' and latitude between -90 and 90
-      and longitude between -180 and 180 and body is null and media_path is null)
+    (message_type = 'location' and latitude is not null and longitude is not null
+      and latitude between -90 and 90 and longitude between -180 and 180
+      and body is null and media_path is null)
   )
 );
 
