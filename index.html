@@ -2,365 +2,414 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vibe Chat</title>
-  <meta name="theme-color" content="#f5f8ff">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Tahoma, sans-serif;
-      background: #f3f6fc;
-      color: #25334b;
-    }
-    header {
-      background: white;
-      padding: 17px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #e6ebf4;
-    }
-    .brand { font-size: 25px; font-weight: 800; color: #263d68; }
-    .brand span { color: #69a9df; }
-    main { max-width: 850px; margin: 35px auto; padding: 0 16px; }
-    .panel {
-      background: white;
-      border-radius: 18px;
-      padding: 25px;
-      box-shadow: 0 5px 25px #263d6810;
-      margin-bottom: 20px;
-    }
-    h2 { margin-top: 0; color: #263d68; }
-    input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #dce4f0;
-      border-radius: 10px;
-      margin: 7px 0 13px;
-      font-size: 15px;
-    }
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 19px;
-      background: #6da9dc;
-      color: white;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover { background: #508fc9; }
-    button.secondary { background: #eaf1fa; color: #344b70; }
-    button:disabled { opacity: .5; cursor: not-allowed; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    #status { color: #61718a; font-size: 14px; line-height: 1.6; }
-    #chatPanel { display: none; }
-    #messages {
-      height: 360px;
-      overflow-y: auto;
-      background: #f7f9fd;
-      border-radius: 12px;
-      padding: 15px;
-      margin: 15px 0;
-    }
-    .message {
-      background: white;
-      border: 1px solid #e8edf5;
-      border-radius: 12px;
-      padding: 10px 13px;
-      margin: 9px 0;
-      max-width: 85%;
-      overflow-wrap: anywhere;
-    }
-    .message.mine {
-      background: #e7f2ff;
-      margin-left: auto;
-    }
-    .message small { display: block; color: #8290a5; margin-top: 5px; }
-    .send-row { display: flex; gap: 9px; }
-    .send-row input { margin: 0; }
-    .send-row button { white-space: nowrap; }
-    .muted { color: #8290a5; font-size: 13px; }
-    @media (max-width: 600px) {
-      main { margin: 18px auto; }
-      .panel { padding: 18px; }
-      #messages { height: 55vh; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vibe Chat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:#25334a;font-family:Arial,"Tahoma",sans-serif}
+header{background:#fff;padding:15px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e7edf5;position:sticky;top:0;z-index:5}
+.logo{font-size:24px;font-weight:800;color:#3978c9}
+.logo span{color:#263b59;font-weight:400}
+button{border:0;border-radius:10px;padding:11px 17px;background:#4b86d6;color:white;font-size:14px;cursor:pointer}
+button:hover{opacity:.88}
+button.secondary{background:#e9f1fc;color:#376caf}
+button.danger{background:#fce9e9;color:#b44444}
+main{max-width:950px;margin:25px auto;padding:0 15px}
+.card{background:white;border:1px solid #e8edf4;border-radius:17px;padding:22px;margin-bottom:18px;box-shadow:0 5px 20px #304c7010}
+h2{margin-top:0;color:#304b70}
+input,textarea{width:100%;padding:13px;border:1px solid #dce4ef;border-radius:10px;font-size:15px;margin:7px 0 15px;background:#fbfcfe}
+textarea{min-height:90px;resize:vertical}
+label{font-size:14px;font-weight:bold;color:#52657f}
+.hidden{display:none!important}
+.tabs{display:flex;gap:10px;margin-bottom:18px}
+.tabs button{flex:1}
+.tabs button.active{background:#294d7b}
+#messages{height:390px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0}
+.msg{background:white;border:1px solid #e8edf4;border-radius:12px;padding:10px 13px;margin-bottom:10px;overflow-wrap:anywhere}
+.msg small{display:block;color:#8795a8;font-size:11px;margin-bottom:5px}
+.msg p{margin:0;white-space:pre-wrap}
+.row{display:flex;gap:8px}
+.row input{margin:0}
+.row button{white-space:nowrap}
+.avatar{width:85px;height:85px;border-radius:50%;object-fit:cover;background:#eaf1fb;border:3px solid #e3edf9}
+#authBox{max-width:430px;margin:55px auto}
+.notice{padding:12px;border-radius:10px;background:#edf5ff;color:#376caf;margin:12px 0;font-size:14px}
+.muted{color:#8290a3;font-size:13px}
+@media(max-width:600px){
+ header{padding:13px 15px}
+ main{margin:15px auto}
+ .card{padding:17px}
+ #messages{height:55vh}
+ .row{gap:5px}
+ .row button{padding:10px}
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="brand">Vibe<span>Chat</span></div>
-    <button id="logoutBtn" class="secondary" style="display:none">ออกจากระบบ</button>
-  </header>
 
-  <main>
-    <section class="panel" id="authPanel">
-      <h2>ยินดีต้อนรับสู่ Vibe Chat</h2>
-      <p>พื้นที่พูดคุย เชื่อมต่อ และพบเพื่อนใหม่</p>
+<header>
+  <div class="logo">Vibe <span>Chat</span></div>
+  <div id="userArea" class="hidden">
+    <span id="userEmail" class="muted"></span>
+    <button class="secondary" onclick="logout()">ออกจากระบบ</button>
+  </div>
+</header>
 
-      <label for="email">อีเมล</label>
-      <input id="email" type="email" placeholder="กรอกอีเมลของคุณ">
+<div id="authBox" class="card">
+  <h2 id="authTitle">เข้าสู่ Vibe Chat</h2>
+  <p class="muted">พื้นที่พูดคุยและพบเพื่อนใหม่</p>
+  <label>อีเมล</label>
+  <input id="email" type="email" placeholder="กรอกอีเมล">
+  <label>รหัสผ่าน</label>
+  <input id="password" type="password" placeholder="กรอกรหัสผ่าน">
+  <button id="authButton" style="width:100%" onclick="login()">เข้าสู่ระบบ</button>
+  <p id="authMessage" class="notice hidden"></p>
+  <p class="muted" style="text-align:center;margin-top:20px">
+    ยังไม่มีบัญชี? <a href="#" onclick="toggleAuth();return false">สมัครสมาชิก</a>
+  </p>
+</div>
 
-      <label for="password">รหัสผ่าน</label>
-      <input id="password" type="password" placeholder="รหัสผ่านอย่างน้อย 6 ตัว">
+<main id="app" class="hidden">
+  <div class="tabs">
+    <button id="chatTab" class="active" onclick="showPage('chat')">แชท</button>
+    <button id="profileTab" class="secondary" onclick="showPage('profile')">โปรไฟล์ของฉัน</button>
+  </div>
 
-      <div class="actions">
-        <button id="loginBtn">เข้าสู่ระบบ</button>
-        <button id="signupBtn" class="secondary">สมัครสมาชิก</button>
+  <section id="chatPage" class="card">
+    <h2>ห้องแชท Vibe</h2>
+    <p class="muted">พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่</p>
+    <div id="messages"></div>
+    <div class="row">
+      <input id="messageInput" placeholder="พิมพ์ข้อความ..." maxlength="2000"
+        onkeydown="if(event.key==='Enter')sendMessage()">
+      <button onclick="sendMessage()">ส่ง</button>
+    </div>
+    <p id="chatStatus" class="muted"></p>
+  </section>
+
+  <section id="profilePage" class="card hidden">
+    <h2>โปรไฟล์ของฉัน</h2>
+    <p class="muted">ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น</p>
+
+    <div style="display:flex;align-items:center;gap:17px;margin:20px 0">
+      <img id="avatarPreview" class="avatar" alt="รูปโปรไฟล์">
+      <div>
+        <strong id="profileEmail"></strong>
+        <p class="muted">สมาชิก Vibe Chat</p>
       </div>
-      <p id="status" role="status">กรอกอีเมลและรหัสผ่านเพื่อเริ่มต้น</p>
-    </section>
+    </div>
 
-    <section class="panel" id="chatPanel">
-      <h2>ห้องแชท Vibe Chat</h2>
-      <p id="welcome"></p>
-      <div id="messages" aria-live="polite"></div>
-      <form class="send-row" id="sendForm">
-        <input id="messageInput" maxlength="2000"
-          placeholder="พิมพ์ข้อความ..." autocomplete="off" required>
-        <button id="sendBtn" type="submit">ส่ง</button>
-      </form>
-      <p class="muted">ข้อความในห้องนี้สมาชิกที่เข้าสู่ระบบสามารถอ่านได้</p>
-      <p id="chatStatus" role="status"></p>
-    </section>
-  </main>
+    <label>ชื่อผู้ใช้ (Username)</label>
+    <input id="username" placeholder="เช่น vibe_user">
 
-  <script>
-    const SUPABASE_URL = "https://epdbfncrfjyrgqwjyctu.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_CEFu0MBeJ9d5Jci-xc0ggg_uMaI82dG";
+    <label>ชื่อที่แสดง</label>
+    <input id="displayName" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
 
-    const db = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+    <label>ลิงก์รูปโปรไฟล์</label>
+    <input id="avatarUrl" type="url" placeholder="https://example.com/photo.jpg">
 
-    const $ = (id) => document.getElementById(id);
-    let currentUser = null;
-    let messageChannel = null;
+    <label>แนะนำตัว</label>
+    <textarea id="bio" maxlength="300" placeholder="เล่าเกี่ยวกับตัวคุณสักนิด..."></textarea>
 
-    function setStatus(message) {
-      $("status").textContent = message;
+    <label>ความสนใจ</label>
+    <input id="interests" placeholder="เช่น เพลง, หนัง, ท่องเที่ยว, เกม">
+    <p class="muted">คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)</p>
+
+    <button onclick="saveProfile()">บันทึกโปรไฟล์</button>
+    <p id="profileStatus" class="notice hidden"></p>
+  </section>
+</main>
+
+<script>
+const SUPABASE_URL = "https://epdbfncrfjyrgqwjyctu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_CEFu0MBeJ9d5Jci-xc0ggg_uMaI82dG";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentProfile = null;
+let realtimeChannel = null;
+let isSignup = false;
+
+function el(id){ return document.getElementById(id); }
+
+function safe(value){
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function showAuthMessage(message){
+  el("authMessage").textContent = message;
+  el("authMessage").classList.remove("hidden");
+}
+
+function toggleAuth(){
+  isSignup = !isSignup;
+  el("authTitle").textContent = isSignup ? "สมัครสมาชิก Vibe Chat" : "เข้าสู่ Vibe Chat";
+  el("authButton").textContent = isSignup ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
+  el("authButton").onclick = isSignup ? signup : login;
+  el("authMessage").classList.add("hidden");
+}
+
+async function login(){
+  const email = el("email").value.trim();
+  const password = el("password").value;
+  if(!email || !password) return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
+
+  el("authButton").disabled = true;
+  const {data,error} = await db.auth.signInWithPassword({email,password});
+  el("authButton").disabled = false;
+
+  if(error) return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: " + error.message);
+  await startApp(data.user);
+}
+
+async function signup(){
+  const email = el("email").value.trim();
+  const password = el("password").value;
+  if(!email || !password) return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
+  if(password.length < 6) return showAuthMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+
+  el("authButton").disabled = true;
+  const {data,error} = await db.auth.signUp({
+    email,password,
+    options:{emailRedirectTo:location.origin}
+  });
+  el("authButton").disabled = false;
+
+  if(error) return showAuthMessage("สมัครสมาชิกไม่สำเร็จ: " + error.message);
+
+  if(data.session){
+    await startApp(data.user);
+  }else{
+    showAuthMessage("สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี จากนั้นกลับมาเข้าสู่ระบบ");
+  }
+}
+
+async function startApp(user){
+  currentUser = user;
+  el("authBox").classList.add("hidden");
+  el("app").classList.remove("hidden");
+  el("userArea").classList.remove("hidden");
+  el("userEmail").textContent = user.email || "";
+
+  await loadOrCreateProfile();
+  await loadMessages();
+  subscribeMessages();
+}
+
+async function loadOrCreateProfile(){
+  el("profileEmail").textContent = currentUser.email || "";
+
+  const {data,error} = await db
+    .from("profiles")
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
+
+  if(error){
+    console.error(error);
+    alert("โหลดโปรไฟล์ไม่สำเร็จ: " + error.message);
+    return;
+  }
+
+  if(data){
+    currentProfile = data;
+  }else{
+    const fallbackName = (currentUser.email || "สมาชิก").split("@")[0];
+    const newProfile = {
+      id:currentUser.id,
+      username:"user_" + currentUser.id.replace(/-/g,"").slice(0,8),
+      display_name:fallbackName,
+      bio:"",
+      avatar_url:"",
+      interests:[]
+    };
+
+    const {data:created,error:createError} = await db
+      .from("profiles")
+      .insert(newProfile)
+      .select()
+      .single();
+
+    if(createError){
+      console.error(createError);
+      alert("สร้างโปรไฟล์ไม่สำเร็จ: " + createError.message);
+      return;
     }
+    currentProfile = created;
+  }
 
-    function showLoggedOut() {
-      currentUser = null;
-      $("authPanel").style.display = "block";
-      $("chatPanel").style.display = "none";
-      $("logoutBtn").style.display = "none";
-      if (messageChannel) {
-        db.removeChannel(messageChannel);
-        messageChannel = null;
-      }
+  el("username").value = currentProfile.username || "";
+  el("displayName").value = currentProfile.display_name || "";
+  el("avatarUrl").value = currentProfile.avatar_url || "";
+  el("bio").value = currentProfile.bio || "";
+  el("interests").value = (currentProfile.interests || []).join(", ");
+  updateAvatarPreview();
+}
+
+function updateAvatarPreview(){
+  const url = el("avatarUrl").value.trim();
+  el("avatarPreview").src = url || "https://ui-avatars.com/api/?name=Vibe+User&background=eaf1fb&color=426b9f";
+}
+el("avatarUrl").addEventListener("input",updateAvatarPreview);
+
+async function saveProfile(){
+  if(!currentUser) return;
+
+  const username = el("username").value.trim().toLowerCase();
+  const displayName = el("displayName").value.trim();
+  const avatarUrl = el("avatarUrl").value.trim();
+  const bio = el("bio").value.trim();
+  const interests = el("interests").value
+    .split(",").map(x=>x.trim()).filter(Boolean).slice(0,20);
+
+  if(!/^[a-z0-9_]{3,24}$/.test(username)){
+    return profileMessage("Username ต้องมี 3–24 ตัว ใช้ได้เฉพาะ a-z, 0-9 และ _");
+  }
+  if(!displayName) return profileMessage("กรุณากรอกชื่อที่แสดง");
+  if(avatarUrl && !/^https?:\/\//i.test(avatarUrl)){
+    return profileMessage("ลิงก์รูปโปรไฟล์ต้องขึ้นต้นด้วย http:// หรือ https://");
+  }
+
+  const {data,error} = await db
+    .from("profiles")
+    .update({
+      username,
+      display_name:displayName,
+      avatar_url:avatarUrl || null,
+      bio,
+      interests
+    })
+    .eq("id",currentUser.id)
+    .select()
+    .single();
+
+  if(error){
+    if(error.code === "23505"){
+      return profileMessage("Username นี้มีคนใช้แล้ว กรุณาเลือกชื่ออื่น");
     }
+    return profileMessage("บันทึกไม่สำเร็จ: " + error.message);
+  }
 
-    async function showLoggedIn(user) {
-      currentUser = user;
-      $("authPanel").style.display = "none";
-      $("chatPanel").style.display = "block";
-      $("logoutBtn").style.display = "block";
-      $("welcome").textContent = "เข้าสู่ระบบด้วย " + user.email;
-      $("chatStatus").textContent = "กำลังโหลดข้อความ...";
-      await loadMessages();
-      subscribeMessages();
-    }
+  currentProfile = data;
+  updateAvatarPreview();
+  profileMessage("บันทึกโปรไฟล์เรียบร้อยแล้ว");
+}
 
-    async function signup() {
-      const email = $("email").value.trim();
-      const password = $("password").value;
+function profileMessage(message){
+  el("profileStatus").textContent = message;
+  el("profileStatus").classList.remove("hidden");
+}
 
-      if (!email || password.length < 6) {
-        setStatus("กรุณากรอกอีเมลและรหัสผ่านอย่างน้อย 6 ตัว");
-        return;
-      }
+function showPage(page){
+  el("chatPage").classList.toggle("hidden",page !== "chat");
+  el("profilePage").classList.toggle("hidden",page !== "profile");
+  el("chatTab").classList.toggle("active",page === "chat");
+  el("profileTab").classList.toggle("active",page === "profile");
+  el("chatTab").classList.toggle("secondary",page !== "chat");
+  el("profileTab").classList.toggle("secondary",page !== "profile");
+}
 
-      $("signupBtn").disabled = true;
-      setStatus("กำลังสมัครสมาชิก...");
+async function loadMessages(){
+  const {data,error} = await db
+    .from("messages")
+    .select("id,created_at,message,user_id")
+    .order("created_at",{ascending:true})
+    .limit(100);
 
-      const { data, error } = await db.auth.signUp({
-        email,
-        password
-      });
+  if(error){
+    el("chatStatus").textContent = "โหลดข้อความไม่สำเร็จ: " + error.message;
+    return;
+  }
 
-      $("signupBtn").disabled = false;
+  el("messages").innerHTML = "";
+  (data || []).forEach(addMessage);
+  scrollMessages();
+}
 
-      if (error) {
-        setStatus("สมัครไม่สำเร็จ: " + error.message);
-        return;
-      }
+function addMessage(message){
+  if(document.querySelector('[data-message-id="'+CSS.escape(String(message.id))+'"]')) return;
 
-      if (data.session) {
-        setStatus("สมัครสมาชิกสำเร็จ");
-        await showLoggedIn(data.user);
-      } else {
-        setStatus("สมัครสำเร็จแล้ว กรุณาเปิดอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ");
-      }
-    }
+  const item = document.createElement("div");
+  item.className = "msg";
+  item.dataset.messageId = message.id;
 
-    async function login() {
-      const email = $("email").value.trim();
-      const password = $("password").value;
+  const isMe = message.user_id === currentUser?.id;
+  const sender = isMe ? "คุณ" : "สมาชิก";
+  const time = message.created_at ? new Date(message.created_at).toLocaleString("th-TH") : "";
 
-      if (!email || !password) {
-        setStatus("กรุณากรอกอีเมลและรหัสผ่าน");
-        return;
-      }
+  item.innerHTML = `<small>${sender} · ${safe(time)}</small><p>${safe(message.message)}</p>`;
+  el("messages").appendChild(item);
+}
 
-      $("loginBtn").disabled = true;
-      setStatus("กำลังเข้าสู่ระบบ...");
+function scrollMessages(){
+  el("messages").scrollTop = el("messages").scrollHeight;
+}
 
-      const { data, error } = await db.auth.signInWithPassword({
-        email,
-        password
-      });
+async function sendMessage(){
+  const input = el("messageInput");
+  const message = input.value.trim();
+  if(!message || !currentUser) return;
 
-      $("loginBtn").disabled = false;
+  input.disabled = true;
+  const {error} = await db.from("messages").insert({
+    message,
+    user_id:currentUser.id
+  });
+  input.disabled = false;
 
-      if (error) {
-        setStatus("เข้าสู่ระบบไม่สำเร็จ: " + error.message);
-        return;
-      }
+  if(error){
+    el("chatStatus").textContent = "ส่งข้อความไม่สำเร็จ: " + error.message;
+  }else{
+    input.value = "";
+    el("chatStatus").textContent = "";
+  }
+  input.focus();
+}
 
-      await showLoggedIn(data.user);
-    }
+function subscribeMessages(){
+  if(realtimeChannel) db.removeChannel(realtimeChannel);
 
-    async function logout() {
-      const { error } = await db.auth.signOut();
-      if (error) {
-        $("chatStatus").textContent = "ออกจากระบบไม่สำเร็จ: " + error.message;
-        return;
-      }
-      showLoggedOut();
-    }
+  realtimeChannel = db.channel("vibe-chat-messages")
+    .on("postgres_changes",{
+      event:"INSERT",
+      schema:"public",
+      table:"messages"
+    },payload=>{
+      addMessage(payload.new);
+      scrollMessages();
+    })
+    .subscribe();
+}
 
-    function addMessage(item) {
-      if (!currentUser) return;
+async function logout(){
+  if(realtimeChannel) await db.removeChannel(realtimeChannel);
+  await db.auth.signOut();
+  currentUser = null;
+  currentProfile = null;
+  el("app").classList.add("hidden");
+  el("userArea").classList.add("hidden");
+  el("authBox").classList.remove("hidden");
+  el("messages").innerHTML = "";
+}
 
-      const container = $("messages");
-      if (container.querySelector('[data-id="' + item.id + '"]')) return;
+async function init(){
+  const {data:{session}} = await db.auth.getSession();
+  if(session?.user) await startApp(session.user);
+}
 
-      const row = document.createElement("div");
-      row.className = "message" +
-        (item.user_id === currentUser.id ? " mine" : "");
-      row.dataset.id = item.id;
+db.auth.onAuthStateChange((event,session)=>{
+  if(event === "SIGNED_OUT"){
+    currentUser = null;
+  }
+});
 
-      const content = document.createElement("div");
-      content.textContent = item.message;
-
-      const info = document.createElement("small");
-      const date = item.created_at
-        ? new Date(item.created_at).toLocaleString("th-TH")
-        : "";
-      info.textContent =
-        (item.user_id === currentUser.id ? "คุณ" : "สมาชิก") +
-        " · " + date;
-
-      row.append(content, info);
-      container.appendChild(row);
-      container.scrollTop = container.scrollHeight;
-    }
-
-    async function loadMessages() {
-      $("messages").replaceChildren();
-
-      const { data, error } = await db
-        .from("messages")
-        .select("id, created_at, message, user_id")
-        .order("created_at", { ascending: true })
-        .limit(100);
-
-      if (error) {
-        $("chatStatus").textContent =
-          "โหลดข้อความไม่สำเร็จ: " + error.message;
-        return;
-      }
-
-      data.forEach(addMessage);
-      $("chatStatus").textContent = "เชื่อมต่อห้องแชทแล้ว";
-    }
-
-    function subscribeMessages() {
-      if (messageChannel) {
-        db.removeChannel(messageChannel);
-      }
-
-      messageChannel = db
-        .channel("vibe-chat-messages")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "messages"
-          },
-          (payload) => addMessage(payload.new)
-        )
-        .subscribe((status) => {
-          if (status === "SUBSCRIBED") {
-            $("chatStatus").textContent = "ออนไลน์ · รับข้อความแบบเรียลไทม์";
-          }
-        });
-    }
-
-    $("signupBtn").addEventListener("click", signup);
-    $("loginBtn").addEventListener("click", login);
-    $("logoutBtn").addEventListener("click", logout);
-
-    $("sendForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      if (!currentUser) return;
-
-      const input = $("messageInput");
-      const message = input.value.trim();
-      if (!message) return;
-
-      $("sendBtn").disabled = true;
-
-      const { error } = await db
-        .from("messages")
-        .insert({
-          message,
-          user_id: currentUser.id
-        });
-
-      $("sendBtn").disabled = false;
-
-      if (error) {
-        $("chatStatus").textContent =
-          "ส่งข้อความไม่สำเร็จ: " + error.message;
-        return;
-      }
-
-      input.value = "";
-      input.focus();
-    });
-
-    db.auth.onAuthStateChange((event, session) => {
-      if (session && !currentUser) {
-        showLoggedIn(session.user);
-      } else if (!session && currentUser) {
-        showLoggedOut();
-      }
-    });
-
-    async function start() {
-      const { data, error } = await db.auth.getSession();
-
-      if (error) {
-        setStatus("เชื่อมต่อไม่สำเร็จ: " + error.message);
-        return;
-      }
-
-      if (data.session) {
-        await showLoggedIn(data.session.user);
-      }
-    }
-
-    start();
-  </script>
+el("authButton").onclick = login;
+init();
+</script>
 </body>
 </html>
