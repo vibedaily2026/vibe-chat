@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#536fe8">
+  <title>Vibe Chat — Connect & Share</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f7f8fc;
+      color: #17233f;
+    }
+    header {
+      background: white;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #edf0f6;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    .logo {
+      font-size: 23px;
+      font-weight: 800;
+      background: linear-gradient(100deg,#536fe8,#7957d5);
+      color: transparent;
+      background-clip: text;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #eee9ff;
+      display: grid;
+      place-items: center;
+      color: #7957d5;
+      font-weight: bold;
+    }
+    main {
+      max-width: 760px;
+      margin: auto;
+      padding: 18px 14px 100px;
+    }
+    .welcome {
+      background: linear-gradient(120deg,#536fe8,#7957d5);
+      color: white;
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .welcome h1 { margin: 0 0 8px; font-size: 25px; }
+    .welcome p { margin: 0; opacity: .9; }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 22px 2px 12px;
+    }
+    .section-title h2 { font-size: 18px; margin: 0; }
+    .online { color: #16a477; font-size: 13px; }
+    .rooms {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 11px;
+    }
+    .room {
+      background: white;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #edf0f6;
+    }
+    .room-icon { font-size: 25px; }
+    .room h3 { margin: 8px 0 4px; font-size: 15px; }
+    .room p { margin: 0; color: #8791a5; font-size: 12px; }
+    .chat-box {
+      background: white;
+      border: 1px solid #edf0f6;
+      border-radius: 18px;
+      padding: 15px;
+    }
+    .message {
+      display: flex;
+      gap: 10px;
+      margin: 14px 0;
+      align-items: flex-start;
+    }
+    .bubble {
+      background: #f0f3fa;
+      border-radius: 4px 14px 14px 14px;
+      padding: 11px 13px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .bubble.purple { background: #eee9ff; }
+    .name { font-size: 11px; color: #8791a5; margin-bottom: 4px; }
+    .chat-note {
+      text-align: center;
+      color: #929cb0;
+      font-size: 12px;
+      padding: 12px 0 2px;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #edf0f6;
+      display: flex;
+      justify-content: space-around;
+      padding: 11px 4px calc(11px + env(safe-area-inset-bottom));
+      z-index: 10;
+    }
+    .nav-item {
+      color: #8993a8;
+      text-align: center;
+      font-size: 11px;
+    }
+    .nav-item span { display: block; font-size: 20px; margin-bottom: 3px; }
+    .nav-item.active { color: #536fe8; font-weight: bold; }
+    @media (min-width: 650px) {
+      main { padding-top: 28px; }
+      .rooms { grid-template-columns: repeat(4,1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Vibe Chat</div>
+    <div class="avatar">V</div>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h1>Find your vibe ✨</h1>
+      <p>พบปะผู้คนใหม่ ๆ พูดคุย และแบ่งปันเรื่องราวไปด้วยกัน</p>
+    </section>
+
+    <div class="section-title">
+      <h2>ห้องแชทแนะนำ</h2>
+      <span class="online">● Community</span>
+    </div>
+
+    <section class="rooms">
+      <div class="room">
+        <div class="room-icon">🌍</div>
+        <h3>Public Lounge</h3>
+        <p>ห้องพูดคุยทั่วไป</p>
+      </div>
+      <div class="room">
+        <div class="room-icon">☕</div>
+        <h3>Daily Talk</h3>
+        <p>พูดคุยประจำวัน</p>
+      </div>
+      <div class="room">
+        <div class="room-icon">🎮</div>
+        <h3>Hobbies</h3>
+        <p>งานอดิเรกและความสนใจ</p>
+      </div>
+      <div class="room">
+        <div class="room-icon">💬</div>
+        <h3>Meet Friends</h3>
+        <p>พบเพื่อนใหม่</p>
+      </div>
+    </section>
+
+    <div class="section-title">
+      <h2>Public Lounge</h2>
+      <span class="online">● ตัวอย่างหน้าจอ</span>
+    </div>
+
+    <section class="chat-box">
+      <div class="message">
+        <div class="avatar">A</div>
+        <div>
+          <div class="name">Alex</div>
+          <div class="bubble">Hello everyone! Welcome to Vibe Chat 👋</div>
+        </div>
+      </div>
+      <div class="message">
+        <div class="avatar">M</div>
+        <div>
+          <div class="name">Mia</div>
+          <div class="bubble purple">Nice to meet you all! ✨</div>
+        </div>
+      </div>
+      <div class="message">
+        <div class="avatar">J</div>
+        <div>
+          <div class="name">Jamie</div>
+          <div class="bubble">Let's connect and share good vibes!</div>
+        </div>
+      </div>
+      <div class="chat-note">นี่คือตัวอย่างหน้าตาแชท ข้อความยังไม่ใช่แชทจริง</div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active"><span>⌂</span>Home</div>
+    <div class="nav-item"><span>▤</span>Rooms</div>
+    <div class="nav-item"><span>♧</span>Friends</div>
+    <div class="nav-item"><span>◉</span>Profile</div>
+  </nav>
+</body>
+</html>
