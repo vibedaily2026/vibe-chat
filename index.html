@@ -79,11 +79,31 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 <main id="app" class="hidden">
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">แชท</button>
+    <button id="privateChatTab" class="secondary" onclick="showPage('inbox')" data-i18n="privateChatTab">ข้อความส่วนตัว</button>
     <button id="discoverTab" class="secondary" onclick="showPage('discover')" data-i18n="discoverTab">ค้นหาเพื่อน</button>
     <button id="nearbyTab" class="secondary" onclick="showPage('nearby')" data-i18n="nearbyTab">เพื่อนใกล้ฉัน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')" data-i18n="profileTab">โปรไฟล์ของฉัน</button>
   </div>
 
+  <section id="inboxPage" class="card hidden">
+    <h2 data-i18n="privateChatHeading">ข้อความส่วนตัว</h2>
+    <p class="muted" data-i18n="privateChatIntro">พูดคุยแบบส่วนตัวกับสมาชิกคนอื่น</p>
+    <p id="inboxStatus" class="muted"></p>
+    <div id="conversationList"></div>
+  </section>
+  <section id="directChatPage" class="card hidden">
+    <button class="secondary" onclick="showPage('inbox')" data-i18n="backToInbox">← กลับข้อความส่วนตัว</button>
+    <div class="person-top" style="margin-top:16px">
+      <img id="directPeerAvatar" class="person-avatar" alt="Profile">
+      <div><div id="directPeerName" class="person-name"></div><div id="directChatStatus" class="person-username"></div></div>
+    </div>
+    <div id="directMessages" style="height:390px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0"></div>
+    <div class="row">
+      <input id="directMessageInput" maxlength="2000" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendDirectMessage()">
+      <button onclick="sendDirectMessage()" data-i18n="send">ส่ง</button>
+    </div>
+    <p id="directStatus" class="muted"></p>
+  </section>
   <section id="chatPage" class="card">
     <h2 data-i18n="chatHeading">ห้องแชท Vibe</h2>
     <p class="muted" data-i18n="chatIntro">พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่</p>
@@ -126,6 +146,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
       <h2 id="detailName" style="margin:12px 0 5px"></h2>
       <p id="detailUsername" class="muted"></p>
     </div>
+    <button id="detailMessageButton" onclick="startDirectChatFromProfile()" style="width:100%;margin:0 0 18px" data-i18n="sendPrivateMessage">ส่งข้อความส่วนตัว</button>
     <h3 data-i18n="aboutMe">แนะนำตัว</h3>
     <p id="detailBio" style="white-space:pre-wrap"></p>
     <h3 data-i18n="interestsHeading">ความสนใจ</h3>
@@ -228,6 +249,8 @@ async function startApp(user){
   await loadMessages();
   setLanguage(currentLanguage);
   subscribeMessages();
+  await loadConversations();
+  subscribeDirectMessages();
 }
 
 async function loadOrCreateProfile(){
@@ -296,13 +319,14 @@ function profileMessage(message){
 }
 
 function showPage(page){
-  ["chat","discover","nearby","profile","personDetail"].forEach(name=>{
+  ["chat","inbox","directChat","discover","nearby","profile","personDetail"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
-  ["chat","discover","nearby","profile"].forEach(name=>{
+  ["chat","inbox","discover","nearby","profile"].forEach(name=>{
     el(name+"Tab").classList.toggle("active",name===page);
     el(name+"Tab").classList.toggle("secondary",name!==page);
   });
+  if(page==="inbox")loadConversations();
   if(page==="discover")searchPeople();
   if(page==="nearby"){loadNearbyStatus();loadNearbyFriends();}
 }
@@ -388,6 +412,7 @@ async function searchPeople(){
 function showPerson(id){
   const person=peopleResults.find(p=>p.id===id);
   if(!person)return;
+  currentPersonId=id;
   const name=person.display_name||tx("สมาชิก Vibe","Vibe member");
   el("detailAvatar").src=safeImage(person.avatar_url,name);
   el("detailAvatar").onerror=()=>{el("detailAvatar").src=fallbackAvatar(name)};
@@ -406,6 +431,101 @@ function showPerson(id){
   showPage("personDetail");
 }
 
+
+
+let activeConversationId=null;
+let activePeerId=null;
+let directRealtimeChannel=null;
+let directPeerCache={};
+
+async function loadConversations(){
+  if(!currentUser)return;
+  el("inboxStatus").textContent=tx("กำลังโหลดข้อความส่วนตัว...","Loading private messages...");
+  el("conversationList").innerHTML="";
+  const {data,error}=await db.from("conversations").select("id,user_a,user_b,updated_at").order("updated_at",{ascending:false}).limit(100);
+  if(error){el("inboxStatus").textContent=tx("โหลดรายการแชตไม่สำเร็จ: ","Could not load conversations: ")+error.message;return}
+  if(!data||!data.length){el("inboxStatus").textContent=tx("ยังไม่มีข้อความส่วนตัว เริ่มต้นได้จากหน้า “ค้นหาเพื่อน”","No private chats yet. Start one from Discover.");return}
+  const peerIds=[...new Set(data.map(c=>c.user_a===currentUser.id?c.user_b:c.user_a))];
+  const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",peerIds);
+  if(profileError){el("inboxStatus").textContent=profileError.message;return}
+  const byId={};(profiles||[]).forEach(p=>byId[p.id]=p);
+  el("inboxStatus").textContent="";
+  for(const conv of data){
+    const peerId=conv.user_a===currentUser.id?conv.user_b:conv.user_a;
+    const peer=byId[peerId]||{id:peerId,display_name:tx("สมาชิก Vibe","Vibe member")};
+    directPeerCache[peerId]=peer;
+    const row=document.createElement("button");
+    row.className="secondary";
+    row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left";
+    const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
+    const label=document.createElement("span");label.textContent=(peer.display_name||"Vibe member")+"  @"+(peer.username||"user");
+    row.append(img,label);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
+  }
+}
+
+async function openDirectChat(peerId,existingId){
+  if(!currentUser||!peerId)return;
+  el("directStatus").textContent=tx("กำลังเปิดแชต...","Opening chat...");
+  let conversationId=existingId;
+  if(!conversationId){
+    const {data,error}=await db.rpc("open_direct_conversation",{p_other_user_id:peerId});
+    if(error){el("directStatus").textContent=tx("เปิดแชตไม่สำเร็จ: ","Could not open chat: ")+error.message;return}
+    conversationId=data;
+  }
+  activeConversationId=conversationId;activePeerId=peerId;
+  let peer=directPeerCache[peerId];
+  if(!peer){
+    const {data}=await db.from("profiles").select("id,display_name,username,avatar_url").eq("id",peerId).maybeSingle();
+    peer=data||{display_name:tx("สมาชิก Vibe","Vibe member")};directPeerCache[peerId]=peer;
+  }
+  el("directPeerName").textContent=peer.display_name||tx("สมาชิก Vibe","Vibe member");
+  el("directPeerAvatar").src=safeImage(peer.avatar_url,peer.display_name);
+  el("directChatStatus").textContent="@"+(peer.username||"user");
+  el("directStatus").textContent="";
+  showPage("directChat");await loadDirectMessages();
+}
+
+async function startDirectChatFromProfile(){
+  const person=peopleResults.find(p=>p.id===currentPersonId);
+  if(!person)return;
+  directPeerCache[person.id]=person;
+  await openDirectChat(person.id);
+}
+let currentPersonId=null;
+
+async function loadDirectMessages(){
+  if(!activeConversationId)return;
+  const {data,error}=await db.from("direct_messages").select("id,sender_id,message_type,body,created_at").eq("conversation_id",activeConversationId).order("created_at",{ascending:true}).limit(200);
+  if(error){el("directStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
+  const box=el("directMessages");box.innerHTML="";
+  (data||[]).forEach(m=>{
+    const wrap=document.createElement("div");wrap.style.cssText="display:flex;margin:8px 0;justify-content:"+(m.sender_id===currentUser.id?"flex-end":"flex-start");
+    const bubble=document.createElement("div");bubble.style.cssText="max-width:82%;padding:10px 13px;border-radius:13px;background:"+(m.sender_id===currentUser.id?"#e7efff":"white")+";border:1px solid #e5ebf4;overflow-wrap:anywhere";
+    const content=document.createElement("div");content.textContent=m.body||"";
+    const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
+    bubble.append(content,time);wrap.append(bubble);box.append(wrap);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+
+async function sendDirectMessage(){
+  if(!activeConversationId||!currentUser)return;
+  const body=el("directMessageInput").value.trim();if(!body)return;
+  el("directMessageInput").disabled=true;
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body});
+  el("directMessageInput").disabled=false;
+  if(error){el("directStatus").textContent=tx("ส่งข้อความไม่สำเร็จ: ","Message failed: ")+error.message;return}
+  el("directMessageInput").value="";await loadDirectMessages();await loadConversations();
+}
+
+function subscribeDirectMessages(){
+  if(directRealtimeChannel)db.removeChannel(directRealtimeChannel);
+  directRealtimeChannel=db.channel("private-chat-"+currentUser.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},payload=>{
+      if(payload.new&&payload.new.conversation_id===activeConversationId)loadDirectMessages();
+      loadConversations();
+    }).subscribe();
+}
 
 async function loadNearbyStatus(){
   if(!currentUser)return;
