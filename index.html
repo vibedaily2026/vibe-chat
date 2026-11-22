@@ -490,7 +490,7 @@ async function loadBlockedUsers(){
     const info=document.createElement("div");info.style.cssText="display:flex;align-items:center;gap:10px;min-width:0";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person?.avatar_url,person?.display_name||"ACHI member");img.alt="";
     const labels=document.createElement("div");
-    const name=document.createElement("div");name.className="person-name";name.textContent=person?.display_name||tx("สมาชิก ACHI","ACHI member");
+    const name=document.createElement("div");name.className="person-name";name.textContent=person?.display_name?.trim()||(person?.username?"@"+person.username:tx("สมาชิก ACHI","ACHI member"));
     const username=document.createElement("div");username.className="person-username";username.textContent=person?.username?"@"+person.username:"";
     labels.append(name,username);info.append(img,labels);
     const button=document.createElement("button");button.className="secondary";button.textContent=tx("เลิกบล็อก","Unblock");button.onclick=()=>unblockMember(block.id,person?.display_name||"ACHI member");
