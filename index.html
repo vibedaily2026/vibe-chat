@@ -101,6 +101,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .feature:nth-child(4){background:#F0F5FF}
 .feature h3{color:#292D50}
 .landing-bottom{background:#202943}
+.settings-group{border-top:1px solid #e9edf5;padding:18px 0}.settings-group h3{margin:0 0 8px;color:#202943}.settings-group .row{display:flex;gap:10px;flex-wrap:wrap}.settings-group .person{background:#f7f8ff;border:1px solid #e9edf5;border-radius:14px;padding:10px}
 .lang-switch{background:#F0EFFF}
 .lang-switch button.selected{color:#5147C7}
 #directMessages{background:#F5F5FF!important}
@@ -144,6 +145,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="discoverTab" class="secondary" onclick="showPage('discover')" data-i18n="discoverTab">ค้นหาเพื่อน</button>
     <button id="nearbyTab" class="secondary" onclick="showPage('nearby')" data-i18n="nearbyTab">เพื่อนใกล้ฉัน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')" data-i18n="profileTab">โปรไฟล์ของฉัน</button>
+    <button id="settingsTab" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button>
     <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
 
@@ -239,10 +241,44 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button onclick="saveProfile()" data-i18n="saveProfile">บันทึกโปรไฟล์</button>
     <p id="profileStatus" class="notice hidden"></p>
   </section>
+  <section id="settingsPage" class="card hidden">
+    <h2 data-i18n="settingsHeading">ตั้งค่า</h2>
+    <p class="muted" data-i18n="settingsIntro">จัดการภาษา การแจ้งเตือน ความเป็นส่วนตัว และบัญชีของคุณ</p>
+    <div class="settings-group">
+      <h3 data-i18n="settingsLanguage">ภาษา</h3>
+      <p class="muted" data-i18n="settingsLanguageHint">เลือกภาษาไทยหรือภาษาอังกฤษ</p>
+      <div class="row"><button class="secondary" type="button" onclick="setLanguage('th')">ไทย</button><button class="secondary" type="button" onclick="setLanguage('en')">English</button></div>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="settingsNotifications">การแจ้งเตือน</h3>
+      <p class="muted" data-i18n="settingsSoundHint">เปิดหรือปิดเสียง ACHI! เมื่อมีข้อความใหม่</p>
+      <button id="settingsSoundToggle" class="secondary" type="button" onclick="toggleNotificationSound()">🔇 เสียงปิด</button>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="settingsPrivacy">ความเป็นส่วนตัวและตำแหน่ง</h3>
+      <p id="settingsNearbyStatus" class="muted" data-i18n="settingsNearbyChecking">กำลังตรวจสอบสถานะ...</p>
+      <p class="muted" data-i18n="settingsNearbyHint">การแชร์ตำแหน่งเป็นทางเลือก ปิดได้ทุกเมื่อ และแสดงเฉพาะระยะทางโดยประมาณ</p>
+      <div class="row">
+        <button id="settingsNearbyEnable" type="button" onclick="enableNearbyFromSettings()" data-i18n="enableLocation">เปิดแชร์ตำแหน่ง</button>
+        <button id="settingsNearbyDisable" class="secondary hidden" type="button" onclick="disableNearbyFromSettings()" data-i18n="disableLocation">ปิดแชร์ตำแหน่ง</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="settingsBlocked">สมาชิกที่บล็อก</h3>
+      <p class="muted" data-i18n="settingsBlockedHint">ดูรายชื่อและเลือกเลิกบล็อกสมาชิกได้</p>
+      <p id="settingsBlockedStatus" class="muted"></p>
+      <div id="settingsBlockedList"></div>
+    </div>
+    <div class="settings-group">
+      <h3 data-i18n="settingsAccount">บัญชี</h3>
+      <p class="muted"><span data-i18n="settingsSignedInAs">เข้าสู่ระบบด้วย</span>: <strong id="settingsAccountEmail"></strong></p>
+      <button class="secondary" type="button" onclick="logout()" data-i18n="logout">ออกจากระบบ</button>
+    </div>
+  </section>
 </main>
 
 <script>
-const dict={th:{eyebrow:"✦ โลกของคุณ ผู้คนของคุณ ในแบบ ACHI",heroTitle:"โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span>",heroText:"พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี สไตล์เดียวกับคุณ เดียวกับคุณ",join:"สมัครสมาชิกฟรี",login:"เข้าสู่ระบบ",features:"ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย",featureSub:"พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่",chatTitle:"พูดคุยและแบ่งปัน",chatText:"เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ",friendsTitle:"ค้นพบเพื่อนใหม่",friendsText:"ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ",nearbyTitle:"เพื่อนใกล้ตัว",nearbyText:"เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ",communityTitle:"ชุมชนที่เป็นมิตร",communityText:"พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย",bottomTitle:"พร้อมพบเพื่อนที่ สไตล์เดียวกับคุณ ตรงกันหรือยัง?",bottomText:"เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้",backHome:"← กลับหน้าแรก",logout:"ออกจากระบบ",chatTab:"แชท",privateChatTab:"ข้อความส่วนตัว",privateChatHeading:"ข้อความส่วนตัว",privateChatIntro:"พูดคุยแบบส่วนตัวกับสมาชิกคนอื่น",backToInbox:"← กลับข้อความส่วนตัว",sendPrivateMessage:"ส่งข้อความส่วนตัว",discoverTab:"ค้นหาเพื่อน",nearbyTab:"เพื่อนใกล้ฉัน",profileTab:"โปรไฟล์ของฉัน",chatHeading:"ห้องแชท ACHI",chatIntro:"พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่",send:"ส่ง",discoverHeading:"ค้นหาเพื่อนใหม่",discoverIntro:"ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน",searchPlaceholder:"ค้นหาจากชื่อหรือ Username...",search:"ค้นหา",nearbyHeading:"เพื่อนใกล้ฉัน",nearbyIntro:"ค้นหาสมาชิก ACHI ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง",enableLocation:"เปิดแชร์ตำแหน่ง",disableLocation:"ปิดแชร์ตำแหน่ง",detailBack:"← กลับไปค้นหาเพื่อน",aboutMe:"แนะนำตัว",interestsHeading:"ความสนใจ",profileHeading:"โปรไฟล์ของฉัน",profileIntro:"ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น",memberLabel:"สมาชิก ACHI",usernameLabel:"ชื่อผู้ใช้ (Username)",usernamePlaceholder:"เช่น achi_user",displayNameLabel:"ชื่อที่แสดง",displayNamePlaceholder:"ชื่อที่อยากให้คนอื่นเห็น",avatarLabel:"ลิงก์รูปโปรไฟล์",bioLabel:"แนะนำตัว",bioPlaceholder:"เล่าเกี่ยวกับตัวคุณสักนิด...",interestsLabel:"ความสนใจ",interestsPlaceholder:"เช่น เพลง, หนัง, ท่องเที่ยว, เกม",interestsHint:"คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)",saveProfile:"บันทึกโปรไฟล์",messagePlaceholder:"พิมพ์ข้อความ..."},en:{eyebrow:"✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.",heroTitle:"A world of new friends<br><span>starts right here</span>",heroText:"Make meaningful connections. Chat, share what you love, and meet people who are on your wavelength.",join:"Join for free",login:"Log in",features:"Every great connection starts with hello",featureSub:"A welcoming space to discover a whole new world",chatTitle:"Chat & Share",chatText:"Start conversations and exchange stories with new people.",friendsTitle:"Discover Friends",friendsText:"Meet people who share your interests and passions.",nearbyTitle:"People Nearby",nearbyText:"Opt in to location sharing and discover people around you.",communityTitle:"A Friendly Community",communityText:"Find welcoming spaces for every interest and conversation.",bottomTitle:"Ready to meet your kind of people?",bottomText:"Start making meaningful connections today.",backHome:"← Back to home",logout:"Log out",chatTab:"Chat",privateChatTab:"Private messages",privateChatHeading:"Private messages",privateChatIntro:"Have a private conversation with other members",backToInbox:"← Back to private messages",sendPrivateMessage:"Send a private message",discoverTab:"Discover",nearbyTab:"People nearby",profileTab:"My profile",chatHeading:"ACHI Room",chatIntro:"Chat with other members here",send:"Send",discoverHeading:"Discover new friends",discoverIntro:"Meet ACHI members who share your interests",searchPlaceholder:"Search by name or username...",search:"Search",nearbyHeading:"People nearby",nearbyIntro:"Discover nearby ACHI members. Location sharing is optional. Only approximate distance is shown, never exact coordinates or addresses.",enableLocation:"Enable location sharing",disableLocation:"Turn off location sharing",detailBack:"← Back to discover",aboutMe:"About me",interestsHeading:"Interests",profileHeading:"My profile",profileIntro:"Help other members get to know you",memberLabel:"ACHI member",usernameLabel:"Username",usernamePlaceholder:"e.g. achi_user",displayNameLabel:"Display name",displayNamePlaceholder:"The name others will see",avatarLabel:"Profile photo URL",bioLabel:"About me",bioPlaceholder:"Tell others a little about yourself...",interestsLabel:"Interests",interestsPlaceholder:"e.g. music, movies, travel, games",interestsHint:"Separate each interest with a comma (,)",saveProfile:"Save profile",messagePlaceholder:"Type a message..."}};let currentLanguage=(localStorage.getItem("achi-language")||localStorage.getItem("vibe-language"))==="en"?"en":"th";function setLanguage(lang){currentLanguage=lang==="en"?"en":"th";localStorage.setItem("achi-language",currentLanguage);document.documentElement.lang=currentLanguage;const thButton=el("langTh"),enButton=el("langEn");if(thButton)thButton.classList.toggle("selected",currentLanguage==="th");if(enButton)enButton.classList.toggle("selected",currentLanguage==="en");document.querySelectorAll("[data-i18n]").forEach(node=>{const key=node.getAttribute("data-i18n");const value=dict[currentLanguage][key];if(typeof value==="string")node.innerHTML=value});document.querySelectorAll("[data-i18n-placeholder]").forEach(node=>{const key=node.getAttribute("data-i18n-placeholder");const value=dict[currentLanguage][key];if(typeof value==="string")node.placeholder=value});if(el("authSubtitle"))el("authSubtitle").textContent=currentLanguage==="en"?"A place to connect and meet new friends":"พื้นที่พูดคุยและพบเพื่อนใหม่";if(el("authTitle"))el("authTitle").textContent=isSignup?(currentLanguage==="en"?"Create your ACHI account":"สมัครสมาชิก ACHI"):(currentLanguage==="en"?"Welcome to ACHI":"เข้าสู่ ACHI");const labels=document.querySelectorAll("#authBox label");if(labels[0])labels[0].textContent=currentLanguage==="en"?"Email":"อีเมล";if(labels[1])labels[1].textContent=currentLanguage==="en"?"Password":"รหัสผ่าน";if(el("email"))el("email").placeholder=currentLanguage==="en"?"Enter your email":"กรอกอีเมล";if(el("password"))el("password").placeholder=currentLanguage==="en"?"Enter your password":"กรอกรหัสผ่าน";if(el("authButton"))el("authButton").textContent=isSignup?(currentLanguage==="en"?"Create account":"สมัครสมาชิก"):(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ");if(el("authSwitchText"))el("authSwitchText").innerHTML=(isSignup?(currentLanguage==="en"?"Already a member? ":"มีบัญชีแล้ว? "):(currentLanguage==="en"?"New here? ":"ยังไม่มีบัญชี? "))+'<a href="#" onclick="toggleAuth();return false">'+(isSignup?(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ"):(currentLanguage==="en"?"Create an account":"สมัครสมาชิก"))+'</a>';updateNotificationSoundButton();}
+const dict={th:{eyebrow:"✦ โลกของคุณ ผู้คนของคุณ ในแบบ ACHI",heroTitle:"โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span>",heroText:"พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี สไตล์เดียวกับคุณ เดียวกับคุณ",join:"สมัครสมาชิกฟรี",login:"เข้าสู่ระบบ",features:"ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย",featureSub:"พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่",chatTitle:"พูดคุยและแบ่งปัน",chatText:"เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ",friendsTitle:"ค้นพบเพื่อนใหม่",friendsText:"ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ",nearbyTitle:"เพื่อนใกล้ตัว",nearbyText:"เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ",communityTitle:"ชุมชนที่เป็นมิตร",communityText:"พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย",bottomTitle:"พร้อมพบเพื่อนที่ สไตล์เดียวกับคุณ ตรงกันหรือยัง?",bottomText:"เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้",backHome:"← กลับหน้าแรก",logout:"ออกจากระบบ",chatTab:"แชท",privateChatTab:"ข้อความส่วนตัว",privateChatHeading:"ข้อความส่วนตัว",privateChatIntro:"พูดคุยแบบส่วนตัวกับสมาชิกคนอื่น",backToInbox:"← กลับข้อความส่วนตัว",sendPrivateMessage:"ส่งข้อความส่วนตัว",discoverTab:"ค้นหาเพื่อน",nearbyTab:"เพื่อนใกล้ฉัน",profileTab:"โปรไฟล์ของฉัน",settingsTab:"ตั้งค่า",settingsHeading:"ตั้งค่า",settingsIntro:"จัดการภาษา การแจ้งเตือน ความเป็นส่วนตัว และบัญชีของคุณ",settingsLanguage:"ภาษา",settingsLanguageHint:"เลือกภาษาไทยหรือภาษาอังกฤษ",settingsNotifications:"การแจ้งเตือน",settingsSoundHint:"เปิดหรือปิดเสียง ACHI! เมื่อมีข้อความใหม่",settingsPrivacy:"ความเป็นส่วนตัวและตำแหน่ง",settingsNearbyChecking:"กำลังตรวจสอบสถานะ...",settingsNearbyHint:"การแชร์ตำแหน่งเป็นทางเลือก ปิดได้ทุกเมื่อ และแสดงเฉพาะระยะทางโดยประมาณ",settingsBlocked:"สมาชิกที่บล็อก",settingsBlockedHint:"ดูรายชื่อและเลือกเลิกบล็อกสมาชิกได้",settingsAccount:"บัญชี",settingsSignedInAs:"เข้าสู่ระบบด้วย",chatHeading:"ห้องแชท ACHI",chatIntro:"พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่",send:"ส่ง",discoverHeading:"ค้นหาเพื่อนใหม่",discoverIntro:"ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน",searchPlaceholder:"ค้นหาจากชื่อหรือ Username...",search:"ค้นหา",nearbyHeading:"เพื่อนใกล้ฉัน",nearbyIntro:"ค้นหาสมาชิก ACHI ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง",enableLocation:"เปิดแชร์ตำแหน่ง",disableLocation:"ปิดแชร์ตำแหน่ง",detailBack:"← กลับไปค้นหาเพื่อน",aboutMe:"แนะนำตัว",interestsHeading:"ความสนใจ",profileHeading:"โปรไฟล์ของฉัน",profileIntro:"ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น",memberLabel:"สมาชิก ACHI",usernameLabel:"ชื่อผู้ใช้ (Username)",usernamePlaceholder:"เช่น achi_user",displayNameLabel:"ชื่อที่แสดง",displayNamePlaceholder:"ชื่อที่อยากให้คนอื่นเห็น",avatarLabel:"ลิงก์รูปโปรไฟล์",bioLabel:"แนะนำตัว",bioPlaceholder:"เล่าเกี่ยวกับตัวคุณสักนิด...",interestsLabel:"ความสนใจ",interestsPlaceholder:"เช่น เพลง, หนัง, ท่องเที่ยว, เกม",interestsHint:"คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)",saveProfile:"บันทึกโปรไฟล์",messagePlaceholder:"พิมพ์ข้อความ..."},en:{eyebrow:"✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.",heroTitle:"A world of new friends<br><span>starts right here</span>",heroText:"Make meaningful connections. Chat, share what you love, and meet people who are on your wavelength.",join:"Join for free",login:"Log in",features:"Every great connection starts with hello",featureSub:"A welcoming space to discover a whole new world",chatTitle:"Chat & Share",chatText:"Start conversations and exchange stories with new people.",friendsTitle:"Discover Friends",friendsText:"Meet people who share your interests and passions.",nearbyTitle:"People Nearby",nearbyText:"Opt in to location sharing and discover people around you.",communityTitle:"A Friendly Community",communityText:"Find welcoming spaces for every interest and conversation.",bottomTitle:"Ready to meet your kind of people?",bottomText:"Start making meaningful connections today.",backHome:"← Back to home",logout:"Log out",chatTab:"Chat",privateChatTab:"Private messages",privateChatHeading:"Private messages",privateChatIntro:"Have a private conversation with other members",backToInbox:"← Back to private messages",sendPrivateMessage:"Send a private message",discoverTab:"Discover",nearbyTab:"People nearby",profileTab:"My profile",settingsTab:"Settings",settingsHeading:"Settings",settingsIntro:"Manage your language, notifications, privacy, and account.",settingsLanguage:"Language",settingsLanguageHint:"Choose Thai or English.",settingsNotifications:"Notifications",settingsSoundHint:"Turn the ACHI! sound on or off for new messages.",settingsPrivacy:"Privacy & location",settingsNearbyChecking:"Checking location status...",settingsNearbyHint:"Location sharing is optional. You can turn it off at any time. Only approximate distance is shown.",settingsBlocked:"Blocked members",settingsBlockedHint:"View your blocked list and unblock members.",settingsAccount:"Account",settingsSignedInAs:"Signed in as",chatHeading:"ACHI Room",chatIntro:"Chat with other members here",send:"Send",discoverHeading:"Discover new friends",discoverIntro:"Meet ACHI members who share your interests",searchPlaceholder:"Search by name or username...",search:"Search",nearbyHeading:"People nearby",nearbyIntro:"Discover nearby ACHI members. Location sharing is optional. Only approximate distance is shown, never exact coordinates or addresses.",enableLocation:"Enable location sharing",disableLocation:"Turn off location sharing",detailBack:"← Back to discover",aboutMe:"About me",interestsHeading:"Interests",profileHeading:"My profile",profileIntro:"Help other members get to know you",memberLabel:"ACHI member",usernameLabel:"Username",usernamePlaceholder:"e.g. achi_user",displayNameLabel:"Display name",displayNamePlaceholder:"The name others will see",avatarLabel:"Profile photo URL",bioLabel:"About me",bioPlaceholder:"Tell others a little about yourself...",interestsLabel:"Interests",interestsPlaceholder:"e.g. music, movies, travel, games",interestsHint:"Separate each interest with a comma (,)",saveProfile:"Save profile",messagePlaceholder:"Type a message..."}};let currentLanguage=(localStorage.getItem("achi-language")||localStorage.getItem("vibe-language"))==="en"?"en":"th";function setLanguage(lang){currentLanguage=lang==="en"?"en":"th";localStorage.setItem("achi-language",currentLanguage);document.documentElement.lang=currentLanguage;const thButton=el("langTh"),enButton=el("langEn");if(thButton)thButton.classList.toggle("selected",currentLanguage==="th");if(enButton)enButton.classList.toggle("selected",currentLanguage==="en");document.querySelectorAll("[data-i18n]").forEach(node=>{const key=node.getAttribute("data-i18n");const value=dict[currentLanguage][key];if(typeof value==="string")node.innerHTML=value});document.querySelectorAll("[data-i18n-placeholder]").forEach(node=>{const key=node.getAttribute("data-i18n-placeholder");const value=dict[currentLanguage][key];if(typeof value==="string")node.placeholder=value});if(el("authSubtitle"))el("authSubtitle").textContent=currentLanguage==="en"?"A place to connect and meet new friends":"พื้นที่พูดคุยและพบเพื่อนใหม่";if(el("authTitle"))el("authTitle").textContent=isSignup?(currentLanguage==="en"?"Create your ACHI account":"สมัครสมาชิก ACHI"):(currentLanguage==="en"?"Welcome to ACHI":"เข้าสู่ ACHI");const labels=document.querySelectorAll("#authBox label");if(labels[0])labels[0].textContent=currentLanguage==="en"?"Email":"อีเมล";if(labels[1])labels[1].textContent=currentLanguage==="en"?"Password":"รหัสผ่าน";if(el("email"))el("email").placeholder=currentLanguage==="en"?"Enter your email":"กรอกอีเมล";if(el("password"))el("password").placeholder=currentLanguage==="en"?"Enter your password":"กรอกรหัสผ่าน";if(el("authButton"))el("authButton").textContent=isSignup?(currentLanguage==="en"?"Create account":"สมัครสมาชิก"):(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ");if(el("authSwitchText"))el("authSwitchText").innerHTML=(isSignup?(currentLanguage==="en"?"Already a member? ":"มีบัญชีแล้ว? "):(currentLanguage==="en"?"New here? ":"ยังไม่มีบัญชี? "))+'<a href="#" onclick="toggleAuth();return false">'+(isSignup?(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ"):(currentLanguage==="en"?"Create an account":"สมัครสมาชิก"))+'</a>';updateNotificationSoundButton();}
 function openAuth(mode){el("landing").classList.add("hidden");el("authBox").classList.remove("hidden");isSignup=mode==="signup";el("authButton").onclick=isSignup?signup:login;setLanguage(currentLanguage);window.scrollTo({top:0,behavior:"smooth"});}
 function tx(th,en){return currentLanguage==="en"?en:th}
 const SUPABASE_URL="https://epdbfncrfjyrgqwjyctu.supabase.co";
@@ -267,6 +303,12 @@ function updateNotificationSoundButton(){
     :tx("🔇 เสียงปิด","🔇 Sound off");
   button.classList.toggle("active",notificationSoundEnabled);
   button.classList.toggle("secondary",!notificationSoundEnabled);
+  const settingsButton=el("settingsSoundToggle");
+  if(settingsButton){
+    settingsButton.textContent=notificationSoundEnabled?tx("🔊 เสียงเปิด","🔊 Sound on"):tx("🔇 เสียงปิด","🔇 Sound off");
+    settingsButton.classList.toggle("active",notificationSoundEnabled);
+    settingsButton.classList.toggle("secondary",!notificationSoundEnabled);
+  }
 }
   
 async function playAchiNotification(){
@@ -411,11 +453,58 @@ function profileMessage(message){
   el("profileStatus").classList.remove("hidden");
 }
 
+async function loadSettings(){
+  if(!currentUser)return;
+  el("settingsAccountEmail").textContent=currentUser.email||"";
+  updateNotificationSoundButton();
+  const {data:enabled,error}=await db.rpc("my_location_enabled");
+  if(error){
+    el("settingsNearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+error.message;
+  }else{
+    el("settingsNearbyStatus").textContent=enabled?tx("กำลังแชร์ตำแหน่งอยู่","Location sharing is on"):tx("ยังไม่ได้เปิดแชร์ตำแหน่ง","Location sharing is off");
+    el("settingsNearbyEnable").classList.toggle("hidden",!!enabled);
+    el("settingsNearbyDisable").classList.toggle("hidden",!enabled);
+  }
+  await loadBlockedUsers();
+}
+async function enableNearbyFromSettings(){await enableNearby();await loadSettings();}
+async function disableNearbyFromSettings(){await disableNearby();await loadSettings();}
+async function loadBlockedUsers(){
+  const status=el("settingsBlockedStatus"),list=el("settingsBlockedList");
+  status.textContent=tx("กำลังโหลดรายการ...","Loading...");
+  list.innerHTML="";
+  const {data:blocks,error}=await db.from("user_blocks").select("id,blocked_id").eq("blocker_id",currentUser.id).order("created_at",{ascending:false});
+  if(error){status.textContent=tx("โหลดรายการไม่สำเร็จ: ","Could not load list: ")+error.message;return}
+  if(!blocks||!blocks.length){status.textContent=tx("คุณยังไม่ได้บล็อกสมาชิก","You haven't blocked anyone");return}
+  const ids=blocks.map(x=>x.blocked_id);
+  const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",ids);
+  if(profileError){status.textContent=tx("โหลดข้อมูลสมาชิกไม่สำเร็จ: ","Could not load profiles: ")+profileError.message;return}
+  const byId={};(profiles||[]).forEach(p=>byId[p.id]=p);
+  status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length;
+  blocks.forEach(block=>{
+    const person=byId[block.blocked_id];
+    const row=document.createElement("div");row.className="person";row.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0";
+    const info=document.createElement("div");info.style.cssText="display:flex;align-items:center;gap:10px;min-width:0";
+    const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person?.avatar_url,person?.display_name||"ACHI member");img.alt="";
+    const labels=document.createElement("div");
+    const name=document.createElement("div");name.className="person-name";name.textContent=person?.display_name||tx("สมาชิก ACHI","ACHI member");
+    const username=document.createElement("div");username.className="person-username";username.textContent=person?.username?"@"+person.username:"";
+    labels.append(name,username);info.append(img,labels);
+    const button=document.createElement("button");button.className="secondary";button.textContent=tx("เลิกบล็อก","Unblock");button.onclick=()=>unblockMember(block.id,person?.display_name||"ACHI member");
+    row.append(info,button);list.appendChild(row);
+  });
+}
+async function unblockMember(blockId,name){
+  if(!confirm(tx("ต้องการเลิกบล็อก ","Unblock ")+name+"?"))return;
+  const {error}=await db.from("user_blocks").delete().eq("id",blockId).eq("blocker_id",currentUser.id);
+  if(error){el("settingsBlockedStatus").textContent=tx("เลิกบล็อกไม่สำเร็จ: ","Could not unblock: ")+error.message;return}
+  await loadBlockedUsers();
+}
 function showPage(page){
-  ["chat","inbox","directChat","discover","nearby","profile","personDetail"].forEach(name=>{
+  ["chat","inbox","directChat","discover","nearby","profile","personDetail","settings"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
-  const tabIds={chat:"chatTab",inbox:"privateChatTab",discover:"discoverTab",nearby:"nearbyTab",profile:"profileTab"};
+  const tabIds={chat:"chatTab",inbox:"privateChatTab",discover:"discoverTab",nearby:"nearbyTab",profile:"profileTab",settings:"settingsTab"};
   Object.entries(tabIds).forEach(([name,id])=>{
     el(id).classList.toggle("active",name===page);
     el(id).classList.toggle("secondary",name!==page);
@@ -423,6 +512,7 @@ function showPage(page){
   if(page==="inbox")loadConversations();
   if(page==="discover")searchPeople();
   if(page==="nearby"){loadNearbyStatus();loadNearbyFriends();}
+  if(page==="settings")loadSettings();
 }
 
 async function searchPeople(){
