@@ -105,6 +105,9 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .lang-switch{background:#F0EFFF}
 .lang-switch button.selected{color:#5147C7}
 #directMessages{background:#F5F5FF!important}
+#privateChatTab{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#FF3158;color:#fff;font-size:12px;font-weight:900;line-height:1;box-shadow:0 2px 9px #FF315866;border:2px solid #fff}
+.unread-badge.hidden{display:none!important}
 @media(max-width:800px){.hero{background:linear-gradient(145deg,#F0EFFF,#F7F8FF 65%,#EAF1FF)}}
 </style>
 </head>
@@ -141,7 +144,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <main id="app" class="hidden">
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">แชท</button>
-    <button id="privateChatTab" class="secondary" onclick="showPage('inbox')" data-i18n="privateChatTab">ข้อความส่วนตัว</button>
+    <button id="privateChatTab" class="secondary" onclick="showPage('inbox')" data-i18n="privateChatTab">ข้อความส่วนตัว <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
     <button id="discoverTab" class="secondary" onclick="showPage('discover')" data-i18n="discoverTab">ค้นหาเพื่อน</button>
     <button id="nearbyTab" class="secondary" onclick="showPage('nearby')" data-i18n="nearbyTab">เพื่อนใกล้ฉัน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')" data-i18n="profileTab">โปรไฟล์ของฉัน</button>
@@ -622,12 +625,37 @@ let activePeerId=null;
 let directRealtimeChannel=null;
 let directPeerCache={};
 
+async function updatePrivateUnreadBadge(){
+  if(!currentUser)return;
+  const badge=el("privateUnreadBadge");if(!badge)return;
+  const {data:conversations,error}=await db.from("conversations").select("id").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).limit(100);
+  if(error){console.warn("Unread conversations:",error.message);return}
+  const ids=(conversations||[]).map(c=>c.id);
+  if(!ids.length){badge.textContent="0";badge.classList.add("hidden");return}
+  const {data:participants,error:participantError}=await db.from("conversation_participants").select("conversation_id,last_read_at").eq("user_id",currentUser.id).in("conversation_id",ids);
+  if(participantError){console.warn("Unread read markers:",participantError.message);return}
+  const readAt={};(participants||[]).forEach(p=>readAt[p.conversation_id]=p.last_read_at||"1970-01-01T00:00:00Z");
+  const earliest=Object.values(readAt).sort()[0]||"1970-01-01T00:00:00Z";
+  const {data:messages,error:messageError}=await db.from("direct_messages").select("conversation_id,created_at").in("conversation_id",ids).neq("sender_id",currentUser.id).gt("created_at",earliest).limit(1000);
+  if(messageError){console.warn("Unread messages:",messageError.message);return}
+  let total=0;(messages||[]).forEach(m=>{if(m.created_at>(readAt[m.conversation_id]||"1970-01-01T00:00:00Z"))total++});
+  badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0);
+}
+
+async function markConversationRead(conversationId){
+  if(!currentUser||!conversationId)return;
+  const {error}=await db.from("conversation_participants").update({last_read_at:new Date().toISOString()}).eq("conversation_id",conversationId).eq("user_id",currentUser.id);
+  if(error)console.warn("Could not mark private messages read:",error.message);
+  await updatePrivateUnreadBadge();
+}
+
 async function loadConversations(){
   if(!currentUser)return;
   el("inboxStatus").textContent=tx("กำลังโหลดข้อความส่วนตัว...","Loading private messages...");
   el("conversationList").innerHTML="";
   const {data,error}=await db.from("conversations").select("id,user_a,user_b,updated_at").order("updated_at",{ascending:false}).limit(100);
   if(error){el("inboxStatus").textContent=tx("โหลดรายการแชตไม่สำเร็จ: ","Could not load conversations: ")+error.message;return}
+  await updatePrivateUnreadBadge();
   if(!data||!data.length){el("inboxStatus").textContent=tx("ยังไม่มีข้อความส่วนตัว เริ่มต้นได้จากหน้า “ค้นหาเพื่อน”","No private chats yet. Start one from Discover.");return}
   const peerIds=[...new Set(data.map(c=>c.user_a===currentUser.id?c.user_b:c.user_a))];
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",peerIds);
@@ -666,7 +694,7 @@ async function openDirectChat(peerId,existingId){
   el("directPeerAvatar").src=safeImage(peer.avatar_url,peer.display_name);
   el("directChatStatus").textContent="@"+(peer.username||"user");
   el("directStatus").textContent="";
-  showPage("directChat");await loadDirectMessages();
+  showPage("directChat");await loadDirectMessages();await markConversationRead(conversationId);
 }
 
 async function startDirectChatFromProfile(){
@@ -707,8 +735,10 @@ function subscribeDirectMessages(){
   directRealtimeChannel=db.channel("private-chat-"+currentUser.id)
     .on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},payload=>{
       if(payload.eventType==="INSERT"&&payload.new?.sender_id!==currentUser?.id)playAchiNotification();
-      if(payload.new&&payload.new.conversation_id===activeConversationId)loadDirectMessages();
-      loadConversations();
+      if(payload.new&&payload.new.conversation_id===activeConversationId){
+        loadDirectMessages().then(()=>{if(!el("directChatPage").classList.contains("hidden"))markConversationRead(activeConversationId)});
+      }
+      updatePrivateUnreadBadge();loadConversations();
     }).subscribe();
 }
 
