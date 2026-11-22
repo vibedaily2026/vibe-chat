@@ -631,15 +631,23 @@ async function updatePrivateUnreadBadge(){
   const {data:conversations,error}=await db.from("conversations").select("id").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).limit(100);
   if(error){console.warn("Unread conversations:",error.message);return}
   const ids=(conversations||[]).map(c=>c.id);
-  if(!ids.length){badge.textContent="0";badge.classList.add("hidden");return}
-  const {data:participants,error:participantError}=await db.from("conversation_participants").select("conversation_id,last_read_at").eq("user_id",currentUser.id).in("conversation_id",ids);
-  if(participantError){console.warn("Unread read markers:",participantError.message);return}
-  const readAt={};(participants||[]).forEach(p=>readAt[p.conversation_id]=p.last_read_at||"1970-01-01T00:00:00Z");
-  const earliest=Object.values(readAt).sort()[0]||"1970-01-01T00:00:00Z";
-  const {data:messages,error:messageError}=await db.from("direct_messages").select("conversation_id,created_at").in("conversation_id",ids).neq("sender_id",currentUser.id).gt("created_at",earliest).limit(1000);
-  if(messageError){console.warn("Unread messages:",messageError.message);return}
-  let total=0;(messages||[]).forEach(m=>{if(m.created_at>(readAt[m.conversation_id]||"1970-01-01T00:00:00Z"))total++});
+  const unreadByConversation={};
+  if(ids.length){
+    const {data:participants,error:participantError}=await db.from("conversation_participants").select("conversation_id,last_read_at").eq("user_id",currentUser.id).in("conversation_id",ids);
+    if(participantError){console.warn("Unread read markers:",participantError.message);return}
+    const readAt={};(participants||[]).forEach(p=>readAt[p.conversation_id]=p.last_read_at||"1970-01-01T00:00:00Z");
+    const earliest=Object.values(readAt).sort()[0]||"1970-01-01T00:00:00Z";
+    const {data:messages,error:messageError}=await db.from("direct_messages").select("conversation_id,created_at").in("conversation_id",ids).neq("sender_id",currentUser.id).gt("created_at",earliest).limit(1000);
+    if(messageError){console.warn("Unread messages:",messageError.message);return}
+    (messages||[]).forEach(m=>{if(m.created_at>(readAt[m.conversation_id]||"1970-01-01T00:00:00Z"))unreadByConversation[m.conversation_id]=(unreadByConversation[m.conversation_id]||0)+1});
+  }
+  const total=Object.values(unreadByConversation).reduce((sum,count)=>sum+count,0);
   badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0);
+  document.querySelectorAll("[data-conversation-id]").forEach(row=>{
+    const count=unreadByConversation[row.dataset.conversationId]||0;
+    const rowBadge=row.querySelector(".conversation-unread-badge");
+    if(rowBadge){rowBadge.textContent=count>99?"99+":String(count);rowBadge.classList.toggle("hidden",count===0)}
+  });
 }
 
 async function markConversationRead(conversationId){
@@ -668,11 +676,14 @@ async function loadConversations(){
     directPeerCache[peerId]=peer;
     const row=document.createElement("button");
     row.className="secondary";
+    row.dataset.conversationId=conv.id;
     row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
-    const label=document.createElement("span");label.textContent=(peer.display_name||"ACHI member")+"  @"+(peer.username||"user");
-    row.append(img,label);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
+    const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left";label.textContent=(peer.display_name||"ACHI member")+"  @"+(peer.username||"user");
+    const unread=document.createElement("span");unread.className="unread-badge conversation-unread-badge hidden";unread.textContent="0";unread.setAttribute("aria-label","Unread messages from this member");
+    row.append(img,label,unread);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
   }
+  await updatePrivateUnreadBadge();
 }
 
 async function openDirectChat(peerId,existingId){
