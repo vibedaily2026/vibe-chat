@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Chat</title>
+<title>ACHI — Your World, Your People.</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
@@ -59,13 +59,72 @@ label{font-size:14px;font-weight:bold;color:#52657f}
  .msg-content{max-width:calc(100% - 50px)}
 }
 :root{--navy:#172b4d;--blue:#477be8;--ink:#26344d}body{background:linear-gradient(180deg,#f5faff,#fff8f0);color:var(--ink);font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif}header{background:#ffffffed;backdrop-filter:blur(12px);box-shadow:0 5px 24px #1b35500b;padding:13px max(5%,calc((100% - 1180px)/2))}.logo{font-size:27px;letter-spacing:-1px;color:#477be8;display:flex;align-items:center;gap:9px}.logo:before{content:"✦";display:grid;place-items:center;width:35px;height:35px;border-radius:12px;background:linear-gradient(135deg,#ffe6a6,#ffbcae);color:#263c62}.logo span{color:var(--navy);font-weight:750}button{background:linear-gradient(135deg,#527ff0,#735fe6);border-radius:13px;font-weight:700;box-shadow:0 7px 16px #5577df26;transition:.18s}button:hover{opacity:1;transform:translateY(-2px)}button.secondary{background:#edf3ff;color:#3d62b2;box-shadow:none}.card{border:1px solid #e9edf5;border-radius:22px;box-shadow:0 14px 40px #253d6010}input,textarea{border-radius:13px;background:#fbfdff}#landing{max-width:1180px;margin:auto;padding:30px 22px 60px}.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:25px;align-items:center;min-height:430px;padding:55px 6%;border-radius:32px;background:radial-gradient(circle at 85% 20%,#fff2c9 0 9%,transparent 28%),linear-gradient(120deg,#e6f5ff,#f2edff 55%,#fff0e8);box-shadow:0 22px 55px #4b6c9c16;overflow:hidden}.eyebrow{display:inline-block;padding:8px 13px;border-radius:30px;background:#ffffffb8;color:#5269a7;font-size:12px;font-weight:800}.hero h1{font-size:clamp(38px,5vw,62px);line-height:1.08;letter-spacing:-2px;color:#1d3154;margin:20px 0 16px}.hero h1 span{background:linear-gradient(90deg,#4b7de8,#8a65d9,#ee8c85);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{font-size:17px;line-height:1.8;color:#52627c;max-width:530px}.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}.hero-actions button{padding:14px 23px}.hero-art{display:grid;place-items:center;position:relative}.mascot-scene{width:min(100%,420px);filter:drop-shadow(0 18px 20px #52658a20)}.section-heading{text-align:center;margin:55px auto 25px}.section-heading h2{font-size:30px;color:#1d3154}.section-heading p,.feature p{color:#718097}.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.feature{padding:22px 18px;border-radius:21px;border:1px solid #edf0f5;min-height:165px}.feature:nth-child(1){background:#e8f5ff}.feature:nth-child(2){background:#fff0ed}.feature:nth-child(3){background:#e9f7ed}.feature:nth-child(4){background:#f1edff}.feature-icon{font-size:25px;margin-bottom:12px}.feature h3{color:#263b5e;margin:0 0 7px}.feature p{font-size:13px;line-height:1.6;margin:0}.landing-bottom{text-align:center;margin-top:45px;padding:30px;border-radius:24px;background:#172d50;color:white}.landing-bottom h2{color:white}.landing-bottom p{color:#d7e1f4}.lang-switch{display:flex;gap:4px;background:#f1f5fc;padding:4px;border-radius:30px}.lang-switch button{padding:7px 11px;border-radius:22px;background:transparent;color:#52627b;box-shadow:none;font-size:12px}.lang-switch button.selected{background:white;color:#345eb6;box-shadow:0 2px 8px #263b5d18}.header-actions{display:flex;align-items:center;gap:12px}@media(max-width:800px){.hero{grid-template-columns:1fr;text-align:center;padding:35px 7%}.hero p{margin:auto}.hero-actions{justify-content:center}.mascot-scene{max-width:330px}.feature-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){header{padding:11px 14px}.logo{font-size:22px}.hero{padding:30px 18px}.hero h1{font-size:39px}.feature-grid{gap:9px}.feature{padding:15px 12px;min-height:160px}#landing{padding:20px 13px 40px}}</style>
+
+<meta name="theme-color" content="#7467F0">
+<meta name="description" content="ACHI — Your World, Your People. Connect, chat and discover new friends.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='14' fill='%237467F0'/%3E%3Ccircle cx='18' cy='21' r='2.5' fill='white'/%3E%3Ccircle cx='30' cy='21' r='2.5' fill='white'/%3E%3Cpath d='M17 29q7 8 14 0' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{--navy:#202943;--blue:#7467F0;--ink:#202943;--achi-purple:#7467F0;--achi-sky:#B9C9FF;--achi-white:#FFFFFF}
+body{background:linear-gradient(180deg,#F7F7FF 0%,#fff 58%,#F5F7FF 100%);color:#202943}
+header{border-bottom:1px solid #E8E7F8;box-shadow:0 5px 24px #2029430b}
+.logo{color:#7467F0;gap:9px;letter-spacing:-.8px}
+.logo:before{display:none}
+.logo span{color:#202943;font-weight:850}
+.brand-mark{width:36px;height:36px;flex:none}
+button{background:linear-gradient(135deg,#8175FF,#6256D9);box-shadow:0 7px 16px #7467F033}
+button.active{background:#5147C7}
+button.secondary{background:#EFEEFF;color:#554BCB;box-shadow:none}
+.card{border-color:#E9E8F7;box-shadow:0 14px 40px #20294310}
+h2{color:#202943}
+input,textarea{border-color:#E1E2F0;background:#FCFCFF}
+input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
+#messages{background:#F5F5FF}
+.msg-content{border-color:#E8E7F7}
+.msg-name,.person-name{color:#39336F}
+.msg-avatar,.avatar,.person-avatar{background:#EFEEFF;border-color:#E1DEFF}
+.notice{background:#F0EFFF;color:#5147C7}
+.people-grid .person{border-color:#E9E8F7}
+.chip{background:#EFEEFF;color:#5147C7}
+.person{border-color:#E9E8F7}
+.hero{background:radial-gradient(circle at 83% 20%,#DCD8FF 0 8%,transparent 29%),linear-gradient(120deg,#F0EFFF,#F7F8FF 56%,#EAF1FF);box-shadow:0 22px 55px #5147C71A}
+.eyebrow{background:#fff;color:#5B52C7}
+.hero h1{color:#202943}
+.hero h1 span{background:linear-gradient(90deg,#7467F0,#8E83FF,#6E91E8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:#56617A}
+.mascot-scene{filter:drop-shadow(0 18px 20px #5147C722)}
+.section-heading h2{color:#202943}
+.section-heading p,.feature p{color:#69758D}
+.feature{border-color:#ECEBFA;background:#fff}
+.feature:nth-child(1){background:#F0EFFF}
+.feature:nth-child(2){background:#EEF2FF}
+.feature:nth-child(3){background:#F5F3FF}
+.feature:nth-child(4){background:#F0F5FF}
+.feature h3{color:#292D50}
+.landing-bottom{background:#202943}
+.lang-switch{background:#F0EFFF}
+.lang-switch button.selected{color:#5147C7}
+#directMessages{background:#F5F5FF!important}
+@media(max-width:800px){.hero{background:linear-gradient(145deg,#F0EFFF,#F7F8FF 65%,#EAF1FF)}}
+</style>
 </head>
 <body>
 
-<header><div class="logo">Vibe <span>Chat</span></div><div class="header-actions"><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></header>
+<header><div class="logo"><svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="achiLogoGradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8B7CFF"/><stop offset="1" stop-color="#5D55D9"/></linearGradient></defs><path d="M24 4C13 4 5 12 5 23c0 12 8 21 19 21s19-9 19-21C43 12 35 4 24 4Z" fill="url(#achiLogoGradient)"/><circle cx="18" cy="21" r="2.6" fill="#fff"/><circle cx="30" cy="21" r="2.6" fill="#fff"/><path d="M17 29q7 8 14 0" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></svg><span>ACHI</span></div><div class="header-actions"><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></header>
 
-<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี vibe เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><svg class="mascot-scene" viewBox="0 0 440 340" role="img" aria-label="Vibe Chat friendship mascots"><ellipse cx="220" cy="300" rx="155" ry="19" fill="#9aaed0" opacity=".22"/><path d="M83 243c-18-15-25-36-16-53 8-16 27-19 41-7 14 12 16 33 8 49-7 14-21 20-33 11z" fill="#f6b75f"/><circle cx="91" cy="210" r="4" fill="#25385a"/><circle cx="108" cy="211" r="4" fill="#25385a"/><path d="M94 222q7 8 14 0" stroke="#25385a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M335 245c-16-13-22-32-13-48 8-15 27-19 40-8 13 11 15 30 7 45-8 15-22 21-34 11z" fill="#8c7be8"/><circle cx="341" cy="213" r="4" fill="#25385a"/><circle cx="359" cy="213" r="4" fill="#25385a"/><path d="M344 225q7 8 14 0" stroke="#25385a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M165 258c-20-20-25-50-15-79 9-26 34-42 70-42s61 16 70 42c10 29 5 59-15 79-22 22-88 22-110 0z" fill="#65bce8"/><path d="M181 205c0-8 6-14 13-14s13 6 13 14-6 13-13 13-13-5-13-13zM233 205c0-8 6-14 13-14s13 6 13 14-6 13-13 13-13-5-13-13z" fill="white"/><circle cx="198" cy="205" r="5" fill="#263b5e"/><circle cx="250" cy="205" r="5" fill="#263b5e"/><path d="M207 231q13 15 27 0" stroke="#263b5e" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="180" cy="226" rx="9" ry="5" fill="#ff9f9a"/><ellipse cx="263" cy="226" rx="9" ry="5" fill="#ff9f9a"/><path d="M141 258q-30-7-32-31M299 258q30-7 32-31" stroke="#263b5e" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M177 270q-10 17-24 17M263 270q10 17 24 17" stroke="#263b5e" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M128 108l7-18 7 18 18 7-18 7-7 18-7-18-18-7z" fill="#ffd16f"/><path d="M319 93l5-13 5 13 13 5-13 5-5 13-5-13-13-5z" fill="#ff9e91"/></svg></div></div><div class="section-heading"><h2 data-i18n="features">ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย</h2><p data-i18n="featureSub">พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่</p></div><div class="feature-grid"><article class="feature"><div class="feature-icon">💬</div><h3 data-i18n="chatTitle">พูดคุยและแบ่งปัน</h3><p data-i18n="chatText">เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ</p></article><article class="feature"><div class="feature-icon">💛</div><h3 data-i18n="friendsTitle">ค้นพบเพื่อนใหม่</h3><p data-i18n="friendsText">ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ</p></article><article class="feature"><div class="feature-icon">📍</div><h3 data-i18n="nearbyTitle">เพื่อนใกล้ตัว</h3><p data-i18n="nearbyText">เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ</p></article><article class="feature"><div class="feature-icon">🌈</div><h3 data-i18n="communityTitle">ชุมชนที่เป็นมิตร</h3><p data-i18n="communityText">พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย</p></article></div><div class="landing-bottom"><h2 data-i18n="bottomTitle">พร้อมพบเพื่อนที่ vibe ตรงกันหรือยัง?</h2><p data-i18n="bottomText">เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้</p><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button></div></section><div id="authBox" class="card hidden">
-  <h2 id="authTitle">เข้าสู่ Vibe Chat</h2>
+<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี your vibe เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><svg class="mascot-scene" viewBox="0 0 440 340" role="img" aria-label="ACHI Buddy mascot">
+<defs><linearGradient id="buddyBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A99EFF"/><stop offset="1" stop-color="#6F63E9"/></linearGradient><linearGradient id="buddySide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#D8D5FF"/><stop offset="1" stop-color="#A9BFFF"/></linearGradient></defs>
+<ellipse cx="220" cy="300" rx="132" ry="17" fill="#202943" opacity=".10"/>
+<circle cx="92" cy="115" r="12" fill="#B9C9FF"/><path d="M335 80l8 17 18 8-18 8-8 18-8-18-18-8 18-8z" fill="#A99EFF"/>
+<path d="M148 253c-15-17-20-43-13-68 9-34 42-57 85-57s76 23 85 57c7 25 2 51-13 68-17 19-43 29-72 29s-55-10-72-29z" fill="url(#buddyBody)"/>
+<ellipse cx="176" cy="209" rx="18" ry="22" fill="#fff"/><ellipse cx="264" cy="209" rx="18" ry="22" fill="#fff"/><circle cx="181" cy="211" r="8" fill="#202943"/><circle cx="259" cy="211" r="8" fill="#202943"/><circle cx="184" cy="207" r="2.5" fill="#fff"/><circle cx="262" cy="207" r="2.5" fill="#fff"/>
+<ellipse cx="145" cy="235" rx="12" ry="7" fill="#F6A8C9" opacity=".8"/><ellipse cx="295" cy="235" rx="12" ry="7" fill="#F6A8C9" opacity=".8"/>
+<path d="M198 246q22 22 44 0" fill="none" stroke="#202943" stroke-width="5" stroke-linecap="round"/>
+<path d="M153 260q-24 12-31 30M287 260q24 12 31 30" fill="none" stroke="#6F63E9" stroke-width="13" stroke-linecap="round"/>
+<path d="M190 278l-9 19M250 278l9 19" fill="none" stroke="#202943" stroke-width="12" stroke-linecap="round"/>
+<path d="M118 164q-24-18-29-42" fill="none" stroke="#A99EFF" stroke-width="8" stroke-linecap="round"/><circle cx="88" cy="119" r="8" fill="#A99EFF"/>
+<path d="M322 163q24-18 29-42" fill="none" stroke="#A99EFF" stroke-width="8" stroke-linecap="round"/><circle cx="353" cy="119" r="8" fill="#A99EFF"/>
+</svg></div></div><div class="section-heading"><h2 data-i18n="features">ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย</h2><p data-i18n="featureSub">พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่</p></div><div class="feature-grid"><article class="feature"><div class="feature-icon">💬</div><h3 data-i18n="chatTitle">พูดคุยและแบ่งปัน</h3><p data-i18n="chatText">เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ</p></article><article class="feature"><div class="feature-icon">💛</div><h3 data-i18n="friendsTitle">ค้นพบเพื่อนใหม่</h3><p data-i18n="friendsText">ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ</p></article><article class="feature"><div class="feature-icon">📍</div><h3 data-i18n="nearbyTitle">เพื่อนใกล้ตัว</h3><p data-i18n="nearbyText">เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ</p></article><article class="feature"><div class="feature-icon">🌈</div><h3 data-i18n="communityTitle">ชุมชนที่เป็นมิตร</h3><p data-i18n="communityText">พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย</p></article></div><div class="landing-bottom"><h2 data-i18n="bottomTitle">พร้อมพบเพื่อนที่ your vibe ตรงกันหรือยัง?</h2><p data-i18n="bottomText">เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้</p><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button></div></section><div id="authBox" class="card hidden">
+  <h2 id="authTitle">เข้าสู่ ACHI</h2>
   <p id="authSubtitle" class="muted">พื้นที่พูดคุยและพบเพื่อนใหม่</p>
   <label>อีเมล</label>
   <input id="email" type="email" placeholder="กรอกอีเมล">
@@ -105,7 +164,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
     <p id="directStatus" class="muted"></p>
   </section>
   <section id="chatPage" class="card">
-    <h2 data-i18n="chatHeading">ห้องแชท Vibe</h2>
+    <h2 data-i18n="chatHeading">ห้องแชท ACHI</h2>
     <p class="muted" data-i18n="chatIntro">พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่</p>
     <div id="messages"></div>
     <div class="row">
@@ -118,7 +177,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 
   <section id="discoverPage" class="card hidden">
     <h2 data-i18n="discoverHeading">ค้นหาเพื่อนใหม่</h2>
-    <p class="muted" data-i18n="discoverIntro">ทำความรู้จักสมาชิก Vibe Chat ที่มีความสนใจคล้ายกัน</p>
+    <p class="muted" data-i18n="discoverIntro">ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน</p>
     <div class="row">
       <input id="peopleSearch" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาจากชื่อหรือ Username..."
         onkeydown="if(event.key==='Enter')searchPeople()">
@@ -130,7 +189,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 
   <section id="nearbyPage" class="card hidden">
     <h2 data-i18n="nearbyHeading">เพื่อนใกล้ฉัน</h2>
-    <p class="muted" data-i18n="nearbyIntro">ค้นหาสมาชิก Vibe Chat ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง</p>
+    <p class="muted" data-i18n="nearbyIntro">ค้นหาสมาชิก ACHI ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง</p>
     <div class="row">
       <button id="nearbyEnableButton" onclick="enableNearby()" data-i18n="enableLocation">เปิดแชร์ตำแหน่ง</button>
       <button id="nearbyDisableButton" class="secondary hidden" onclick="disableNearby()" data-i18n="disableLocation">ปิดแชร์ตำแหน่ง</button>
@@ -160,11 +219,11 @@ label{font-size:14px;font-weight:bold;color:#52657f}
       <img id="avatarPreview" class="avatar" alt="รูปโปรไฟล์">
       <div>
         <strong id="profileEmail"></strong>
-        <p class="muted" data-i18n="memberLabel">สมาชิก Vibe Chat</p>
+        <p class="muted" data-i18n="memberLabel">สมาชิก ACHI</p>
       </div>
     </div>
     <label data-i18n="usernameLabel">ชื่อผู้ใช้ (Username)</label>
-    <input id="username" data-i18n-placeholder="usernamePlaceholder" placeholder="เช่น vibe_user">
+    <input id="username" data-i18n-placeholder="usernamePlaceholder" placeholder="เช่น achi_user">
     <label data-i18n="displayNameLabel">ชื่อที่แสดง</label>
     <input id="displayName" data-i18n-placeholder="displayNamePlaceholder" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
     <label data-i18n="avatarLabel">ลิงก์รูปโปรไฟล์</label>
@@ -180,7 +239,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 </main>
 
 <script>
-const dict={th:{eyebrow:"✦ พื้นที่ของคุณ ผู้คนของคุณ ในแบบของคุณ",heroTitle:"โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span>",heroText:"พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี vibe เดียวกับคุณ",join:"สมัครสมาชิกฟรี",login:"เข้าสู่ระบบ",features:"ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย",featureSub:"พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่",chatTitle:"พูดคุยและแบ่งปัน",chatText:"เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ",friendsTitle:"ค้นพบเพื่อนใหม่",friendsText:"ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ",nearbyTitle:"เพื่อนใกล้ตัว",nearbyText:"เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ",communityTitle:"ชุมชนที่เป็นมิตร",communityText:"พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย",bottomTitle:"พร้อมพบเพื่อนที่ vibe ตรงกันหรือยัง?",bottomText:"เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้",backHome:"← กลับหน้าแรก",logout:"ออกจากระบบ",chatTab:"แชท",discoverTab:"ค้นหาเพื่อน",nearbyTab:"เพื่อนใกล้ฉัน",profileTab:"โปรไฟล์ของฉัน",chatHeading:"ห้องแชท Vibe",chatIntro:"พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่",send:"ส่ง",discoverHeading:"ค้นหาเพื่อนใหม่",discoverIntro:"ทำความรู้จักสมาชิก Vibe Chat ที่มีความสนใจคล้ายกัน",searchPlaceholder:"ค้นหาจากชื่อหรือ Username...",search:"ค้นหา",nearbyHeading:"เพื่อนใกล้ฉัน",nearbyIntro:"ค้นหาสมาชิก Vibe Chat ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง",enableLocation:"เปิดแชร์ตำแหน่ง",disableLocation:"ปิดแชร์ตำแหน่ง",detailBack:"← กลับไปค้นหาเพื่อน",aboutMe:"แนะนำตัว",interestsHeading:"ความสนใจ",profileHeading:"โปรไฟล์ของฉัน",profileIntro:"ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น",memberLabel:"สมาชิก Vibe Chat",usernameLabel:"ชื่อผู้ใช้ (Username)",usernamePlaceholder:"เช่น vibe_user",displayNameLabel:"ชื่อที่แสดง",displayNamePlaceholder:"ชื่อที่อยากให้คนอื่นเห็น",avatarLabel:"ลิงก์รูปโปรไฟล์",bioLabel:"แนะนำตัว",bioPlaceholder:"เล่าเกี่ยวกับตัวคุณสักนิด...",interestsLabel:"ความสนใจ",interestsPlaceholder:"เช่น เพลง, หนัง, ท่องเที่ยว, เกม",interestsHint:"คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)",saveProfile:"บันทึกโปรไฟล์",messagePlaceholder:"พิมพ์ข้อความ..."},en:{eyebrow:"✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.",heroTitle:"A world of new friends<br><span>starts right here</span>",heroText:"Make meaningful connections. Chat, share what you love, and meet people who are on your wavelength.",join:"Join for free",login:"Log in",features:"Every great connection starts with hello",featureSub:"A welcoming space to discover a whole new world",chatTitle:"Chat & Share",chatText:"Start conversations and exchange stories with new people.",friendsTitle:"Discover Friends",friendsText:"Meet people who share your interests and passions.",nearbyTitle:"People Nearby",nearbyText:"Opt in to location sharing and discover people around you.",communityTitle:"A Friendly Community",communityText:"Find welcoming spaces for every interest and conversation.",bottomTitle:"Ready to meet your kind of people?",bottomText:"Start making meaningful connections today.",backHome:"← Back to home",logout:"Log out",chatTab:"Chat",discoverTab:"Discover",nearbyTab:"People nearby",profileTab:"My profile",chatHeading:"Vibe Chat Room",chatIntro:"Chat with other members here",send:"Send",discoverHeading:"Discover new friends",discoverIntro:"Meet Vibe Chat members who share your interests",searchPlaceholder:"Search by name or username...",search:"Search",nearbyHeading:"People nearby",nearbyIntro:"Discover nearby Vibe Chat members. Location sharing is optional. Only approximate distance is shown, never exact coordinates or addresses.",enableLocation:"Enable location sharing",disableLocation:"Turn off location sharing",detailBack:"← Back to discover",aboutMe:"About me",interestsHeading:"Interests",profileHeading:"My profile",profileIntro:"Help other members get to know you",memberLabel:"Vibe Chat member",usernameLabel:"Username",usernamePlaceholder:"e.g. vibe_user",displayNameLabel:"Display name",displayNamePlaceholder:"The name others will see",avatarLabel:"Profile photo URL",bioLabel:"About me",bioPlaceholder:"Tell others a little about yourself...",interestsLabel:"Interests",interestsPlaceholder:"e.g. music, movies, travel, games",interestsHint:"Separate each interest with a comma (,)",saveProfile:"Save profile",messagePlaceholder:"Type a message..."}};let currentLanguage=localStorage.getItem("vibe-language")==="en"?"en":"th";function setLanguage(lang){currentLanguage=lang==="en"?"en":"th";localStorage.setItem("vibe-language",currentLanguage);document.documentElement.lang=currentLanguage;const thButton=el("langTh"),enButton=el("langEn");if(thButton)thButton.classList.toggle("selected",currentLanguage==="th");if(enButton)enButton.classList.toggle("selected",currentLanguage==="en");document.querySelectorAll("[data-i18n]").forEach(node=>{const key=node.getAttribute("data-i18n");const value=dict[currentLanguage][key];if(typeof value==="string")node.innerHTML=value});document.querySelectorAll("[data-i18n-placeholder]").forEach(node=>{const key=node.getAttribute("data-i18n-placeholder");const value=dict[currentLanguage][key];if(typeof value==="string")node.placeholder=value});if(el("authSubtitle"))el("authSubtitle").textContent=currentLanguage==="en"?"A place to connect and meet new friends":"พื้นที่พูดคุยและพบเพื่อนใหม่";if(el("authTitle"))el("authTitle").textContent=isSignup?(currentLanguage==="en"?"Create your Vibe Chat account":"สมัครสมาชิก Vibe Chat"):(currentLanguage==="en"?"Welcome to Vibe Chat":"เข้าสู่ Vibe Chat");const labels=document.querySelectorAll("#authBox label");if(labels[0])labels[0].textContent=currentLanguage==="en"?"Email":"อีเมล";if(labels[1])labels[1].textContent=currentLanguage==="en"?"Password":"รหัสผ่าน";if(el("email"))el("email").placeholder=currentLanguage==="en"?"Enter your email":"กรอกอีเมล";if(el("password"))el("password").placeholder=currentLanguage==="en"?"Enter your password":"กรอกรหัสผ่าน";if(el("authButton"))el("authButton").textContent=isSignup?(currentLanguage==="en"?"Create account":"สมัครสมาชิก"):(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ");if(el("authSwitchText"))el("authSwitchText").innerHTML=(isSignup?(currentLanguage==="en"?"Already a member? ":"มีบัญชีแล้ว? "):(currentLanguage==="en"?"New here? ":"ยังไม่มีบัญชี? "))+'<a href="#" onclick="toggleAuth();return false">'+(isSignup?(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ"):(currentLanguage==="en"?"Create an account":"สมัครสมาชิก"))+'</a>';}
+const dict={th:{eyebrow:"✦ พื้นที่ของคุณ ผู้คนของคุณ ในแบบของคุณ",heroTitle:"โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span>",heroText:"พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มี your vibe เดียวกับคุณ",join:"สมัครสมาชิกฟรี",login:"เข้าสู่ระบบ",features:"ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย",featureSub:"พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่",chatTitle:"พูดคุยและแบ่งปัน",chatText:"เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ",friendsTitle:"ค้นพบเพื่อนใหม่",friendsText:"ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ",nearbyTitle:"เพื่อนใกล้ตัว",nearbyText:"เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ",communityTitle:"ชุมชนที่เป็นมิตร",communityText:"พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย",bottomTitle:"พร้อมพบเพื่อนที่ your vibe ตรงกันหรือยัง?",bottomText:"เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้",backHome:"← กลับหน้าแรก",logout:"ออกจากระบบ",chatTab:"แชท",discoverTab:"ค้นหาเพื่อน",nearbyTab:"เพื่อนใกล้ฉัน",profileTab:"โปรไฟล์ของฉัน",chatHeading:"ห้องแชท ACHI",chatIntro:"พูดคุยกับสมาชิกคนอื่น ๆ ได้ที่นี่",send:"ส่ง",discoverHeading:"ค้นหาเพื่อนใหม่",discoverIntro:"ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน",searchPlaceholder:"ค้นหาจากชื่อหรือ Username...",search:"ค้นหา",nearbyHeading:"เพื่อนใกล้ฉัน",nearbyIntro:"ค้นหาสมาชิก ACHI ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง",enableLocation:"เปิดแชร์ตำแหน่ง",disableLocation:"ปิดแชร์ตำแหน่ง",detailBack:"← กลับไปค้นหาเพื่อน",aboutMe:"แนะนำตัว",interestsHeading:"ความสนใจ",profileHeading:"โปรไฟล์ของฉัน",profileIntro:"ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น",memberLabel:"สมาชิก ACHI",usernameLabel:"ชื่อผู้ใช้ (Username)",usernamePlaceholder:"เช่น achi_user",displayNameLabel:"ชื่อที่แสดง",displayNamePlaceholder:"ชื่อที่อยากให้คนอื่นเห็น",avatarLabel:"ลิงก์รูปโปรไฟล์",bioLabel:"แนะนำตัว",bioPlaceholder:"เล่าเกี่ยวกับตัวคุณสักนิด...",interestsLabel:"ความสนใจ",interestsPlaceholder:"เช่น เพลง, หนัง, ท่องเที่ยว, เกม",interestsHint:"คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)",saveProfile:"บันทึกโปรไฟล์",messagePlaceholder:"พิมพ์ข้อความ..."},en:{eyebrow:"✦ YOUR SPACE. YOUR PEOPLE. YOUR VIBE.",heroTitle:"A world of new friends<br><span>starts right here</span>",heroText:"Make meaningful connections. Chat, share what you love, and meet people who are on your wavelength.",join:"Join for free",login:"Log in",features:"Every great connection starts with hello",featureSub:"A welcoming space to discover a whole new world",chatTitle:"Chat & Share",chatText:"Start conversations and exchange stories with new people.",friendsTitle:"Discover Friends",friendsText:"Meet people who share your interests and passions.",nearbyTitle:"People Nearby",nearbyText:"Opt in to location sharing and discover people around you.",communityTitle:"A Friendly Community",communityText:"Find welcoming spaces for every interest and conversation.",bottomTitle:"Ready to meet your kind of people?",bottomText:"Start making meaningful connections today.",backHome:"← Back to home",logout:"Log out",chatTab:"Chat",discoverTab:"Discover",nearbyTab:"People nearby",profileTab:"My profile",chatHeading:"ACHI Room",chatIntro:"Chat with other members here",send:"Send",discoverHeading:"Discover new friends",discoverIntro:"Meet ACHI members who share your interests",searchPlaceholder:"Search by name or username...",search:"Search",nearbyHeading:"People nearby",nearbyIntro:"Discover nearby ACHI members. Location sharing is optional. Only approximate distance is shown, never exact coordinates or addresses.",enableLocation:"Enable location sharing",disableLocation:"Turn off location sharing",detailBack:"← Back to discover",aboutMe:"About me",interestsHeading:"Interests",profileHeading:"My profile",profileIntro:"Help other members get to know you",memberLabel:"ACHI member",usernameLabel:"Username",usernamePlaceholder:"e.g. achi_user",displayNameLabel:"Display name",displayNamePlaceholder:"The name others will see",avatarLabel:"Profile photo URL",bioLabel:"About me",bioPlaceholder:"Tell others a little about yourself...",interestsLabel:"Interests",interestsPlaceholder:"e.g. music, movies, travel, games",interestsHint:"Separate each interest with a comma (,)",saveProfile:"Save profile",messagePlaceholder:"Type a message..."}};let currentLanguage=localStorage.getItem("your vibe-language")==="en"?"en":"th";function setLanguage(lang){currentLanguage=lang==="en"?"en":"th";localStorage.setItem("your vibe-language",currentLanguage);document.documentElement.lang=currentLanguage;const thButton=el("langTh"),enButton=el("langEn");if(thButton)thButton.classList.toggle("selected",currentLanguage==="th");if(enButton)enButton.classList.toggle("selected",currentLanguage==="en");document.querySelectorAll("[data-i18n]").forEach(node=>{const key=node.getAttribute("data-i18n");const value=dict[currentLanguage][key];if(typeof value==="string")node.innerHTML=value});document.querySelectorAll("[data-i18n-placeholder]").forEach(node=>{const key=node.getAttribute("data-i18n-placeholder");const value=dict[currentLanguage][key];if(typeof value==="string")node.placeholder=value});if(el("authSubtitle"))el("authSubtitle").textContent=currentLanguage==="en"?"A place to connect and meet new friends":"พื้นที่พูดคุยและพบเพื่อนใหม่";if(el("authTitle"))el("authTitle").textContent=isSignup?(currentLanguage==="en"?"Create your ACHI account":"สมัครสมาชิก ACHI"):(currentLanguage==="en"?"Welcome to ACHI":"เข้าสู่ ACHI");const labels=document.querySelectorAll("#authBox label");if(labels[0])labels[0].textContent=currentLanguage==="en"?"Email":"อีเมล";if(labels[1])labels[1].textContent=currentLanguage==="en"?"Password":"รหัสผ่าน";if(el("email"))el("email").placeholder=currentLanguage==="en"?"Enter your email":"กรอกอีเมล";if(el("password"))el("password").placeholder=currentLanguage==="en"?"Enter your password":"กรอกรหัสผ่าน";if(el("authButton"))el("authButton").textContent=isSignup?(currentLanguage==="en"?"Create account":"สมัครสมาชิก"):(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ");if(el("authSwitchText"))el("authSwitchText").innerHTML=(isSignup?(currentLanguage==="en"?"Already a member? ":"มีบัญชีแล้ว? "):(currentLanguage==="en"?"New here? ":"ยังไม่มีบัญชี? "))+'<a href="#" onclick="toggleAuth();return false">'+(isSignup?(currentLanguage==="en"?"Log in":"เข้าสู่ระบบ"):(currentLanguage==="en"?"Create an account":"สมัครสมาชิก"))+'</a>';}
 function openAuth(mode){el("landing").classList.add("hidden");el("authBox").classList.remove("hidden");isSignup=mode==="signup";el("authButton").onclick=isSignup?signup:login;setLanguage(currentLanguage);window.scrollTo({top:0,behavior:"smooth"});}
 function tx(th,en){return currentLanguage==="en"?en:th}
 const SUPABASE_URL="https://epdbfncrfjyrgqwjyctu.supabase.co";
@@ -196,7 +255,7 @@ let peopleResults=[];
 
 function el(id){return document.getElementById(id)}
 function fallbackAvatar(name){
-  return "https://ui-avatars.com/api/?name="+encodeURIComponent(name||"Vibe User")+"&background=eaf1fb&color=426b9f";
+  return "https://ui-avatars.com/api/?name="+encodeURIComponent(name||"ACHI User")+"&background=eaf1fb&color=426b9f";
 }
 function safeImage(url,name){return url||fallbackAvatar(name)}
 
@@ -281,7 +340,7 @@ async function loadOrCreateProfile(){
 }
 
 function updateAvatarPreview(){
-  el("avatarPreview").src=safeImage(el("avatarUrl").value.trim(),el("displayName").value||"Vibe User");
+  el("avatarPreview").src=safeImage(el("avatarUrl").value.trim(),el("displayName").value||"ACHI User");
 }
 el("avatarUrl").addEventListener("input",updateAvatarPreview);
 
@@ -382,7 +441,7 @@ async function searchPeople(){
     names.style.minWidth="0";
     const name=document.createElement("div");
     name.className="person-name";
-    name.textContent=person.display_name||tx("สมาชิก Vibe","Vibe member");
+    name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const username=document.createElement("div");
     username.className="person-username";
     username.textContent="@"+(person.username||"user");
@@ -414,7 +473,7 @@ function showPerson(id){
   const person=peopleResults.find(p=>p.id===id);
   if(!person)return;
   currentPersonId=id;
-  const name=person.display_name||tx("สมาชิก Vibe","Vibe member");
+  const name=person.display_name||tx("สมาชิก ACHI","ACHI member");
   el("detailAvatar").src=safeImage(person.avatar_url,name);
   el("detailAvatar").onerror=()=>{el("detailAvatar").src=fallbackAvatar(name)};
   el("detailName").textContent=name;
@@ -453,13 +512,13 @@ async function loadConversations(){
   el("inboxStatus").textContent="";
   for(const conv of data){
     const peerId=conv.user_a===currentUser.id?conv.user_b:conv.user_a;
-    const peer=byId[peerId]||{id:peerId,display_name:tx("สมาชิก Vibe","Vibe member")};
+    const peer=byId[peerId]||{id:peerId,display_name:tx("สมาชิก ACHI","ACHI member")};
     directPeerCache[peerId]=peer;
     const row=document.createElement("button");
     row.className="secondary";
     row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
-    const label=document.createElement("span");label.textContent=(peer.display_name||"Vibe member")+"  @"+(peer.username||"user");
+    const label=document.createElement("span");label.textContent=(peer.display_name||"ACHI member")+"  @"+(peer.username||"user");
     row.append(img,label);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
   }
 }
@@ -477,9 +536,9 @@ async function openDirectChat(peerId,existingId){
   let peer=directPeerCache[peerId];
   if(!peer){
     const {data}=await db.from("profiles").select("id,display_name,username,avatar_url").eq("id",peerId).maybeSingle();
-    peer=data||{display_name:tx("สมาชิก Vibe","Vibe member")};directPeerCache[peerId]=peer;
+    peer=data||{display_name:tx("สมาชิก ACHI","ACHI member")};directPeerCache[peerId]=peer;
   }
-  el("directPeerName").textContent=peer.display_name||tx("สมาชิก Vibe","Vibe member");
+  el("directPeerName").textContent=peer.display_name||tx("สมาชิก ACHI","ACHI member");
   el("directPeerAvatar").src=safeImage(peer.avatar_url,peer.display_name);
   el("directChatStatus").textContent="@"+(peer.username||"user");
   el("directStatus").textContent="";
@@ -606,7 +665,7 @@ async function loadNearbyFriends(){
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person.avatar_url,person.display_name);img.alt="รูปโปรไฟล์";
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
     const names=document.createElement("div");names.style.minWidth="0";
-    const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||tx("สมาชิก Vibe","Vibe member");
+    const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const username=document.createElement("div");username.className="person-username";username.textContent="@"+(person.username||"user");
     names.append(name,username);top.append(img,names);
     const distance=document.createElement("div");distance.className="nearby-distance";distance.textContent=tx("ระยะทางโดยประมาณ: ","Approx. distance: ")+item.distance_km+tx(" กม."," km");
@@ -632,7 +691,7 @@ async function reportNearbyUser(userId,name){
   const details=prompt("รายละเอียดเพิ่มเติม (ไม่บังคับ)")||"";
   const {error}=await db.from("user_reports").insert({reporter_id:currentUser.id,reported_id:userId,reason:reason.trim().slice(0,100),details:details.trim().slice(0,1000)});
   if(error){el("nearbyStatus").textContent="ส่งรายงานไม่สำเร็จ: "+error.message;return}
-  alert(tx("ส่งรายงานเรียบร้อยแล้ว ขอบคุณที่ช่วยให้ Vibe Chat ปลอดภัยขึ้น","Report submitted. Thank you for helping keep Vibe Chat safe."));
+  alert(tx("ส่งรายงานเรียบร้อยแล้ว ขอบคุณที่ช่วยให้ ACHI ปลอดภัยขึ้น","Report submitted. Thank you for helping keep ACHI safe."));
 }
 
 async function loadProfiles(userIds){
@@ -702,7 +761,7 @@ async function sendMessage(){
 
 function subscribeMessages(){
   if(realtimeChannel)db.removeChannel(realtimeChannel);
-  realtimeChannel=db.channel("vibe-chat-messages")
+  realtimeChannel=db.channel("your vibe-chat-messages")
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},
       async payload=>{
         await loadProfiles([payload.new.user_id]);
