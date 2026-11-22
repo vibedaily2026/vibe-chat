@@ -739,7 +739,9 @@ function subscribeDirectMessages(){
         loadDirectMessages().then(()=>{if(!el("directChatPage").classList.contains("hidden"))markConversationRead(activeConversationId)});
       }
       updatePrivateUnreadBadge();loadConversations();
-    }).subscribe();
+    })
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"conversation_participants",filter:"user_id=eq."+currentUser.id},()=>updatePrivateUnreadBadge())
+    .subscribe();
 }
 
 async function loadNearbyStatus(){
