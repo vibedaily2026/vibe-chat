@@ -3,7 +3,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vibe Chat</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -24,9 +24,9 @@ input,textarea{width:100%;padding:13px;border:1px solid #dce4ef;border-radius:10
 textarea{min-height:90px;resize:vertical}
 label{font-size:14px;font-weight:bold;color:#52657f}
 .hidden{display:none!important}
-.tabs{display:flex;gap:10px;margin-bottom:18px}
-.tabs button{flex:1}
-#messages{height:430px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tabs button{flex:1;min-width:90px}
+#messages{height:390px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0}
 .msg{display:flex;align-items:flex-start;gap:10px;margin-bottom:13px}
 .msg-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eaf1fb;flex-shrink:0}
 .msg-content{background:white;border:1px solid #e8edf4;border-radius:12px;padding:10px 13px;min-width:0;max-width:85%;overflow-wrap:anywhere}
@@ -40,6 +40,15 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #authBox{max-width:430px;margin:55px auto}
 .notice{padding:12px;border-radius:10px;background:#edf5ff;color:#376caf;margin:12px 0;font-size:14px}
 .muted{color:#8290a3;font-size:13px}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:18px}
+.person{border:1px solid #e6edf5;border-radius:15px;padding:17px;background:#fff;min-width:0}
+.person-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.person-avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;background:#eaf1fb;flex-shrink:0}
+.person-name{font-weight:bold;color:#304b70;overflow-wrap:anywhere}
+.person-username{font-size:12px;color:#8290a3;margin-top:4px}
+.person-bio{font-size:13px;color:#52657f;white-space:pre-wrap;overflow-wrap:anywhere;min-height:38px}
+.chip{display:inline-block;background:#edf4fd;color:#426b9f;border-radius:20px;padding:5px 9px;font-size:11px;margin:3px 3px 3px 0}
+.person button{margin-top:12px;width:100%}
 @media(max-width:600px){
  header{padding:13px 15px}
  main{margin:15px auto}
@@ -78,6 +87,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 <main id="app" class="hidden">
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')">แชท</button>
+    <button id="discoverTab" class="secondary" onclick="showPage('discover')">ค้นหาเพื่อน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')">โปรไฟล์ของฉัน</button>
   </div>
 
@@ -93,10 +103,34 @@ label{font-size:14px;font-weight:bold;color:#52657f}
     <p id="chatStatus" class="muted"></p>
   </section>
 
+  <section id="discoverPage" class="card hidden">
+    <h2>ค้นหาเพื่อนใหม่</h2>
+    <p class="muted">ทำความรู้จักสมาชิก Vibe Chat ที่มีความสนใจคล้ายกัน</p>
+    <div class="row">
+      <input id="peopleSearch" placeholder="ค้นหาจากชื่อหรือ Username..."
+        onkeydown="if(event.key==='Enter')searchPeople()">
+      <button onclick="searchPeople()">ค้นหา</button>
+    </div>
+    <p id="peopleStatus" class="muted">กำลังโหลดสมาชิก...</p>
+    <div id="peopleList" class="people-grid"></div>
+  </section>
+
+  <section id="personDetailPage" class="card hidden">
+    <button class="secondary" onclick="showPage('discover')">← กลับไปค้นหาเพื่อน</button>
+    <div style="text-align:center;padding:20px 0">
+      <img id="detailAvatar" class="avatar" alt="รูปโปรไฟล์">
+      <h2 id="detailName" style="margin:12px 0 5px"></h2>
+      <p id="detailUsername" class="muted"></p>
+    </div>
+    <h3>แนะนำตัว</h3>
+    <p id="detailBio" style="white-space:pre-wrap"></p>
+    <h3>ความสนใจ</h3>
+    <div id="detailInterests"></div>
+  </section>
+
   <section id="profilePage" class="card hidden">
     <h2>โปรไฟล์ของฉัน</h2>
     <p class="muted">ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น</p>
-
     <div style="display:flex;align-items:center;gap:17px;margin:20px 0">
       <img id="avatarPreview" class="avatar" alt="รูปโปรไฟล์">
       <div>
@@ -104,356 +138,357 @@ label{font-size:14px;font-weight:bold;color:#52657f}
         <p class="muted">สมาชิก Vibe Chat</p>
       </div>
     </div>
-
     <label>ชื่อผู้ใช้ (Username)</label>
     <input id="username" placeholder="เช่น vibe_user">
-
     <label>ชื่อที่แสดง</label>
     <input id="displayName" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
-
     <label>ลิงก์รูปโปรไฟล์</label>
     <input id="avatarUrl" type="url" placeholder="https://example.com/photo.jpg">
-
     <label>แนะนำตัว</label>
     <textarea id="bio" maxlength="300" placeholder="เล่าเกี่ยวกับตัวคุณสักนิด..."></textarea>
-
     <label>ความสนใจ</label>
     <input id="interests" placeholder="เช่น เพลง, หนัง, ท่องเที่ยว, เกม">
     <p class="muted">คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)</p>
-
     <button onclick="saveProfile()">บันทึกโปรไฟล์</button>
     <p id="profileStatus" class="notice hidden"></p>
   </section>
 </main>
 
 <script>
-const SUPABASE_URL = "https://epdbfncrfjyrgqwjyctu.supabase.co";
-const SUPABASE_KEY = "sb_publishable_CEFu0MBeJ9d5Jci-xc0ggg_uMaI82dG";
-const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_URL="https://epdbfncrfjyrgqwjyctu.supabase.co";
+const SUPABASE_KEY="sb_publishable_CEFu0MBeJ9d5Jci-xc0ggg_uMaI82dG";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let currentUser = null;
-let currentProfile = null;
-let realtimeChannel = null;
-let isSignup = false;
-let profileCache = {};
+let currentUser=null;
+let currentProfile=null;
+let realtimeChannel=null;
+let isSignup=false;
+let profileCache={};
+let peopleResults=[];
 
 function el(id){return document.getElementById(id)}
-
 function fallbackAvatar(name){
-  return "https://ui-avatars.com/api/?name="+encodeURIComponent(name || "Vibe User")+"&background=eaf1fb&color=426b9f";
+  return "https://ui-avatars.com/api/?name="+encodeURIComponent(name||"Vibe User")+"&background=eaf1fb&color=426b9f";
 }
-
-function safeImage(url,name){
-  return url || fallbackAvatar(name);
-}
+function safeImage(url,name){return url||fallbackAvatar(name)}
 
 function showAuthMessage(message){
-  el("authMessage").textContent = message;
+  el("authMessage").textContent=message;
   el("authMessage").classList.remove("hidden");
 }
-
 function toggleAuth(){
-  isSignup = !isSignup;
-  el("authTitle").textContent = isSignup ? "สมัครสมาชิก Vibe Chat" : "เข้าสู่ Vibe Chat";
-  el("authButton").textContent = isSignup ? "สมัครสมาชิก" : "เข้าสู่ระบบ";
-  el("authButton").onclick = isSignup ? signup : login;
+  isSignup=!isSignup;
+  el("authTitle").textContent=isSignup?"สมัครสมาชิก Vibe Chat":"เข้าสู่ Vibe Chat";
+  el("authButton").textContent=isSignup?"สมัครสมาชิก":"เข้าสู่ระบบ";
+  el("authButton").onclick=isSignup?signup:login;
   el("authMessage").classList.add("hidden");
 }
 
 async function login(){
-  const email = el("email").value.trim();
-  const password = el("password").value;
-  if(!email || !password) return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
-
-  el("authButton").disabled = true;
-  const {data,error} = await db.auth.signInWithPassword({email,password});
-  el("authButton").disabled = false;
-
-  if(error) return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: "+error.message);
+  const email=el("email").value.trim();
+  const password=el("password").value;
+  if(!email||!password)return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
+  el("authButton").disabled=true;
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  el("authButton").disabled=false;
+  if(error)return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: "+error.message);
   await startApp(data.user);
 }
 
 async function signup(){
-  const email = el("email").value.trim();
-  const password = el("password").value;
-  if(!email || !password) return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
-  if(password.length < 6) return showAuthMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
-
-  el("authButton").disabled = true;
-  const {data,error} = await db.auth.signUp({
-    email,password,
-    options:{emailRedirectTo:location.origin}
+  const email=el("email").value.trim();
+  const password=el("password").value;
+  if(!email||!password)return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
+  if(password.length<6)return showAuthMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+  el("authButton").disabled=true;
+  const {data,error}=await db.auth.signUp({
+    email,password,options:{emailRedirectTo:location.origin}
   });
-  el("authButton").disabled = false;
-
-  if(error) return showAuthMessage("สมัครสมาชิกไม่สำเร็จ: "+error.message);
-
-  if(data.session){
-    await startApp(data.user);
-  }else{
-    showAuthMessage("สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบ");
-  }
+  el("authButton").disabled=false;
+  if(error)return showAuthMessage("สมัครสมาชิกไม่สำเร็จ: "+error.message);
+  if(data.session)await startApp(data.user);
+  else showAuthMessage("สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบ");
 }
 
 async function startApp(user){
-  currentUser = user;
+  currentUser=user;
   el("authBox").classList.add("hidden");
   el("app").classList.remove("hidden");
   el("userArea").classList.remove("hidden");
-  el("userEmail").textContent = user.email || "";
-
+  el("userEmail").textContent=user.email||"";
   await loadOrCreateProfile();
   await loadMessages();
   subscribeMessages();
 }
 
 async function loadOrCreateProfile(){
-  el("profileEmail").textContent = currentUser.email || "";
-
-  const {data,error} = await db.from("profiles")
-    .select("*").eq("id",currentUser.id).maybeSingle();
-
-  if(error){
-    alert("โหลดโปรไฟล์ไม่สำเร็จ: "+error.message);
-    return;
-  }
-
-  if(data){
-    currentProfile = data;
-  }else{
-    const fallbackName = (currentUser.email || "สมาชิก").split("@")[0];
-    const newProfile = {
+  el("profileEmail").textContent=currentUser.email||"";
+  const {data,error}=await db.from("profiles").select("*")
+    .eq("id",currentUser.id).maybeSingle();
+  if(error){alert("โหลดโปรไฟล์ไม่สำเร็จ: "+error.message);return}
+  if(data)currentProfile=data;
+  else{
+    const fallbackName=(currentUser.email||"สมาชิก").split("@")[0];
+    const newProfile={
       id:currentUser.id,
       username:"user_"+currentUser.id.replace(/-/g,"").slice(0,8),
-      display_name:fallbackName,
-      bio:"",
-      avatar_url:"",
-      interests:[]
+      display_name:fallbackName,bio:"",avatar_url:"",interests:[]
     };
-
-    const {data:created,error:createError} = await db.from("profiles")
+    const {data:created,error:createError}=await db.from("profiles")
       .insert(newProfile).select().single();
-
-    if(createError){
-      alert("สร้างโปรไฟล์ไม่สำเร็จ: "+createError.message);
-      return;
-    }
-    currentProfile = created;
+    if(createError){alert("สร้างโปรไฟล์ไม่สำเร็จ: "+createError.message);return}
+    currentProfile=created;
   }
-
-  profileCache[currentUser.id] = currentProfile;
-  el("username").value = currentProfile.username || "";
-  el("displayName").value = currentProfile.display_name || "";
-  el("avatarUrl").value = currentProfile.avatar_url || "";
-  el("bio").value = currentProfile.bio || "";
-  el("interests").value = (currentProfile.interests || []).join(", ");
+  profileCache[currentUser.id]=currentProfile;
+  el("username").value=currentProfile.username||"";
+  el("displayName").value=currentProfile.display_name||"";
+  el("avatarUrl").value=currentProfile.avatar_url||"";
+  el("bio").value=currentProfile.bio||"";
+  el("interests").value=(currentProfile.interests||[]).join(", ");
   updateAvatarPreview();
 }
 
 function updateAvatarPreview(){
-  const url = el("avatarUrl").value.trim();
-  el("avatarPreview").src = safeImage(url,el("displayName").value || "Vibe User");
+  el("avatarPreview").src=safeImage(el("avatarUrl").value.trim(),el("displayName").value||"Vibe User");
 }
 el("avatarUrl").addEventListener("input",updateAvatarPreview);
 
 async function saveProfile(){
-  if(!currentUser) return;
+  if(!currentUser)return;
+  const username=el("username").value.trim().toLowerCase();
+  const displayName=el("displayName").value.trim();
+  const avatarUrl=el("avatarUrl").value.trim();
+  const bio=el("bio").value.trim();
+  const interests=el("interests").value.split(",").map(x=>x.trim()).filter(Boolean).slice(0,20);
 
-  const username = el("username").value.trim().toLowerCase();
-  const displayName = el("displayName").value.trim();
-  const avatarUrl = el("avatarUrl").value.trim();
-  const bio = el("bio").value.trim();
-  const interests = el("interests").value.split(",")
-    .map(x=>x.trim()).filter(Boolean).slice(0,20);
-
-  if(!/^[a-z0-9_]{3,24}$/.test(username)){
+  if(!/^[a-z0-9_]{3,24}$/.test(username))
     return profileMessage("Username ต้องมี 3–24 ตัว ใช้ได้เฉพาะ a-z, 0-9 และ _");
-  }
-  if(!displayName) return profileMessage("กรุณากรอกชื่อที่แสดง");
-  if(avatarUrl && !/^https?:\/\//i.test(avatarUrl)){
+  if(!displayName)return profileMessage("กรุณากรอกชื่อที่แสดง");
+  if(avatarUrl&&!/^https?:\/\//i.test(avatarUrl))
     return profileMessage("ลิงก์รูปโปรไฟล์ต้องขึ้นต้นด้วย http:// หรือ https://");
-  }
 
-  const {data,error} = await db.from("profiles").update({
-    username,
-    display_name:displayName,
-    avatar_url:avatarUrl || null,
-    bio,
-    interests
+  const {data,error}=await db.from("profiles").update({
+    username,display_name:displayName,avatar_url:avatarUrl||null,bio,interests
   }).eq("id",currentUser.id).select().single();
 
   if(error){
-    if(error.code === "23505") return profileMessage("Username นี้มีคนใช้แล้ว กรุณาเลือกชื่ออื่น");
+    if(error.code==="23505")return profileMessage("Username นี้มีคนใช้แล้ว กรุณาเลือกชื่ออื่น");
     return profileMessage("บันทึกไม่สำเร็จ: "+error.message);
   }
-
-  currentProfile = data;
-  profileCache[currentUser.id] = data;
+  currentProfile=data;
+  profileCache[currentUser.id]=data;
   updateAvatarPreview();
-
-  // อัปเดตข้อความเดิมของสมาชิกคนนี้ให้ใช้ชื่อและรูปใหม่
   await loadMessages();
   profileMessage("บันทึกโปรไฟล์เรียบร้อยแล้ว");
 }
-
 function profileMessage(message){
-  el("profileStatus").textContent = message;
+  el("profileStatus").textContent=message;
   el("profileStatus").classList.remove("hidden");
 }
 
 function showPage(page){
-  el("chatPage").classList.toggle("hidden",page !== "chat");
-  el("profilePage").classList.toggle("hidden",page !== "profile");
-  el("chatTab").classList.toggle("active",page === "chat");
-  el("profileTab").classList.toggle("active",page === "profile");
-  el("chatTab").classList.toggle("secondary",page !== "chat");
-  el("profileTab").classList.toggle("secondary",page !== "profile");
+  ["chat","discover","profile","personDetail"].forEach(name=>{
+    el(name+"Page").classList.toggle("hidden",name!==page);
+  });
+  ["chat","discover","profile"].forEach(name=>{
+    el(name+"Tab").classList.toggle("active",name===page);
+    el(name+"Tab").classList.toggle("secondary",name!==page);
+  });
+  if(page==="discover")searchPeople();
 }
 
-async function loadProfiles(userIds){
-  const ids = [...new Set(userIds.filter(Boolean))];
-  const missing = ids.filter(id=>!profileCache[id]);
+async function searchPeople(){
+  if(!currentUser)return;
+  const term=el("peopleSearch").value.trim();
+  el("peopleStatus").textContent="กำลังค้นหาสมาชิก...";
+  el("peopleList").innerHTML="";
 
-  if(missing.length){
-    const {data,error} = await db.from("profiles")
-      .select("id,username,display_name,avatar_url")
-      .in("id",missing);
+  let query=db.from("profiles")
+    .select("id,username,display_name,avatar_url,bio,interests")
+    .neq("id",currentUser.id)
+    .limit(50);
 
-    if(!error){
-      (data || []).forEach(profile=>{
-        profileCache[profile.id] = profile;
-      });
+  if(term){
+    const safeTerm=term.replace(/[,%()]/g," ").trim();
+    if(!safeTerm){
+      el("peopleStatus").textContent="กรุณาพิมพ์ชื่อหรือ Username";
+      return;
     }
+    query=query.or("display_name.ilike.%"+safeTerm+"%,username.ilike.%"+safeTerm+"%");
   }
-}
 
-async function loadMessages(){
-  const {data,error} = await db.from("messages")
-    .select("id,created_at,message,user_id")
-    .order("created_at",{ascending:true})
-    .limit(100);
-
+  const {data,error}=await query.order("created_at",{ascending:false});
   if(error){
-    el("chatStatus").textContent = "โหลดข้อความไม่สำเร็จ: "+error.message;
+    el("peopleStatus").textContent="ค้นหาสมาชิกไม่สำเร็จ: "+error.message;
     return;
   }
 
-  await loadProfiles((data || []).map(item=>item.user_id));
+  peopleResults=data||[];
+  if(!peopleResults.length){
+    el("peopleStatus").textContent="ยังไม่พบสมาชิก ลองค้นหาด้วยคำอื่น";
+    return;
+  }
 
-  el("messages").innerHTML = "";
-  (data || []).forEach(addMessage);
+  el("peopleStatus").textContent="พบสมาชิก "+peopleResults.length+" คน";
+  peopleResults.forEach(person=>{
+    const card=document.createElement("div");
+    card.className="person";
+
+    const top=document.createElement("div");
+    top.className="person-top";
+
+    const img=document.createElement("img");
+    img.className="person-avatar";
+    img.src=safeImage(person.avatar_url,person.display_name);
+    img.alt="รูปโปรไฟล์";
+    img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
+
+    const names=document.createElement("div");
+    names.style.minWidth="0";
+    const name=document.createElement("div");
+    name.className="person-name";
+    name.textContent=person.display_name||"สมาชิก Vibe";
+    const username=document.createElement("div");
+    username.className="person-username";
+    username.textContent="@"+(person.username||"user");
+    names.append(name,username);
+    top.append(img,names);
+
+    const bio=document.createElement("p");
+    bio.className="person-bio";
+    bio.textContent=person.bio||"ยังไม่ได้เขียนแนะนำตัว";
+
+    const chips=document.createElement("div");
+    (person.interests||[]).slice(0,5).forEach(item=>{
+      const chip=document.createElement("span");
+      chip.className="chip";
+      chip.textContent=item;
+      chips.appendChild(chip);
+    });
+
+    const button=document.createElement("button");
+    button.textContent="ดูโปรไฟล์";
+    button.onclick=()=>showPerson(person.id);
+
+    card.append(top,bio,chips,button);
+    el("peopleList").appendChild(card);
+  });
+}
+
+function showPerson(id){
+  const person=peopleResults.find(p=>p.id===id);
+  if(!person)return;
+  const name=person.display_name||"สมาชิก Vibe";
+  el("detailAvatar").src=safeImage(person.avatar_url,name);
+  el("detailAvatar").onerror=()=>{el("detailAvatar").src=fallbackAvatar(name)};
+  el("detailName").textContent=name;
+  el("detailUsername").textContent="@"+(person.username||"user");
+  el("detailBio").textContent=person.bio||"สมาชิกคนนี้ยังไม่ได้เขียนแนะนำตัว";
+  el("detailInterests").innerHTML="";
+  const interests=person.interests||[];
+  if(!interests.length)el("detailInterests").textContent="ยังไม่ได้ระบุความสนใจ";
+  interests.forEach(item=>{
+    const chip=document.createElement("span");
+    chip.className="chip";
+    chip.textContent=item;
+    el("detailInterests").appendChild(chip);
+  });
+  showPage("personDetail");
+}
+
+async function loadProfiles(userIds){
+  const ids=[...new Set(userIds.filter(Boolean))];
+  const missing=ids.filter(id=>!profileCache[id]);
+  if(!missing.length)return;
+  const {data,error}=await db.from("profiles")
+    .select("id,username,display_name,avatar_url").in("id",missing);
+  if(!error)(data||[]).forEach(p=>profileCache[p.id]=p);
+}
+
+async function loadMessages(){
+  const {data,error}=await db.from("messages")
+    .select("id,created_at,message,user_id")
+    .order("created_at",{ascending:true}).limit(100);
+  if(error){el("chatStatus").textContent="โหลดข้อความไม่สำเร็จ: "+error.message;return}
+  await loadProfiles((data||[]).map(m=>m.user_id));
+  el("messages").innerHTML="";
+  (data||[]).forEach(addMessage);
   scrollMessages();
 }
 
 function addMessage(message){
-  if(document.getElementById("message-"+message.id)) return;
+  if(document.getElementById("message-"+message.id))return;
+  const profile=profileCache[message.user_id]||{};
+  const name=profile.display_name||profile.username||"สมาชิก";
+  const item=document.createElement("div");
+  item.className="msg";
+  item.id="message-"+message.id;
 
-  const profile = profileCache[message.user_id] || {};
-  const name = profile.display_name || profile.username || "สมาชิก";
-  const avatar = safeImage(profile.avatar_url,name);
-  const isMe = message.user_id === currentUser?.id;
-  const time = message.created_at
-    ? new Date(message.created_at).toLocaleString("th-TH")
-    : "";
+  const img=document.createElement("img");
+  img.className="msg-avatar";
+  img.src=safeImage(profile.avatar_url,name);
+  img.alt="รูปโปรไฟล์";
+  img.onerror=()=>{img.src=fallbackAvatar(name)};
 
-  const item = document.createElement("div");
-  item.className = "msg";
-  item.id = "message-"+message.id;
+  const content=document.createElement("div");
+  content.className="msg-content";
+  const title=document.createElement("div");
+  title.className="msg-name";
+  title.textContent=name+(message.user_id===currentUser?.id?" (คุณ)":"");
+  const time=document.createElement("span");
+  time.className="msg-time";
+  time.textContent=message.created_at?new Date(message.created_at).toLocaleString("th-TH"):"";
+  title.appendChild(time);
 
-  const img = document.createElement("img");
-  img.className = "msg-avatar";
-  img.src = avatar;
-  img.alt = "รูปโปรไฟล์";
-  img.onerror = function(){this.onerror=null;this.src=fallbackAvatar(name)};
-
-  const content = document.createElement("div");
-  content.className = "msg-content";
-
-  const title = document.createElement("div");
-  title.className = "msg-name";
-  title.textContent = name + (isMe ? " (คุณ)" : "");
-
-  const timestamp = document.createElement("span");
-  timestamp.className = "msg-time";
-  timestamp.textContent = time;
-  title.appendChild(timestamp);
-
-  const text = document.createElement("p");
-  text.textContent = message.message || "";
-
-  content.appendChild(title);
-  content.appendChild(text);
-  item.appendChild(img);
-  item.appendChild(content);
+  const text=document.createElement("p");
+  text.textContent=message.message||"";
+  content.append(title,text);
+  item.append(img,content);
   el("messages").appendChild(item);
 }
 
-function scrollMessages(){
-  el("messages").scrollTop = el("messages").scrollHeight;
-}
+function scrollMessages(){el("messages").scrollTop=el("messages").scrollHeight}
 
 async function sendMessage(){
-  const input = el("messageInput");
-  const message = input.value.trim();
-  if(!message || !currentUser) return;
-
-  el("sendButton").disabled = true;
-  const {error} = await db.from("messages").insert({
-    message,
-    user_id:currentUser.id
-  });
-  el("sendButton").disabled = false;
-
-  if(error){
-    el("chatStatus").textContent = "ส่งข้อความไม่สำเร็จ: "+error.message;
-  }else{
-    input.value = "";
-    el("chatStatus").textContent = "";
-  }
+  const input=el("messageInput");
+  const message=input.value.trim();
+  if(!message||!currentUser)return;
+  el("sendButton").disabled=true;
+  const {error}=await db.from("messages").insert({message,user_id:currentUser.id});
+  el("sendButton").disabled=false;
+  if(error)el("chatStatus").textContent="ส่งข้อความไม่สำเร็จ: "+error.message;
+  else{input.value="";el("chatStatus").textContent=""}
   input.focus();
 }
 
 function subscribeMessages(){
-  if(realtimeChannel) db.removeChannel(realtimeChannel);
-
-  realtimeChannel = db.channel("vibe-chat-messages")
-    .on("postgres_changes",{
-      event:"INSERT",
-      schema:"public",
-      table:"messages"
-    },async payload=>{
-      await loadProfiles([payload.new.user_id]);
-      addMessage(payload.new);
-      scrollMessages();
-    })
-    .subscribe();
+  if(realtimeChannel)db.removeChannel(realtimeChannel);
+  realtimeChannel=db.channel("vibe-chat-messages")
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},
+      async payload=>{
+        await loadProfiles([payload.new.user_id]);
+        addMessage(payload.new);
+        scrollMessages();
+      }).subscribe();
 }
 
 async function logout(){
-  if(realtimeChannel){
-    await db.removeChannel(realtimeChannel);
-    realtimeChannel = null;
-  }
-
+  if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null}
   await db.auth.signOut();
-  currentUser = null;
-  currentProfile = null;
-  profileCache = {};
-
+  currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
   el("app").classList.add("hidden");
   el("userArea").classList.add("hidden");
   el("authBox").classList.remove("hidden");
-  el("messages").innerHTML = "";
-  el("email").value = "";
-  el("password").value = "";
+  el("messages").innerHTML="";
+  el("email").value="";
+  el("password").value="";
 }
 
 async function init(){
-  const {data:{session}} = await db.auth.getSession();
-  if(session?.user) await startApp(session.user);
+  const {data:{session}}=await db.auth.getSession();
+  if(session?.user)await startApp(session.user);
 }
-
-el("authButton").onclick = login;
+el("authButton").onclick=login;
 init();
 </script>
 </body>
