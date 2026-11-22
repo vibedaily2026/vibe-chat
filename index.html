@@ -88,6 +88,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')">แชท</button>
     <button id="discoverTab" class="secondary" onclick="showPage('discover')">ค้นหาเพื่อน</button>
+    <button id="nearbyTab" class="secondary" onclick="showPage('nearby')">เพื่อนใกล้ฉัน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')">โปรไฟล์ของฉัน</button>
   </div>
 
@@ -113,6 +114,17 @@ label{font-size:14px;font-weight:bold;color:#52657f}
     </div>
     <p id="peopleStatus" class="muted">กำลังโหลดสมาชิก...</p>
     <div id="peopleList" class="people-grid"></div>
+  </section>
+
+  <section id="nearbyPage" class="card hidden">
+    <h2>เพื่อนใกล้ฉัน</h2>
+    <p class="muted">ค้นหาสมาชิก Vibe Chat ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง</p>
+    <div class="row">
+      <button id="nearbyEnableButton" onclick="enableNearby()">เปิดแชร์ตำแหน่ง</button>
+      <button id="nearbyDisableButton" class="secondary hidden" onclick="disableNearby()">ปิดแชร์ตำแหน่ง</button>
+    </div>
+    <p id="nearbyStatus" class="muted">กำลังตรวจสอบสถานะ...</p>
+    <div id="nearbyList" class="people-grid"></div>
   </section>
 
   <section id="personDetailPage" class="card hidden">
@@ -287,14 +299,15 @@ function profileMessage(message){
 }
 
 function showPage(page){
-  ["chat","discover","profile","personDetail"].forEach(name=>{
+  ["chat","discover","nearby","profile","personDetail"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
-  ["chat","discover","profile"].forEach(name=>{
+  ["chat","discover","nearby","profile"].forEach(name=>{
     el(name+"Tab").classList.toggle("active",name===page);
     el(name+"Tab").classList.toggle("secondary",name!==page);
   });
   if(page==="discover")searchPeople();
+  if(page==="nearby"){loadNearbyStatus();loadNearbyFriends();}
 }
 
 async function searchPeople(){
