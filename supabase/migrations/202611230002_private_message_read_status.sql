@@ -16,3 +16,17 @@ with check (user_id = (select auth.uid()));
 grant update (last_read_at)
 on public.conversation_participants
 to authenticated;
+
+-- Keep the unread badge in sync across the member's signed-in devices.
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (
+       select 1 from pg_publication_tables
+       where pubname = 'supabase_realtime'
+         and schemaname = 'public'
+         and tablename = 'conversation_participants'
+     ) then
+    alter publication supabase_realtime add table public.conversation_participants;
+  end if;
+end $$;
