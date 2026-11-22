@@ -8,14 +8,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f4f7fb;color:#25334a;font-family:Arial,"Tahoma",sans-serif}
-header{background:#fff;padding:15px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e7edf5;position:sticky;top:0;z-index:5}
+body{margin:0;background:#f4f7fb;color:#25334a;font-family:Arial,Tahoma,sans-serif}
+header{background:white;padding:15px 5%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e7edf5;position:sticky;top:0;z-index:5}
 .logo{font-size:24px;font-weight:800;color:#3978c9}
 .logo span{color:#263b59;font-weight:400}
 button{border:0;border-radius:10px;padding:11px 17px;background:#4b86d6;color:white;font-size:14px;cursor:pointer}
 button:hover{opacity:.88}
+button:disabled{opacity:.5;cursor:not-allowed}
 button.secondary{background:#e9f1fc;color:#376caf}
-button.danger{background:#fce9e9;color:#b44444}
+button.active{background:#294d7b;color:white}
 main{max-width:950px;margin:25px auto;padding:0 15px}
 .card{background:white;border:1px solid #e8edf4;border-radius:17px;padding:22px;margin-bottom:18px;box-shadow:0 5px 20px #304c7010}
 h2{margin-top:0;color:#304b70}
@@ -25,11 +26,13 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .hidden{display:none!important}
 .tabs{display:flex;gap:10px;margin-bottom:18px}
 .tabs button{flex:1}
-.tabs button.active{background:#294d7b}
-#messages{height:390px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0}
-.msg{background:white;border:1px solid #e8edf4;border-radius:12px;padding:10px 13px;margin-bottom:10px;overflow-wrap:anywhere}
-.msg small{display:block;color:#8795a8;font-size:11px;margin-bottom:5px}
-.msg p{margin:0;white-space:pre-wrap}
+#messages{height:430px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0}
+.msg{display:flex;align-items:flex-start;gap:10px;margin-bottom:13px}
+.msg-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#eaf1fb;flex-shrink:0}
+.msg-content{background:white;border:1px solid #e8edf4;border-radius:12px;padding:10px 13px;min-width:0;max-width:85%;overflow-wrap:anywhere}
+.msg-name{font-weight:bold;font-size:13px;color:#426b9f;margin-bottom:4px}
+.msg-time{font-size:11px;color:#99a5b5;font-weight:normal;margin-left:7px}
+.msg p{margin:0;white-space:pre-wrap;line-height:1.5}
 .row{display:flex;gap:8px}
 .row input{margin:0}
 .row button{white-space:nowrap}
@@ -44,6 +47,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
  #messages{height:55vh}
  .row{gap:5px}
  .row button{padding:10px}
+ .msg-content{max-width:calc(100% - 50px)}
 }
 </style>
 </head>
@@ -84,7 +88,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
     <div class="row">
       <input id="messageInput" placeholder="พิมพ์ข้อความ..." maxlength="2000"
         onkeydown="if(event.key==='Enter')sendMessage()">
-      <button onclick="sendMessage()">ส่ง</button>
+      <button id="sendButton" onclick="sendMessage()">ส่ง</button>
     </div>
     <p id="chatStatus" class="muted"></p>
   </section>
@@ -125,20 +129,22 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 <script>
 const SUPABASE_URL = "https://epdbfncrfjyrgqwjyctu.supabase.co";
 const SUPABASE_KEY = "sb_publishable_CEFu0MBeJ9d5Jci-xc0ggg_uMaI82dG";
-
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser = null;
 let currentProfile = null;
 let realtimeChannel = null;
 let isSignup = false;
+let profileCache = {};
 
-function el(id){ return document.getElementById(id); }
+function el(id){return document.getElementById(id)}
 
-function safe(value){
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
+function fallbackAvatar(name){
+  return "https://ui-avatars.com/api/?name="+encodeURIComponent(name || "Vibe User")+"&background=eaf1fb&color=426b9f";
+}
+
+function safeImage(url,name){
+  return url || fallbackAvatar(name);
 }
 
 function showAuthMessage(message){
@@ -163,7 +169,7 @@ async function login(){
   const {data,error} = await db.auth.signInWithPassword({email,password});
   el("authButton").disabled = false;
 
-  if(error) return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: " + error.message);
+  if(error) return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: "+error.message);
   await startApp(data.user);
 }
 
@@ -180,12 +186,12 @@ async function signup(){
   });
   el("authButton").disabled = false;
 
-  if(error) return showAuthMessage("สมัครสมาชิกไม่สำเร็จ: " + error.message);
+  if(error) return showAuthMessage("สมัครสมาชิกไม่สำเร็จ: "+error.message);
 
   if(data.session){
     await startApp(data.user);
   }else{
-    showAuthMessage("สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี จากนั้นกลับมาเข้าสู่ระบบ");
+    showAuthMessage("สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบ");
   }
 }
 
@@ -204,15 +210,11 @@ async function startApp(user){
 async function loadOrCreateProfile(){
   el("profileEmail").textContent = currentUser.email || "";
 
-  const {data,error} = await db
-    .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
-    .maybeSingle();
+  const {data,error} = await db.from("profiles")
+    .select("*").eq("id",currentUser.id).maybeSingle();
 
   if(error){
-    console.error(error);
-    alert("โหลดโปรไฟล์ไม่สำเร็จ: " + error.message);
+    alert("โหลดโปรไฟล์ไม่สำเร็จ: "+error.message);
     return;
   }
 
@@ -222,27 +224,24 @@ async function loadOrCreateProfile(){
     const fallbackName = (currentUser.email || "สมาชิก").split("@")[0];
     const newProfile = {
       id:currentUser.id,
-      username:"user_" + currentUser.id.replace(/-/g,"").slice(0,8),
+      username:"user_"+currentUser.id.replace(/-/g,"").slice(0,8),
       display_name:fallbackName,
       bio:"",
       avatar_url:"",
       interests:[]
     };
 
-    const {data:created,error:createError} = await db
-      .from("profiles")
-      .insert(newProfile)
-      .select()
-      .single();
+    const {data:created,error:createError} = await db.from("profiles")
+      .insert(newProfile).select().single();
 
     if(createError){
-      console.error(createError);
-      alert("สร้างโปรไฟล์ไม่สำเร็จ: " + createError.message);
+      alert("สร้างโปรไฟล์ไม่สำเร็จ: "+createError.message);
       return;
     }
     currentProfile = created;
   }
 
+  profileCache[currentUser.id] = currentProfile;
   el("username").value = currentProfile.username || "";
   el("displayName").value = currentProfile.display_name || "";
   el("avatarUrl").value = currentProfile.avatar_url || "";
@@ -253,7 +252,7 @@ async function loadOrCreateProfile(){
 
 function updateAvatarPreview(){
   const url = el("avatarUrl").value.trim();
-  el("avatarPreview").src = url || "https://ui-avatars.com/api/?name=Vibe+User&background=eaf1fb&color=426b9f";
+  el("avatarPreview").src = safeImage(url,el("displayName").value || "Vibe User");
 }
 el("avatarUrl").addEventListener("input",updateAvatarPreview);
 
@@ -264,8 +263,8 @@ async function saveProfile(){
   const displayName = el("displayName").value.trim();
   const avatarUrl = el("avatarUrl").value.trim();
   const bio = el("bio").value.trim();
-  const interests = el("interests").value
-    .split(",").map(x=>x.trim()).filter(Boolean).slice(0,20);
+  const interests = el("interests").value.split(",")
+    .map(x=>x.trim()).filter(Boolean).slice(0,20);
 
   if(!/^[a-z0-9_]{3,24}$/.test(username)){
     return profileMessage("Username ต้องมี 3–24 ตัว ใช้ได้เฉพาะ a-z, 0-9 และ _");
@@ -275,28 +274,25 @@ async function saveProfile(){
     return profileMessage("ลิงก์รูปโปรไฟล์ต้องขึ้นต้นด้วย http:// หรือ https://");
   }
 
-  const {data,error} = await db
-    .from("profiles")
-    .update({
-      username,
-      display_name:displayName,
-      avatar_url:avatarUrl || null,
-      bio,
-      interests
-    })
-    .eq("id",currentUser.id)
-    .select()
-    .single();
+  const {data,error} = await db.from("profiles").update({
+    username,
+    display_name:displayName,
+    avatar_url:avatarUrl || null,
+    bio,
+    interests
+  }).eq("id",currentUser.id).select().single();
 
   if(error){
-    if(error.code === "23505"){
-      return profileMessage("Username นี้มีคนใช้แล้ว กรุณาเลือกชื่ออื่น");
-    }
-    return profileMessage("บันทึกไม่สำเร็จ: " + error.message);
+    if(error.code === "23505") return profileMessage("Username นี้มีคนใช้แล้ว กรุณาเลือกชื่ออื่น");
+    return profileMessage("บันทึกไม่สำเร็จ: "+error.message);
   }
 
   currentProfile = data;
+  profileCache[currentUser.id] = data;
   updateAvatarPreview();
+
+  // อัปเดตข้อความเดิมของสมาชิกคนนี้ให้ใช้ชื่อและรูปใหม่
+  await loadMessages();
   profileMessage("บันทึกโปรไฟล์เรียบร้อยแล้ว");
 }
 
@@ -314,17 +310,35 @@ function showPage(page){
   el("profileTab").classList.toggle("secondary",page !== "profile");
 }
 
+async function loadProfiles(userIds){
+  const ids = [...new Set(userIds.filter(Boolean))];
+  const missing = ids.filter(id=>!profileCache[id]);
+
+  if(missing.length){
+    const {data,error} = await db.from("profiles")
+      .select("id,username,display_name,avatar_url")
+      .in("id",missing);
+
+    if(!error){
+      (data || []).forEach(profile=>{
+        profileCache[profile.id] = profile;
+      });
+    }
+  }
+}
+
 async function loadMessages(){
-  const {data,error} = await db
-    .from("messages")
+  const {data,error} = await db.from("messages")
     .select("id,created_at,message,user_id")
     .order("created_at",{ascending:true})
     .limit(100);
 
   if(error){
-    el("chatStatus").textContent = "โหลดข้อความไม่สำเร็จ: " + error.message;
+    el("chatStatus").textContent = "โหลดข้อความไม่สำเร็จ: "+error.message;
     return;
   }
+
+  await loadProfiles((data || []).map(item=>item.user_id));
 
   el("messages").innerHTML = "";
   (data || []).forEach(addMessage);
@@ -332,17 +346,45 @@ async function loadMessages(){
 }
 
 function addMessage(message){
-  if(document.querySelector('[data-message-id="'+CSS.escape(String(message.id))+'"]')) return;
+  if(document.getElementById("message-"+message.id)) return;
+
+  const profile = profileCache[message.user_id] || {};
+  const name = profile.display_name || profile.username || "สมาชิก";
+  const avatar = safeImage(profile.avatar_url,name);
+  const isMe = message.user_id === currentUser?.id;
+  const time = message.created_at
+    ? new Date(message.created_at).toLocaleString("th-TH")
+    : "";
 
   const item = document.createElement("div");
   item.className = "msg";
-  item.dataset.messageId = message.id;
+  item.id = "message-"+message.id;
 
-  const isMe = message.user_id === currentUser?.id;
-  const sender = isMe ? "คุณ" : "สมาชิก";
-  const time = message.created_at ? new Date(message.created_at).toLocaleString("th-TH") : "";
+  const img = document.createElement("img");
+  img.className = "msg-avatar";
+  img.src = avatar;
+  img.alt = "รูปโปรไฟล์";
+  img.onerror = function(){this.onerror=null;this.src=fallbackAvatar(name)};
 
-  item.innerHTML = `<small>${sender} · ${safe(time)}</small><p>${safe(message.message)}</p>`;
+  const content = document.createElement("div");
+  content.className = "msg-content";
+
+  const title = document.createElement("div");
+  title.className = "msg-name";
+  title.textContent = name + (isMe ? " (คุณ)" : "");
+
+  const timestamp = document.createElement("span");
+  timestamp.className = "msg-time";
+  timestamp.textContent = time;
+  title.appendChild(timestamp);
+
+  const text = document.createElement("p");
+  text.textContent = message.message || "";
+
+  content.appendChild(title);
+  content.appendChild(text);
+  item.appendChild(img);
+  item.appendChild(content);
   el("messages").appendChild(item);
 }
 
@@ -355,15 +397,15 @@ async function sendMessage(){
   const message = input.value.trim();
   if(!message || !currentUser) return;
 
-  input.disabled = true;
+  el("sendButton").disabled = true;
   const {error} = await db.from("messages").insert({
     message,
     user_id:currentUser.id
   });
-  input.disabled = false;
+  el("sendButton").disabled = false;
 
   if(error){
-    el("chatStatus").textContent = "ส่งข้อความไม่สำเร็จ: " + error.message;
+    el("chatStatus").textContent = "ส่งข้อความไม่สำเร็จ: "+error.message;
   }else{
     input.value = "";
     el("chatStatus").textContent = "";
@@ -379,7 +421,8 @@ function subscribeMessages(){
       event:"INSERT",
       schema:"public",
       table:"messages"
-    },payload=>{
+    },async payload=>{
+      await loadProfiles([payload.new.user_id]);
       addMessage(payload.new);
       scrollMessages();
     })
@@ -387,26 +430,28 @@ function subscribeMessages(){
 }
 
 async function logout(){
-  if(realtimeChannel) await db.removeChannel(realtimeChannel);
+  if(realtimeChannel){
+    await db.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+
   await db.auth.signOut();
   currentUser = null;
   currentProfile = null;
+  profileCache = {};
+
   el("app").classList.add("hidden");
   el("userArea").classList.add("hidden");
   el("authBox").classList.remove("hidden");
   el("messages").innerHTML = "";
+  el("email").value = "";
+  el("password").value = "";
 }
 
 async function init(){
   const {data:{session}} = await db.auth.getSession();
   if(session?.user) await startApp(session.user);
 }
-
-db.auth.onAuthStateChange((event,session)=>{
-  if(event === "SIGNED_OUT"){
-    currentUser = null;
-  }
-});
 
 el("authButton").onclick = login;
 init();
