@@ -77,6 +77,23 @@ create table if not exists public.call_signals (
 create index if not exists call_signals_call_created_idx
   on public.call_signals (call_id, created_at);
 
+create or replace function public.users_are_blocked(p_user_a uuid, p_user_b uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $
+  select exists (
+    select 1 from public.user_blocks b
+    where (b.blocker_id = p_user_a and b.blocked_id = p_user_b)
+       or (b.blocker_id = p_user_b and b.blocked_id = p_user_a)
+  );
+$;
+
+revoke all on function public.users_are_blocked(uuid, uuid) from public, anon;
+grant execute on function public.users_are_blocked(uuid, uuid) to authenticated;
+
 alter table public.conversations enable row level security;
 alter table public.conversation_participants enable row level security;
 alter table public.direct_messages enable row level security;
@@ -113,11 +130,7 @@ using (
         or (c.user_b = (select auth.uid()) and c.user_a = direct_messages.sender_id)
         or direct_messages.sender_id = (select auth.uid())
       )
-      and not exists (
-        select 1 from public.user_blocks b
-        where (b.blocker_id = c.user_a and b.blocked_id = c.user_b)
-           or (b.blocker_id = c.user_b and b.blocked_id = c.user_a)
-      )
+      and not public.users_are_blocked(c.user_a, c.user_b)
   )
 );
 
@@ -133,11 +146,7 @@ with check (
     where cp.conversation_id = direct_messages.conversation_id
       and cp.user_id = (select auth.uid())
       and (c.user_a = (select auth.uid()) or c.user_b = (select auth.uid()))
-      and not exists (
-        select 1 from public.user_blocks b
-        where (b.blocker_id = c.user_a and b.blocked_id = c.user_b)
-           or (b.blocker_id = c.user_b and b.blocked_id = c.user_a)
-      )
+      and not public.users_are_blocked(c.user_a, c.user_b)
   )
 );
 
@@ -160,11 +169,7 @@ with check (
         (c.user_a = caller_id and c.user_b = callee_id)
         or (c.user_b = caller_id and c.user_a = callee_id)
       )
-      and not exists (
-        select 1 from public.user_blocks b
-        where (b.blocker_id = c.user_a and b.blocked_id = c.user_b)
-           or (b.blocker_id = c.user_b and b.blocked_id = c.user_a)
-      )
+      and not public.users_are_blocked(c.user_a, c.user_b)
   )
 );
 
@@ -278,11 +283,7 @@ using (
     select 1 from public.conversations c
     where c.id::text = (storage.foldername(name))[1]
       and (c.user_a = (select auth.uid()) or c.user_b = (select auth.uid()))
-      and not exists (
-        select 1 from public.user_blocks b
-        where (b.blocker_id = c.user_a and b.blocked_id = c.user_b)
-           or (b.blocker_id = c.user_b and b.blocked_id = c.user_a)
-      )
+      and not public.users_are_blocked(c.user_a, c.user_b)
   )
 );
 
@@ -296,11 +297,7 @@ with check (
     select 1 from public.conversations c
     where c.id::text = (storage.foldername(name))[1]
       and (c.user_a = (select auth.uid()) or c.user_b = (select auth.uid()))
-      and not exists (
-        select 1 from public.user_blocks b
-        where (b.blocker_id = c.user_a and b.blocked_id = c.user_b)
-           or (b.blocker_id = c.user_b and b.blocked_id = c.user_a)
-      )
+      and not public.users_are_blocked(c.user_a, c.user_b)
   )
 );
 
