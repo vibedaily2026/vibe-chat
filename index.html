@@ -135,6 +135,8 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   <p id="authSwitchText" class="muted" style="text-align:center;margin-top:20px">ยังไม่มีบัญชี? <a href="#" onclick="toggleAuth();return false">สมัครสมาชิก</a></p><p style="text-align:center"><a href="#" onclick="el('authBox').classList.add('hidden');el('landing').classList.remove('hidden');return false" data-i18n="backHome">← กลับหน้าแรก</a></p>
 </div>
 
+<audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
+
 <main id="app" class="hidden">
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">แชท</button>
@@ -142,6 +144,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="discoverTab" class="secondary" onclick="showPage('discover')" data-i18n="discoverTab">ค้นหาเพื่อน</button>
     <button id="nearbyTab" class="secondary" onclick="showPage('nearby')" data-i18n="nearbyTab">เพื่อนใกล้ฉัน</button>
     <button id="profileTab" class="secondary" onclick="showPage('profile')" data-i18n="profileTab">โปรไฟล์ของฉัน</button>
+    <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
 
   <section id="inboxPage" class="card hidden">
@@ -252,8 +255,39 @@ let realtimeChannel=null;
 let isSignup=false;
 let profileCache={};
 let peopleResults=[];
+let notificationSoundEnabled=localStorage.getItem("achiNotificationSoundEnabled")==="true";
 
 function el(id){return document.getElementById(id)}
+
+function updateNotificationSoundButton(){
+  const button=el("notificationSoundToggle");
+  if(!button)return;
+  button.textContent=notificationSoundEnabled
+    ?tx("🔊 เสียงเปิด","🔊 Sound on")
+    :tx("🔇 เสียงปิด","🔇 Sound off");
+  button.classList.toggle("active",notificationSoundEnabled);
+  button.classList.toggle("secondary",!notificationSoundEnabled);
+}
+  updateNotificationSoundButton();
+
+async function playAchiNotification(){
+  if(!notificationSoundEnabled)return;
+  const audio=el("achiNotificationSound");
+  if(!audio)return;
+  try{
+    audio.currentTime=0;
+    await audio.play();
+  }catch(error){
+    console.warn("ACHI notification sound could not play:",error);
+  }
+}
+
+function toggleNotificationSound(){
+  notificationSoundEnabled=!notificationSoundEnabled;
+  localStorage.setItem("achiNotificationSoundEnabled",String(notificationSoundEnabled));
+  updateNotificationSoundButton();
+  if(notificationSoundEnabled)playAchiNotification();
+}
 function fallbackAvatar(name){
   return "https://ui-avatars.com/api/?name="+encodeURIComponent(name||"ACHI User")+"&background=efeeff&color=7467f0";
 }
@@ -304,6 +338,7 @@ async function startApp(user){
   el("userArea").classList.remove("hidden");
   el("userEmail").textContent=user.email||"";
   setLanguage(currentLanguage);
+  updateNotificationSoundButton();
   await loadOrCreateProfile();
   await loadMessages();
   setLanguage(currentLanguage);
@@ -582,6 +617,7 @@ function subscribeDirectMessages(){
   if(directRealtimeChannel)db.removeChannel(directRealtimeChannel);
   directRealtimeChannel=db.channel("private-chat-"+currentUser.id)
     .on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},payload=>{
+      if(payload.eventType==="INSERT"&&payload.new?.sender_id!==currentUser?.id)playAchiNotification();
       if(payload.new&&payload.new.conversation_id===activeConversationId)loadDirectMessages();
       loadConversations();
     }).subscribe();
@@ -765,6 +801,7 @@ function subscribeMessages(){
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},
       async payload=>{
         await loadProfiles([payload.new.user_id]);
+        if(payload.new.user_id!==currentUser?.id)playAchiNotification();
         addMessage(payload.new);
         scrollMessages();
       }).subscribe();
