@@ -322,9 +322,10 @@ function showPage(page){
   ["chat","inbox","directChat","discover","nearby","profile","personDetail"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
-  ["chat","inbox","discover","nearby","profile"].forEach(name=>{
-    el(name+"Tab").classList.toggle("active",name===page);
-    el(name+"Tab").classList.toggle("secondary",name!==page);
+  const tabIds={chat:"chatTab",inbox:"privateChatTab",discover:"discoverTab",nearby:"nearbyTab",profile:"profileTab"};
+  Object.entries(tabIds).forEach(([name,id])=>{
+    el(id).classList.toggle("active",name===page);
+    el(id).classList.toggle("secondary",name!==page);
   });
   if(page==="inbox")loadConversations();
   if(page==="discover")searchPeople();
