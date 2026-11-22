@@ -110,7 +110,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 
   <section id="nearbyPage" class="card hidden">
     <h2 data-i18n="nearbyHeading">เพื่อนใกล้ฉัน</h2>
-    <p class="muted">ค้นหาสมาชิก Vibe Chat ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง</p>
+    <p class="muted" data-i18n="nearbyIntro">ค้นหาสมาชิก Vibe Chat ที่อยู่ใกล้เคียง โดยต้องเปิดแชร์ตำแหน่งด้วยความสมัครใจ ระบบจะแสดงเฉพาะระยะทางโดยประมาณ ไม่แสดงพิกัดหรือที่อยู่จริง</p>
     <div class="row">
       <button id="nearbyEnableButton" onclick="enableNearby()" data-i18n="enableLocation">เปิดแชร์ตำแหน่ง</button>
       <button id="nearbyDisableButton" class="secondary hidden" onclick="disableNearby()" data-i18n="disableLocation">ปิดแชร์ตำแหน่ง</button>
@@ -120,39 +120,39 @@ label{font-size:14px;font-weight:bold;color:#52657f}
   </section>
 
   <section id="personDetailPage" class="card hidden">
-    <button class="secondary" onclick="showPage('discover')">← กลับไปค้นหาเพื่อน</button>
+    <button class="secondary" onclick="showPage('discover')" data-i18n="detailBack">← กลับไปค้นหาเพื่อน</button>
     <div style="text-align:center;padding:20px 0">
       <img id="detailAvatar" class="avatar" alt="รูปโปรไฟล์">
       <h2 id="detailName" style="margin:12px 0 5px"></h2>
       <p id="detailUsername" class="muted"></p>
     </div>
-    <h3>แนะนำตัว</h3>
+    <h3 data-i18n="aboutMe">แนะนำตัว</h3>
     <p id="detailBio" style="white-space:pre-wrap"></p>
-    <h3>ความสนใจ</h3>
+    <h3 data-i18n="interestsHeading">ความสนใจ</h3>
     <div id="detailInterests"></div>
   </section>
 
   <section id="profilePage" class="card hidden">
     <h2 data-i18n="profileHeading">โปรไฟล์ของฉัน</h2>
-    <p class="muted">ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น</p>
+    <p class="muted" data-i18n="profileIntro">ข้อมูลนี้ช่วยให้สมาชิกคนอื่นรู้จักคุณมากขึ้น</p>
     <div style="display:flex;align-items:center;gap:17px;margin:20px 0">
       <img id="avatarPreview" class="avatar" alt="รูปโปรไฟล์">
       <div>
         <strong id="profileEmail"></strong>
-        <p class="muted">สมาชิก Vibe Chat</p>
+        <p class="muted" data-i18n="memberLabel">สมาชิก Vibe Chat</p>
       </div>
     </div>
     <label data-i18n="usernameLabel">ชื่อผู้ใช้ (Username)</label>
-    <input id="username" placeholder="เช่น vibe_user">
+    <input id="username" data-i18n-placeholder="usernamePlaceholder" placeholder="เช่น vibe_user">
     <label data-i18n="displayNameLabel">ชื่อที่แสดง</label>
-    <input id="displayName" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
+    <input id="displayName" data-i18n-placeholder="displayNamePlaceholder" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
     <label data-i18n="avatarLabel">ลิงก์รูปโปรไฟล์</label>
     <input id="avatarUrl" type="url" placeholder="https://example.com/photo.jpg">
     <label data-i18n="bioLabel">แนะนำตัว</label>
-    <textarea id="bio" maxlength="300" placeholder="เล่าเกี่ยวกับตัวคุณสักนิด..."></textarea>
+    <textarea id="bio" maxlength="300" data-i18n-placeholder="bioPlaceholder" placeholder="เล่าเกี่ยวกับตัวคุณสักนิด..."></textarea>
     <label data-i18n="interestsLabel">ความสนใจ</label>
-    <input id="interests" placeholder="เช่น เพลง, หนัง, ท่องเที่ยว, เกม">
-    <p class="muted">คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)</p>
+    <input id="interests" data-i18n-placeholder="interestsPlaceholder" placeholder="เช่น เพลง, หนัง, ท่องเที่ยว, เกม">
+    <p class="muted" data-i18n="interestsHint">คั่นแต่ละความสนใจด้วยเครื่องหมายจุลภาค (,)</p>
     <button onclick="saveProfile()" data-i18n="saveProfile">บันทึกโปรไฟล์</button>
     <p id="profileStatus" class="notice hidden"></p>
   </section>
