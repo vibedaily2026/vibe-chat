@@ -310,3 +310,23 @@ using (
   bucket_id = 'private-chat-media'
   and (storage.foldername(name))[2] = (select auth.uid())::text
 );
+
+
+-- Enable Supabase Realtime for private message and call signaling events.
+do $$
+declare
+  v_table text;
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    foreach v_table in array array['direct_messages','call_sessions','call_signals'] loop
+      if not exists (
+        select 1 from pg_publication_tables
+        where pubname = 'supabase_realtime'
+          and schemaname = 'public'
+          and tablename = v_table
+      ) then
+        execute format('alter publication supabase_realtime add table public.%I', v_table);
+      end if;
+    end loop;
+  end if;
+end $$;
