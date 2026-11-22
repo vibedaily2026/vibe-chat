@@ -396,6 +396,114 @@ function showPerson(id){
   showPage("personDetail");
 }
 
+
+async function loadNearbyStatus(){
+  if(!currentUser)return;
+  const {data,error}=await db.rpc("my_location_enabled");
+  if(error){el("nearbyStatus").textContent="ตรวจสอบสถานะไม่สำเร็จ: "+error.message;return}
+  const enabled=!!data;
+  el("nearbyEnableButton").classList.toggle("hidden",enabled);
+  el("nearbyDisableButton").classList.toggle("hidden",!enabled);
+  el("nearbyStatus").textContent=enabled?"กำลังเปิดแชร์ตำแหน่งอยู่":"ขณะนี้ยังไม่ได้แชร์ตำแหน่ง";
+}
+
+function getCurrentPosition(){
+  return new Promise((resolve,reject)=>{
+    if(!navigator.geolocation)return reject(new Error("เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง"));
+    navigator.geolocation.getCurrentPosition(
+      position=>resolve(position),
+      error=>reject(new Error(error.code===1?"คุณยังไม่ได้อนุญาตให้เว็บไซต์ใช้ตำแหน่ง":error.code===2?"ไม่สามารถระบุตำแหน่งได้ กรุณาลองอีกครั้ง":"หมดเวลารอพิกัด กรุณาลองอีกครั้ง")),
+      {enableHighAccuracy:false,timeout:15000,maximumAge:60000}
+    );
+  });
+}
+
+async function enableNearby(){
+  if(!currentUser)return;
+  el("nearbyEnableButton").disabled=true;
+  el("nearbyStatus").textContent="กำลังขออนุญาตตำแหน่งจากเบราว์เซอร์...";
+  try{
+    const position=await getCurrentPosition();
+    const {error}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
+    if(error)throw error;
+    await loadNearbyStatus();
+    el("nearbyStatus").textContent="เปิดแชร์ตำแหน่งแล้ว ระบบจะแสดงเฉพาะระยะทางโดยประมาณ";
+    await loadNearbyFriends();
+  }catch(error){
+    el("nearbyStatus").textContent="เปิดแชร์ตำแหน่งไม่สำเร็จ: "+(error.message||"เกิดข้อผิดพลาด");
+  }finally{el("nearbyEnableButton").disabled=false}
+}
+
+async function disableNearby(){
+  if(!currentUser)return;
+  el("nearbyDisableButton").disabled=true;
+  const {error}=await db.rpc("set_my_location",{p_lat:null,p_lon:null,p_enabled:false});
+  el("nearbyDisableButton").disabled=false;
+  if(error){el("nearbyStatus").textContent="ปิดแชร์ตำแหน่งไม่สำเร็จ: "+error.message;return}
+  el("nearbyList").innerHTML="";
+  await loadNearbyStatus();
+  el("nearbyStatus").textContent="ปิดแชร์ตำแหน่งแล้ว และลบพิกัดที่จัดเก็บไว้แล้ว";
+}
+
+async function loadNearbyFriends(){
+  if(!currentUser)return;
+  el("nearbyList").innerHTML="";
+  el("nearbyStatus").textContent="กำลังค้นหาเพื่อนใกล้เคียง...";
+  const {data:enabled,error:statusError}=await db.rpc("my_location_enabled");
+  if(statusError){el("nearbyStatus").textContent="ตรวจสอบสถานะไม่สำเร็จ: "+statusError.message;return}
+  if(!enabled){el("nearbyStatus").textContent="กรุณากด “เปิดแชร์ตำแหน่ง” ก่อนค้นหาเพื่อนใกล้เคียง";return}
+  try{
+    const position=await getCurrentPosition();
+    const {error:updateError}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
+    if(updateError)throw updateError;
+  }catch(error){el("nearbyStatus").textContent="อัปเดตตำแหน่งไม่สำเร็จ: "+error.message;return}
+  const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:50});
+  if(error){el("nearbyStatus").textContent="ค้นหาเพื่อนไม่สำเร็จ: "+error.message;return}
+  if(!data||!data.length){el("nearbyStatus").textContent="ยังไม่พบสมาชิกที่แชร์ตำแหน่งภายใน 50 กม. เมื่อมีสมาชิกใกล้เคียงเปิดแชร์ ระบบจะแสดงที่นี่";return}
+  const ids=data.map(x=>x.user_id);
+  const {data:profiles,error:profileError}=await db.from("profiles").select("id,username,display_name,avatar_url,bio,interests").in("id",ids);
+  if(profileError){el("nearbyStatus").textContent="โหลดโปรไฟล์สมาชิกไม่สำเร็จ: "+profileError.message;return}
+  const byId={};
+  (profiles||[]).forEach(p=>byId[p.id]=p);
+  const found=data.filter(x=>byId[x.user_id]);
+  if(!found.length){el("nearbyStatus").textContent="ไม่พบโปรไฟล์สมาชิกที่ตรงกับตำแหน่ง";return}
+  el("nearbyStatus").textContent="พบสมาชิกใกล้เคียง "+found.length+" คน (ระยะทางโดยประมาณ)";
+  found.forEach(item=>{
+    const person=byId[item.user_id];
+    const card=document.createElement("div");card.className="person";
+    const top=document.createElement("div");top.className="person-top";
+    const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person.avatar_url,person.display_name);img.alt="รูปโปรไฟล์";
+    img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
+    const names=document.createElement("div");names.style.minWidth="0";
+    const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||"สมาชิก Vibe";
+    const username=document.createElement("div");username.className="person-username";username.textContent="@"+(person.username||"user");
+    names.append(name,username);top.append(img,names);
+    const distance=document.createElement("div");distance.className="nearby-distance";distance.textContent="ระยะทางโดยประมาณ: "+item.distance_km+" กม.";
+    const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||"ยังไม่ได้เขียนแนะนำตัว";
+    const actions=document.createElement("div");actions.className="nearby-actions";
+    const view=document.createElement("button");view.textContent="ดูโปรไฟล์";view.onclick=()=>{peopleResults=[person];showPerson(person.id)};
+    const block=document.createElement("button");block.className="secondary";block.textContent="บล็อก";block.onclick=()=>blockNearbyUser(person.id,person.display_name||"สมาชิก");
+    const report=document.createElement("button");report.className="secondary";report.textContent="รายงาน";report.onclick=()=>reportNearbyUser(person.id,person.display_name||"สมาชิก");
+    actions.append(view,block,report);card.append(top,distance,bio,actions);el("nearbyList").appendChild(card);
+  });
+}
+
+async function blockNearbyUser(userId,name){
+  if(!confirm("ต้องการบล็อก "+name+" ใช่ไหม? สมาชิกที่บล็อกกันจะไม่ปรากฏในผลค้นหาเพื่อนใกล้ฉัน"))return;
+  const {error}=await db.from("user_blocks").insert({blocker_id:currentUser.id,blocked_id:userId});
+  if(error){el("nearbyStatus").textContent=error.code==="23505"?"คุณบล็อกสมาชิกนี้อยู่แล้ว":"บล็อกไม่สำเร็จ: "+error.message;return}
+  el("nearbyStatus").textContent="บล็อกสมาชิกแล้ว";await loadNearbyFriends();
+}
+
+async function reportNearbyUser(userId,name){
+  const reason=prompt("ระบุเหตุผลในการรายงาน "+name+" (เช่น คุกคาม, สแปม, แอบอ้าง)");
+  if(!reason||!reason.trim())return;
+  const details=prompt("รายละเอียดเพิ่มเติม (ไม่บังคับ)")||"";
+  const {error}=await db.from("user_reports").insert({reporter_id:currentUser.id,reported_id:userId,reason:reason.trim().slice(0,100),details:details.trim().slice(0,1000)});
+  if(error){el("nearbyStatus").textContent="ส่งรายงานไม่สำเร็จ: "+error.message;return}
+  alert("ส่งรายงานเรียบร้อยแล้ว ขอบคุณที่ช่วยให้ Vibe Chat ปลอดภัยขึ้น");
+}
+
 async function loadProfiles(userIds){
   const ids=[...new Set(userIds.filter(Boolean))];
   const missing=ids.filter(id=>!profileCache[id]);
