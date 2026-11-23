@@ -681,6 +681,12 @@ let callPeerName="";
 let callRingbackContext=null;
 let callRingbackTimer=null;
 let callRingbackOscillator=null;
+let incomingRingContext=null;
+let incomingRingTimer=null;
+let callTimeoutTimer=null;
+let callSessionId=null;
+let callConnectedAt=null;
+let callHistoryLogged=false;
 
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
@@ -800,7 +806,24 @@ async function loadDirectMessages(){
       link.target="_blank";link.rel="noopener noreferrer";link.textContent=tx("📍 เปิดตำแหน่งที่แชร์","📍 Open shared location");
       bubble.append(link);
     }
-    if(m.body){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
+    let callEvent=null;
+    if(typeof m.body==="string"&&m.body.startsWith("ACHI_CALL_EVENT:")){
+      try{callEvent=JSON.parse(m.body.slice("ACHI_CALL_EVENT:".length))}catch(error){console.warn("Invalid call history entry",error)}
+    }
+    if(callEvent){
+      const line=document.createElement("div");line.style.cssText="display:flex;align-items:center;gap:10px;min-width:190px";
+      const icon=document.createElement("span");icon.style.cssText="font-size:25px";icon.textContent=callEvent.type==="video"?"📹":"📞";
+      const details=document.createElement("div");
+      const heading=document.createElement("strong");
+      const isTh=currentLanguage==="th";
+      heading.textContent=callEvent.status==="ended"?(isTh?"สิ้นสุดการโทร":"Call ended"):callEvent.status==="missed"?(isTh?"ไม่ได้รับสาย":"Missed call"):callEvent.status==="rejected"?(isTh?"ถูกปฏิเสธสาย":"Call declined"):callEvent.status==="busy"?(isTh?"สายไม่สำเร็จ — ไม่ว่าง":"Call failed — busy"):(isTh?"โทรไม่สำเร็จ":"Call failed");
+      const sub=document.createElement("div");sub.style.cssText="font-size:12px;color:#8290a3;margin-top:3px";
+      if(callEvent.status==="ended"){
+        const secs=Math.max(0,Number(callEvent.durationSeconds)||0),mins=Math.floor(secs/60),rem=secs%60;
+        sub.textContent=isTh?("ระยะเวลา "+mins+" นาที "+rem+" วินาที"):("Duration "+mins+"m "+rem+"s");
+      }else sub.textContent=isTh?"ไม่มีการเชื่อมต่อสาย":"No connection";
+      details.append(heading,sub);line.append(icon,details);bubble.append(line);
+    }else if(m.body){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
     const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
     bubble.append(time);
     if(m.sender_id===currentUser.id){
@@ -932,14 +955,14 @@ async function ensureCallChannel(conversationId){
       if(callState!=="idle"){await sendCallSignal("call-busy",{to:payload.callerId,from:currentUser.id});return}
       pendingCallOffer=payload;callType=payload.callType==="video"?"video":"audio";
       callPeerName=payload.callerName||el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
-      callState="ringing";showPage("directChat");showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);
+      callState="ringing";callSessionId=payload.callId||null;callConnectedAt=null;callHistoryLogged=false;showPage("directChat");showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);startIncomingCallRingtone();
       el("directIncomingActions").classList.remove("hidden");el("directActiveActions").classList.add("hidden");
       el("directCallVideos").classList.toggle("hidden",callType!=="video");
       el("directCameraButton").classList.toggle("hidden",callType!=="video");
     })
     .on("broadcast",{event:"call-answer"},async({payload})=>{
       if(!payload||payload.from===currentUser?.id||!callPeerConnection)return;
-      stopCallRingback();
+      stopCallRingback();stopCallTimeout();
       try{await callPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));await flushQueuedIceCandidates();callState="connected";showDirectCallPanel(tx("กำลังสนทนา","In call"))}
       catch(error){console.error("Call answer error",error);el("directCallStatus").textContent=tx("เชื่อมต่อสายไม่สำเร็จ: ","Could not connect call: ")+error.message}
     })
@@ -950,15 +973,15 @@ async function ensureCallChannel(conversationId){
     })
     .on("broadcast",{event:"call-reject"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
-      el("directCallStatus").textContent=tx("อีกฝ่ายปฏิเสธสาย","The call was declined");await cleanupDirectCall(false);
+      el("directCallStatus").textContent=tx("อีกฝ่ายปฏิเสธสาย","The call was declined");stopCallTimeout();await saveCallHistory("rejected");await cleanupDirectCall(false);
     })
     .on("broadcast",{event:"call-end"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
-      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");await cleanupDirectCall(false);
+      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");stopCallTimeout();if(callConnectedAt)await saveCallHistory("ended");else await saveCallHistory("missed");await cleanupDirectCall(false);
     })
     .on("broadcast",{event:"call-busy"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
-      el("directCallStatus").textContent=tx("สมาชิกกำลังติดสายอื่น","This member is busy");await cleanupDirectCall(false);
+      el("directCallStatus").textContent=tx("สมาชิกกำลังติดสายอื่น","This member is busy");stopCallTimeout();await saveCallHistory("busy");await cleanupDirectCall(false);
     });
   await new Promise((resolve,reject)=>{
     const timeout=setTimeout(()=>reject(new Error("Realtime subscription timed out")),12000);
@@ -974,6 +997,41 @@ async function sendCallSignal(event,payload){
   if(result!=="ok")throw new Error("Signal could not be sent: "+result);
 }
 function showDirectCallPanel(status){el("directCallPanel").classList.remove("hidden");el("directCallStatus").textContent=status}
+function stopIncomingCallRingtone(){
+  if(incomingRingTimer){clearInterval(incomingRingTimer);incomingRingTimer=null}
+  if(incomingRingContext){try{incomingRingContext.close()}catch(error){}incomingRingContext=null}
+}
+function playIncomingCallTone(){
+  const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;
+  try{
+    if(!incomingRingContext)incomingRingContext=new Ctx();
+    const ctx=incomingRingContext;if(ctx.state==="suspended")ctx.resume().catch(()=>{});
+    [0,0.28].forEach(offset=>{
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type="sine";osc.frequency.value=660;
+      gain.gain.setValueAtTime(0.0001,ctx.currentTime+offset);
+      gain.gain.exponentialRampToValueAtTime(0.13,ctx.currentTime+offset+0.04);
+      gain.gain.setValueAtTime(0.13,ctx.currentTime+offset+0.17);
+      gain.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+offset+0.23);
+      osc.connect(gain);gain.connect(ctx.destination);osc.start(ctx.currentTime+offset);osc.stop(ctx.currentTime+offset+0.24);
+    });
+  }catch(error){console.warn("Incoming ringtone error",error)}
+}
+function startIncomingCallRingtone(){stopIncomingCallRingtone();playIncomingCallTone();incomingRingTimer=setInterval(playIncomingCallTone,2600)}
+function newCallSession(){
+  callSessionId=(window.crypto?.randomUUID?.()||("call-"+Date.now()+"-"+Math.random().toString(36).slice(2)));
+  callConnectedAt=null;callHistoryLogged=false;
+}
+async function saveCallHistory(status){
+  if(callHistoryLogged||!activeConversationId||!currentUser||!callSessionId)return;
+  callHistoryLogged=true;
+  const durationSeconds=status==="ended"&&callConnectedAt?Math.max(0,Math.round((Date.now()-callConnectedAt)/1000)):0;
+  const body="ACHI_CALL_EVENT:"+JSON.stringify({id:callSessionId,type:callType,status,durationSeconds});
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body});
+  if(error){callHistoryLogged=false;console.warn("Could not save call history:",error.message);el("directStatus").textContent=tx("บันทึกประวัติการโทรไม่สำเร็จ: ","Could not save call history: ")+error.message;return}
+  await loadDirectMessages();await loadConversations();
+}
+function stopCallTimeout(){if(callTimeoutTimer){clearTimeout(callTimeoutTimer);callTimeoutTimer=null}}
 function createDirectPeerConnection(){
   const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
   pc.onicecandidate=event=>{if(event.candidate)sendCallSignal("ice-candidate",{from:currentUser.id,candidate:event.candidate.toJSON()}).catch(error=>console.warn("Could not send ICE candidate",error))};
@@ -984,7 +1042,7 @@ function createDirectPeerConnection(){
     else el("directRemoteAudio").srcObject=callRemoteStream;
   };
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==="connected"){stopCallRingback();callState="connected";el("directCallStatus").textContent=tx("กำลังสนทนา","In call")}
+    if(pc.connectionState==="connected"){stopCallRingback();stopCallTimeout();callState="connected";if(!callConnectedAt)callConnectedAt=Date.now();el("directCallStatus").textContent=tx("กำลังสนทนา","In call")}
     else if(pc.connectionState==="failed")el("directCallStatus").textContent=tx("การเชื่อมต่อล้มเหลว อาจต้องใช้ TURN Server","Connection failed. A TURN server may be required.");
   };
   return pc;
@@ -999,16 +1057,22 @@ async function startDirectCall(type){
   if(callState!=="idle"){el("directStatus").textContent=tx("มีสายที่กำลังดำเนินอยู่แล้ว","A call is already in progress");return}
   callType=type==="video"?"video":"audio";callPeerName=el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
   try{
-    await ensureCallChannel(activeConversationId);callState="outgoing";
+    await ensureCallChannel(activeConversationId);newCallSession();callState="outgoing";
     showDirectCallPanel(tx("กำลังโทรหา ","Calling ")+callPeerName+"...");
     el("directIncomingActions").classList.add("hidden");el("directActiveActions").classList.remove("hidden");
     el("directCallVideos").classList.toggle("hidden",callType!=="video");el("directCameraButton").classList.toggle("hidden",callType!=="video");
-    await acquireCallMedia();callPeerConnection=createDirectPeerConnection();
+    stopIncomingCallRingtone();await acquireCallMedia();callPeerConnection=createDirectPeerConnection();
     callLocalStream.getTracks().forEach(track=>callPeerConnection.addTrack(track,callLocalStream));
     const offer=await callPeerConnection.createOffer();await callPeerConnection.setLocalDescription(offer);
-    await sendCallSignal("call-offer",{callerId:currentUser.id,callerName:currentProfile?.display_name||"ACHI member",callType,offer:callPeerConnection.localDescription.toJSON()});
+    await sendCallSignal("call-offer",{callerId:currentUser.id,callerName:currentProfile?.display_name||"ACHI member",callType,callId:callSessionId,offer:callPeerConnection.localDescription.toJSON()});
     el("directCallStatus").textContent=tx("กำลังเรียก... รออีกฝ่ายรับสาย","Ringing... Waiting for answer");
     await startCallRingback();
+    callTimeoutTimer=setTimeout(async()=>{
+      if(callState!=="outgoing")return;
+      try{await sendCallSignal("call-end",{from:currentUser.id,callId:callSessionId,reason:"timeout"})}catch(error){console.warn("Could not notify missed call",error)}
+      el("directCallStatus").textContent=tx("ไม่มีผู้รับสายภายใน 30 วินาที","No answer after 30 seconds");
+      stopCallRingback();await saveCallHistory("missed");await cleanupDirectCall(false);
+    },30000);
   }catch(error){el("directCallStatus").textContent=tx("เริ่มโทรไม่สำเร็จ: ","Could not start call: ")+(error.message||error);await cleanupDirectCall(false)}
 }
 async function acceptDirectCall(){
@@ -1028,9 +1092,9 @@ async function flushQueuedIceCandidates(){
   const candidates=queuedIceCandidates.splice(0);
   for(const candidate of candidates){try{await callPeerConnection.addIceCandidate(candidate)}catch(error){console.warn("Queued ICE candidate error",error)}}
 }
-async function rejectDirectCall(){try{await sendCallSignal("call-reject",{from:currentUser.id})}catch(error){console.warn(error)}await cleanupDirectCall(false)}
+async function rejectDirectCall(){stopIncomingCallRingtone();try{await sendCallSignal("call-reject",{from:currentUser.id,callId:callSessionId})}catch(error){console.warn(error)}await cleanupDirectCall(false)}
 async function cleanupDirectCall(hidePanel=true){
-  stopCallRingback();
+  stopCallRingback();stopIncomingCallRingtone();stopCallTimeout();
   if(callLocalStream){callLocalStream.getTracks().forEach(track=>track.stop());callLocalStream=null}
   if(callPeerConnection){callPeerConnection.ontrack=null;callPeerConnection.onicecandidate=null;callPeerConnection.close();callPeerConnection=null}
   callRemoteStream=null;queuedIceCandidates=[];pendingCallOffer=null;callState="idle";
@@ -1042,7 +1106,10 @@ async function cleanupDirectCall(hidePanel=true){
 }
 async function endDirectCall(sendSignal=true){
   if(callState==="idle")return;
-  if(sendSignal){try{await sendCallSignal("call-end",{from:currentUser?.id})}catch(error){console.warn("Could not send call end",error)}}
+  const wasConnected=!!callConnectedAt;
+  stopCallTimeout();
+  if(sendSignal){try{await sendCallSignal("call-end",{from:currentUser?.id,callId:callSessionId})}catch(error){console.warn("Could not send call end",error)}}
+  if(wasConnected)await saveCallHistory("ended");
   await cleanupDirectCall(true);
 }
 function toggleDirectMute(){
