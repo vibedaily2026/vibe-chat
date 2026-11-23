@@ -801,7 +801,7 @@ async function sendDirectImage(){
   el("directStatus").textContent=tx("กำลังอัปโหลดรูปภาพ...","Uploading image...");
   const {error:uploadError}=await db.storage.from("private-chat-media").upload(path,file,{contentType:file.type,upsert:false});
   if(uploadError){el("directStatus").textContent=tx("อัปโหลดรูปไม่สำเร็จ: ","Image upload failed: ")+uploadError.message;return}
-  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"image",media_path:path,body:""});
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"image",media_path:path,body:null});
   if(error){
     await db.storage.from("private-chat-media").remove([path]);
     el("directStatus").textContent=tx("ส่งรูปไม่สำเร็จ: ","Could not send image: ")+error.message;return;
@@ -815,7 +815,7 @@ async function shareDirectLocation(){
     const position=await getCurrentPosition();
     const {error}=await db.from("direct_messages").insert({
       conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"location",
-      body:"",latitude:position.coords.latitude,longitude:position.coords.longitude
+      body:null,latitude:position.coords.latitude,longitude:position.coords.longitude
     });
     if(error)throw error;
     await loadDirectMessages();await loadConversations();
