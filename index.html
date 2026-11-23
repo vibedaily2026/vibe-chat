@@ -687,6 +687,7 @@ let callTimeoutTimer=null;
 let callSessionId=null;
 let callConnectedAt=null;
 let callHistoryLogged=false;
+let isCallInitiator=false;
 
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
@@ -955,7 +956,7 @@ async function ensureCallChannel(conversationId){
       if(callState!=="idle"){await sendCallSignal("call-busy",{to:payload.callerId,from:currentUser.id});return}
       pendingCallOffer=payload;callType=payload.callType==="video"?"video":"audio";
       callPeerName=payload.callerName||el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
-      callState="ringing";callSessionId=payload.callId||null;callConnectedAt=null;callHistoryLogged=false;showPage("directChat");showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);startIncomingCallRingtone();
+      callState="ringing";callSessionId=payload.callId||null;callConnectedAt=null;callHistoryLogged=false;isCallInitiator=false;showPage("directChat");showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);startIncomingCallRingtone();
       el("directIncomingActions").classList.remove("hidden");el("directActiveActions").classList.add("hidden");
       el("directCallVideos").classList.toggle("hidden",callType!=="video");
       el("directCameraButton").classList.toggle("hidden",callType!=="video");
@@ -977,7 +978,7 @@ async function ensureCallChannel(conversationId){
     })
     .on("broadcast",{event:"call-end"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
-      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");stopCallTimeout();if(callConnectedAt)await saveCallHistory("ended");else await saveCallHistory("missed");await cleanupDirectCall(false);
+      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");stopCallTimeout();await cleanupDirectCall(false);
     })
     .on("broadcast",{event:"call-busy"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
@@ -1020,10 +1021,10 @@ function playIncomingCallTone(){
 function startIncomingCallRingtone(){stopIncomingCallRingtone();playIncomingCallTone();incomingRingTimer=setInterval(playIncomingCallTone,2600)}
 function newCallSession(){
   callSessionId=(window.crypto?.randomUUID?.()||("call-"+Date.now()+"-"+Math.random().toString(36).slice(2)));
-  callConnectedAt=null;callHistoryLogged=false;
+  callConnectedAt=null;callHistoryLogged=false;isCallInitiator=true;
 }
 async function saveCallHistory(status){
-  if(callHistoryLogged||!activeConversationId||!currentUser||!callSessionId)return;
+  if(callHistoryLogged||!isCallInitiator||!activeConversationId||!currentUser||!callSessionId)return;
   callHistoryLogged=true;
   const durationSeconds=status==="ended"&&callConnectedAt?Math.max(0,Math.round((Date.now()-callConnectedAt)/1000)):0;
   const body="ACHI_CALL_EVENT:"+JSON.stringify({id:callSessionId,type:callType,status,durationSeconds});
@@ -1109,7 +1110,7 @@ async function endDirectCall(sendSignal=true){
   const wasConnected=!!callConnectedAt;
   stopCallTimeout();
   if(sendSignal){try{await sendCallSignal("call-end",{from:currentUser?.id,callId:callSessionId})}catch(error){console.warn("Could not send call end",error)}}
-  if(wasConnected)await saveCallHistory("ended");
+  if(wasConnected&&isCallInitiator)await saveCallHistory("ended");
   await cleanupDirectCall(true);
 }
 function toggleDirectMute(){
