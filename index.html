@@ -114,6 +114,8 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .room-latest-time{font-size:11px;color:#929BB0;white-space:nowrap;flex:none}
 .room-latest-empty{color:#929BB0;font-style:italic}
 
+.room-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 7px;margin-left:7px;border-radius:999px;background:#e5485d;color:#fff;font-size:11px;font-weight:700;vertical-align:middle}
+
 </style>
 </head>
 <body>
@@ -1281,6 +1283,28 @@ async function loadProfiles(userIds){
   if(!error)(data||[]).forEach(p=>profileCache[p.id]=p);
 }
 
+async function markCommunityRoomRead(roomId){
+  if(!currentUser||!roomId)return;
+  const {error}=await db.from("community_room_reads").upsert({
+    user_id:currentUser.id,
+    room_id:roomId,
+    last_read_at:new Date().toISOString()
+  },{onConflict:"user_id,room_id"});
+  if(error)console.warn("Could not mark community room as read:",error.message);
+}
+
+async function getCommunityUnreadCount(roomId,lastReadAt){
+  let query=db.from("messages").select("id",{count:"exact",head:true})
+    .eq("room_id",roomId).neq("user_id",currentUser.id);
+  if(lastReadAt)query=query.gt("created_at",lastReadAt);
+  const {count,error}=await query;
+  if(error){
+    console.warn("Could not load unread community messages:",error.message);
+    return null;
+  }
+  return count||0;
+}
+
 async function loadCommunityRooms(){
   if(!currentUser)return;
   el("communityRoomsStatus").textContent=tx("กำลังโหลดห้องชุมชน...","Loading community rooms...");
@@ -1298,22 +1322,39 @@ async function loadCommunityRooms(){
     return;
   }
   el("communityRoomsStatus").textContent=tx("เลือกห้องที่ต้องการเข้าไปพูดคุย","Choose a room to start chatting");
-  const latestResults=await Promise.all(communityRooms.map(async room=>{
-    const result=await db.from("messages")
-      .select("message,created_at")
-      .eq("room_id",room.id)
-      .order("created_at",{ascending:false})
-      .limit(1);
-    return {roomId:room.id,message:result.data?.[0]||null,error:result.error};
-  }));
+  const [latestResults,readResult]=await Promise.all([
+    Promise.all(communityRooms.map(async room=>{
+      const result=await db.from("messages")
+        .select("message,created_at")
+        .eq("room_id",room.id)
+        .order("created_at",{ascending:false})
+        .limit(1);
+      return {roomId:room.id,message:result.data?.[0]||null,error:result.error};
+    })),
+    db.from("community_room_reads").select("room_id,last_read_at").eq("user_id",currentUser.id)
+  ]);
   const latestByRoom={};
   latestResults.forEach(result=>latestByRoom[result.roomId]=result);
+  const readByRoom={};
+  if(!readResult.error)(readResult.data||[]).forEach(row=>readByRoom[row.room_id]=row.last_read_at);
+  const unreadCounts=await Promise.all(communityRooms.map(async room=>({
+    roomId:room.id,count:await getCommunityUnreadCount(room.id,readByRoom[room.id]||null)
+  })));
+  const unreadByRoom={};
+  unreadCounts.forEach(item=>unreadByRoom[item.roomId]=item.count);
   communityRooms.forEach(room=>{
     const card=document.createElement("article");card.className="person";
     const top=document.createElement("div");top.className="person-top";
     const emoji=document.createElement("div");emoji.style.cssText="font-size:34px;width:58px;text-align:center";emoji.textContent=room.emoji||"💬";
     const details=document.createElement("div");details.style.minWidth="0";
     const name=document.createElement("div");name.className="person-name";name.textContent=currentLanguage==="en"?(room.name_en||room.name_th):(room.name_th||room.name_en);
+    const unreadCount=unreadByRoom[room.id];
+    if(unreadCount>0){
+      const badge=document.createElement("span");badge.className="room-unread-badge";
+      badge.textContent=unreadCount>99?"99+":String(unreadCount);
+      badge.setAttribute("aria-label",tx("ข้อความที่ยังไม่ได้อ่าน "," unread messages ")+unreadCount);
+      name.append(badge);
+    }
     const description=document.createElement("p");description.className="person-bio";description.textContent=currentLanguage==="en"?(room.description_en||room.description_th):(room.description_th||room.description_en);
     details.append(name,description);top.append(emoji,details);
     const latest=latestByRoom[room.id];
@@ -1345,6 +1386,9 @@ async function openCommunityRoom(roomId){
   el("chatStatus").textContent="";
   showPage("communityRoom");
   await loadMessages(room.id);
+  if(!el("chatStatus").textContent){
+    await markCommunityRoomRead(room.id);
+  }
 }
 async function loadMessages(roomId=activeCommunityRoomId){
   if(!roomId)return;
@@ -1411,7 +1455,10 @@ function subscribeMessages(){
       async payload=>{
         await loadProfiles([payload.new.user_id]);
         if(payload.new.room_id!==activeCommunityRoomId||el("communityRoomPage").classList.contains("hidden"))return;
-        if(payload.new.user_id!==currentUser?.id)playAchiNotification();
+        if(payload.new.user_id!==currentUser?.id){
+          playAchiNotification();
+          await markCommunityRoomRead(activeCommunityRoomId);
+        }
         addMessage(payload.new);
         scrollMessages();
       }).subscribe();
