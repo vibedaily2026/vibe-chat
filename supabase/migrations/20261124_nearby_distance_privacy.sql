@@ -1,5 +1,5 @@
--- ACHI Nearby Friends: reduce distance precision to protect member location privacy.
--- Returns distance rounded to 0.1 km (100 metres), never coordinates.
+-- ACHI Nearby Friends: keep the distance display at the requested two decimal places.
+-- Returns distance rounded to 0.01 km (10 metres), never coordinates.
 -- Safe to re-run; does not change stored locations or user records.
 
 CREATE OR REPLACE FUNCTION public.find_nearby_friends(
@@ -45,7 +45,7 @@ BEGIN
         * COS(RADIANS(other.latitude))
         * POWER(SIN(RADIANS(other.longitude - v_lon) / 2), 2)
       ))
-    )::numeric, 1)
+    )::numeric, 2)
   FROM private.nearby_locations AS other
   WHERE other.user_id <> auth.uid()
     AND other.is_sharing = true
