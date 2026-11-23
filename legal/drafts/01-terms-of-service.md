@@ -12,7 +12,7 @@
 เมื่อสร้างบัญชีหรือใช้บริการ ACHI คุณยืนยันว่าได้อ่านและยอมรับข้อกำหนดฉบับนี้และแนวทางชุมชน การยอมรับข้อกำหนดการใช้บริการต้องแยกจากการให้ความยินยอมอื่นที่กฎหมายกำหนด
 
 ### 2. อายุและคุณสมบัติสมาชิก
-ACHI ให้บริการเฉพาะบุคคลที่มีอายุ **18 ปีบริบูรณ์ขึ้นไป** เท่านั้น ผู้สมัครต้องให้วันเดือนปีเกิดที่ถูกต้องและไม่แอบอ้างอายุ หากพบว่าผู้ใช้มีอายุต่ำกว่า 18 ปีหรือให้ข้อมูลอายุเท็จ ACHI อาจระงับหรือลบบัญชี และดำเนินการกับข้อมูลตามกฎหมายที่เกี่ยวข้อง
+ACHI ให้บริการเฉพาะบุคคลที่มีอายุ **18 ปีบริบูรณ์ขึ้นไป** เท่านั้น ผู้สมัครต้องยืนยันว่ามีอายุครบ 18 ปีบริบูรณ์และไม่แอบอ้างอายุ หากพบว่าผู้ใช้มีอายุต่ำกว่า 18 ปีหรือให้ข้อมูลอายุเท็จ ACHI อาจระงับหรือลบบัญชี และดำเนินการกับข้อมูลตามกฎหมายที่เกี่ยวข้อง
 
 ### 3. บัญชีและความปลอดภัย
 คุณต้องให้ข้อมูลที่ถูกต้อง เก็บรักษาข้อมูลเข้าสู่ระบบเป็นความลับ และแจ้ง ACHI เมื่อสงสัยว่าบัญชีถูกเข้าถึงโดยไม่ได้รับอนุญาต ห้ามขาย ให้เช่า หรือโอนบัญชีแก่ผู้อื่น
@@ -50,7 +50,7 @@ ACHI อาจปรับปรุง ระงับ หรือยุติ�
 By creating an account or using ACHI, you confirm that you have read and agree to these Terms and the Community Guidelines. Acceptance of these Terms is separate from any consent that must be obtained independently under applicable law.
 
 ### 2. Age and eligibility
-ACHI is for people who are **18 years of age or older**. You must provide an accurate date of birth and must not misrepresent your age. If ACHI reasonably determines that an account belongs to someone under 18 or contains a false age, ACHI may suspend or close the account and handle related data as required by law.
+ACHI is for people who are **18 years of age or older**. You must confirm that you are at least 18 years old and must not misrepresent your age. If ACHI reasonably determines that an account belongs to someone under 18 or contains a false age, ACHI may suspend or close the account and handle related data as required by law.
 
 ### 3. Accounts and security
 You must provide accurate information, keep your credentials secure, and promptly report suspected unauthorized access. You may not sell, rent, or transfer your account.
