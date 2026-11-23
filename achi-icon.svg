@@ -1,7 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="116" fill="#7467F0"/>
-  <circle cx="190" cy="220" r="27" fill="#fff"/>
-  <circle cx="322" cy="220" r="27" fill="#fff"/>
-  <path d="M164 304 Q256 400 348 304" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round"/>
-  <circle cx="256" cy="256" r="218" fill="none" stroke="#B9C9FF" stroke-width="12" opacity=".65"/>
+<rect width="512" height="512" rx="112" fill="#7467F0"/>
+<path d="M0 380C110 315 190 455 300 395S440 360 512 405V512H0Z" fill="#8F86FF" opacity=".35"/>
+<g transform="translate(40 83) scale(.98)">
+<defs>
+<linearGradient id="buddyBody" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A99EFF"/><stop offset="1" stop-color="#6F63E9"/></linearGradient>
+<linearGradient id="buddySide" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#D8D5FF"/><stop offset="1" stop-color="#A9BFFF"/></linearGradient>
+</defs>
+<ellipse cx="220" cy="300" rx="132" ry="17" fill="#202943" opacity=".10"/>
+<circle cx="92" cy="115" r="12" fill="#B9C9FF"/><path d="M335 80l8 17 18 8-18 8-8 18-8-18-18-8 18-8z" fill="#A99EFF"/>
+<path d="M148 253c-15-17-20-43-13-68 9-34 42-57 85-57s76 23 85 57c7 25 2 51-13 68-17 19-43 29-72 29s-55-10-72-29z" fill="url(#buddyBody)"/>
+<ellipse cx="176" cy="209" rx="18" ry="22" fill="#fff"/><ellipse cx="264" cy="209" rx="18" ry="22" fill="#fff"/><circle cx="181" cy="211" r="8" fill="#202943"/><circle cx="259" cy="211" r="8" fill="#202943"/><circle cx="184" cy="207" r="2.5" fill="#fff"/><circle cx="262" cy="207" r="2.5" fill="#fff"/>
+<ellipse cx="145" cy="235" rx="12" ry="7" fill="#F6A8C9" opacity=".8"/><ellipse cx="295" cy="235" rx="12" ry="7" fill="#F6A8C9" opacity=".8"/>
+<path d="M198 246q22 22 44 0" fill="none" stroke="#202943" stroke-width="5" stroke-linecap="round"/>
+<path d="M153 260q-24 12-31 30M287 260q24 12 31 30" fill="none" stroke="#6F63E9" stroke-width="13" stroke-linecap="round"/>
+<path d="M190 278l-9 19M250 278l9 19" fill="none" stroke="#202943" stroke-width="12" stroke-linecap="round"/>
+<path d="M118 164q-24-18-29-42" fill="none" stroke="#A99EFF" stroke-width="8" stroke-linecap="round"/><circle cx="88" cy="119" r="8" fill="#A99EFF"/>
+<path d="M322 163q24-18 29-42" fill="none" stroke="#A99EFF" stroke-width="8" stroke-linecap="round"/><circle cx="353" cy="119" r="8" fill="#A99EFF"/>
+</g>
 </svg>
