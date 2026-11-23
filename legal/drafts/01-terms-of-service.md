@@ -40,7 +40,7 @@ ACHI อาจปรับปรุง ระงับ หรือยุติ�
 
 ### 11. ติดต่อ
 ข้อสงสัยเกี่ยวกับข้อกำหนด: [อีเมลติดต่อ]  
-ที่อยู่ผู้ให้บริการ: [ต้องระบุชื่อบุคคล/นิติบุคคลผู้ให้บริการและที่อยู่]
+ที่อยู่ติดต่อผู้ให้บริการ: กรุงเทพมหานคร ประเทศไทย | ชื่อบุคคล/นิติบุคคลผู้ให้บริการ: [ยังต้องระบุ]
 
 ---
 
@@ -78,4 +78,4 @@ You may contact Settings → Account → Delete my account, or email achichatapp
 
 ### 11. Contact
 Terms inquiries: achichatapp@gmail.com  
-Service provider address: [Legal provider's name and registered/contact address required]
+Service provider contact location: Bangkok, Thailand | Legal provider's name: [still required]
