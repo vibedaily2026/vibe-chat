@@ -703,7 +703,10 @@ async function updatePrivateUnreadBadge(){
     const earliest=Object.values(readAt).sort()[0]||"1970-01-01T00:00:00Z";
     const {data:messages,error:messageError}=await db.from("direct_messages").select("conversation_id,created_at").in("conversation_id",ids).neq("sender_id",currentUser.id).gt("created_at",earliest).limit(1000);
     if(messageError){console.warn("Unread messages:",messageError.message);return}
-    (messages||[]).forEach(m=>{if(m.created_at>(readAt[m.conversation_id]||"1970-01-01T00:00:00Z"))unreadByConversation[m.conversation_id]=(unreadByConversation[m.conversation_id]||0)+1});
+    (messages||[]).forEach(m=>{
+      const isOpenAndVisible=activeConversationId===m.conversation_id&&!el("directChatPage").classList.contains("hidden");
+      if(!isOpenAndVisible&&m.created_at>(readAt[m.conversation_id]||"1970-01-01T00:00:00Z"))unreadByConversation[m.conversation_id]=(unreadByConversation[m.conversation_id]||0)+1;
+    });
   }
   const total=Object.values(unreadByConversation).reduce((sum,count)=>sum+count,0);
   badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0);
@@ -1130,10 +1133,18 @@ function subscribeDirectMessages(){
     .on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},payload=>{
       if(payload.eventType==="INSERT"&&payload.new?.sender_id!==currentUser?.id)playAchiNotification();
       const changedMessage=payload.new||payload.old;
-      if(changedMessage?.conversation_id===activeConversationId || payload.eventType==="DELETE"){
-        if(!el("directChatPage").classList.contains("hidden"))loadDirectMessages();
+      const viewingChangedConversation=changedMessage?.conversation_id===activeConversationId&&!el("directChatPage").classList.contains("hidden");
+      if(viewingChangedConversation || (payload.eventType==="DELETE"&&changedMessage?.conversation_id===activeConversationId)){
+        if(viewingChangedConversation)loadDirectMessages();
+        if(payload.eventType==="INSERT"&&payload.new?.sender_id!==currentUser?.id){
+          markConversationRead(activeConversationId);
+        }else{
+          updatePrivateUnreadBadge();
+        }
+      }else{
+        updatePrivateUnreadBadge();
       }
-      updatePrivateUnreadBadge();loadConversations();
+      loadConversations();
     })
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"conversation_participants",filter:"user_id=eq."+currentUser.id},()=>updatePrivateUnreadBadge())
     .subscribe();
