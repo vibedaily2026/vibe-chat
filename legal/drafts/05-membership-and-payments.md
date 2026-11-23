@@ -1,6 +1,6 @@
 # ACHI — เงื่อนไขสมาชิกและการชำระเงิน (ฉบับร่าง)
 
-**ชื่อบริการ:** ACHI | **เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** [กำหนดก่อนเปิดระบบชำระเงิน]
+**ชื่อบริการ:** ACHI | **ผู้ให้บริการตามกฎหมาย:** ACHI CHAT | **เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** 23 พฤศจิกายน 2569
 
 ## ภาษาไทย
 
@@ -22,7 +22,7 @@
 การเปลี่ยนราคา สิทธิประโยชน์ หรือรอบเรียกเก็บต้องแจ้งล่วงหน้าอย่างเหมาะสม และขอความยินยอมใหม่เมื่อกฎหมายกำหนด
 
 ### 5. การติดต่อ
-คำถามเรื่องสมาชิกหรือการชำระเงิน: [อีเมล/ช่องทางสนับสนุน]
+คำถามเรื่องสมาชิกหรือการชำระเงิน: achichatapp@gmail.com
 
 ## English
 
@@ -44,4 +44,4 @@ Cancellation must be straightforward, with clear information about the effective
 Material changes to prices, benefits, or billing cycles will be communicated in advance where appropriate, and renewed consent will be obtained where required by law.
 
 ### 5. Contact
-Membership and payment questions: [support email/channel]
+Membership and payment questions: achichatapp@gmail.com
