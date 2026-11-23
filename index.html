@@ -882,8 +882,8 @@ async function ensureCallChannel(conversationId){
       catch(error){console.error("Call answer error",error);el("directCallStatus").textContent=tx("เชื่อมต่อสายไม่สำเร็จ: ","Could not connect call: ")+error.message}
     })
     .on("broadcast",{event:"ice-candidate"},async({payload})=>{
-      if(!payload||payload.from===currentUser?.id||!payload.candidate||!callPeerConnection)return;
-      try{const candidate=new RTCIceCandidate(payload.candidate);if(callPeerConnection.remoteDescription)await callPeerConnection.addIceCandidate(candidate);else queuedIceCandidates.push(candidate)}
+      if(!payload||payload.from===currentUser?.id||!payload.candidate)return;
+      try{const candidate=new RTCIceCandidate(payload.candidate);if(callPeerConnection?.remoteDescription)await callPeerConnection.addIceCandidate(candidate);else queuedIceCandidates.push(candidate)}
       catch(error){console.warn("ICE candidate error",error)}
     })
     .on("broadcast",{event:"call-reject"},async({payload})=>{
