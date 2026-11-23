@@ -817,7 +817,7 @@ async function loadDirectMessages(){
       const details=document.createElement("div");
       const heading=document.createElement("strong");
       const isTh=currentLanguage==="th";
-      heading.textContent=callEvent.status==="ended"?(isTh?"สิ้นสุดการโทร":"Call ended"):callEvent.status==="missed"?(isTh?"ไม่ได้รับสาย":"Missed call"):callEvent.status==="rejected"?(isTh?"ถูกปฏิเสธสาย":"Call declined"):callEvent.status==="busy"?(isTh?"สายไม่สำเร็จ — ไม่ว่าง":"Call failed — busy"):(isTh?"โทรไม่สำเร็จ":"Call failed");
+      heading.textContent=callEvent.status==="ended"?(isTh?"สิ้นสุดการโทร":"Call ended"):callEvent.status==="missed"?(isTh?"ไม่ได้รับสาย":"Missed call"):callEvent.status==="rejected"?(isTh?"ถูกปฏิเสธสาย":"Call declined"):callEvent.status==="cancelled"?(isTh?"ยกเลิกการโทร":"Call cancelled"):callEvent.status==="busy"?(isTh?"สายไม่สำเร็จ — ไม่ว่าง":"Call failed — busy"):(isTh?"โทรไม่สำเร็จ":"Call failed");
       const sub=document.createElement("div");sub.style.cssText="font-size:12px;color:#8290a3;margin-top:3px";
       if(callEvent.status==="ended"){
         const secs=Math.max(0,Number(callEvent.durationSeconds)||0),mins=Math.floor(secs/60),rem=secs%60;
@@ -964,7 +964,7 @@ async function ensureCallChannel(conversationId){
     .on("broadcast",{event:"call-answer"},async({payload})=>{
       if(!payload||payload.from===currentUser?.id||!callPeerConnection)return;
       stopCallRingback();stopCallTimeout();
-      try{await callPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));await flushQueuedIceCandidates();callState="connected";showDirectCallPanel(tx("กำลังสนทนา","In call"))}
+      try{await callPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));await flushQueuedIceCandidates();if(!callConnectedAt)callConnectedAt=Date.now();callState="connected";showDirectCallPanel(tx("กำลังสนทนา","In call"))}
       catch(error){console.error("Call answer error",error);el("directCallStatus").textContent=tx("เชื่อมต่อสายไม่สำเร็จ: ","Could not connect call: ")+error.message}
     })
     .on("broadcast",{event:"ice-candidate"},async({payload})=>{
@@ -1110,7 +1110,7 @@ async function endDirectCall(sendSignal=true){
   const wasConnected=!!callConnectedAt;
   stopCallTimeout();
   if(sendSignal){try{await sendCallSignal("call-end",{from:currentUser?.id,callId:callSessionId})}catch(error){console.warn("Could not send call end",error)}}
-  if(wasConnected&&isCallInitiator)await saveCallHistory("ended");
+  if(isCallInitiator)await saveCallHistory(wasConnected?"ended":"cancelled");
   await cleanupDirectCall(true);
 }
 function toggleDirectMute(){
