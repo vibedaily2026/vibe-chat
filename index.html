@@ -482,18 +482,19 @@ async function loadBlockedUsers(){
   const ids=blocks.map(x=>x.blocked_id);
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",ids);
   if(profileError){status.textContent=tx("โหลดข้อมูลสมาชิกไม่สำเร็จ: ","Could not load profiles: ")+profileError.message;return}
-  const byId={};(profiles||[]).forEach(p=>byId[p.id]=p);
+  // Normalize UUID keys before matching block records to profiles.
+  const byId={};(profiles||[]).forEach(p=>{if(p?.id)byId[String(p.id).toLowerCase()]=p});
   // Retry missing profiles individually in case the batch lookup omits rows.
-  const missingIds=ids.filter(id=>!byId[id]);
+  const missingIds=ids.filter(id=>!byId[String(id).toLowerCase()]);
   for(const missingId of missingIds){
     const {data:person,error:singleProfileError}=await db.from("profiles")
       .select("id,display_name,username,avatar_url").eq("id",missingId).maybeSingle();
     if(singleProfileError)console.warn("Blocked member profile lookup:",missingId,singleProfileError.message);
-    if(person)byId[person.id]=person;
+    if(person?.id)byId[String(person.id).toLowerCase()]=person;
   }
   status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length;
   blocks.forEach(block=>{
-    const person=byId[block.blocked_id];
+    const person=byId[String(block.blocked_id).toLowerCase()];
     const row=document.createElement("div");row.className="person";row.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0";
     const info=document.createElement("div");info.style.cssText="display:flex;align-items:center;gap:10px;min-width:0";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person?.avatar_url,person?.display_name||"ACHI member");img.alt="";
