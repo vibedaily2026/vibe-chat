@@ -109,6 +109,11 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#FF3158;color:#fff;font-size:12px;font-weight:900;line-height:1;box-shadow:0 2px 9px #FF315866;border:2px solid #fff}
 .unread-badge.hidden{display:none!important}
 @media(max-width:800px){.hero{background:linear-gradient(145deg,#F0EFFF,#F7F8FF 65%,#EAF1FF)}}
+.room-latest{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:2px 0 12px;padding:10px 11px;border-radius:12px;background:#F7F7FF;border:1px solid #EFEEFF;min-width:0}
+.room-latest-text{font-size:13px;color:#56617A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.room-latest-time{font-size:11px;color:#929BB0;white-space:nowrap;flex:none}
+.room-latest-empty{color:#929BB0;font-style:italic}
+
 </style>
 </head>
 <body>
@@ -1293,6 +1298,16 @@ async function loadCommunityRooms(){
     return;
   }
   el("communityRoomsStatus").textContent=tx("เลือกห้องที่ต้องการเข้าไปพูดคุย","Choose a room to start chatting");
+  const latestResults=await Promise.all(communityRooms.map(async room=>{
+    const result=await db.from("messages")
+      .select("message,created_at")
+      .eq("room_id",room.id)
+      .order("created_at",{ascending:false})
+      .limit(1);
+    return {roomId:room.id,message:result.data?.[0]||null,error:result.error};
+  }));
+  const latestByRoom={};
+  latestResults.forEach(result=>latestByRoom[result.roomId]=result);
   communityRooms.forEach(room=>{
     const card=document.createElement("article");card.className="person";
     const top=document.createElement("div");top.className="person-top";
@@ -1301,8 +1316,24 @@ async function loadCommunityRooms(){
     const name=document.createElement("div");name.className="person-name";name.textContent=currentLanguage==="en"?(room.name_en||room.name_th):(room.name_th||room.name_en);
     const description=document.createElement("p");description.className="person-bio";description.textContent=currentLanguage==="en"?(room.description_en||room.description_th):(room.description_th||room.description_en);
     details.append(name,description);top.append(emoji,details);
+    const latest=latestByRoom[room.id];
+    const preview=document.createElement("div");preview.className="room-latest";
+    const previewText=document.createElement("span");previewText.className="room-latest-text";
+    const previewTime=document.createElement("time");previewTime.className="room-latest-time";
+    if(latest?.error){
+      previewText.textContent=tx("โหลดข้อความล่าสุดไม่สำเร็จ","Could not load latest message");
+      previewText.classList.add("room-latest-empty");
+    }else if(latest?.message){
+      previewText.textContent=latest.message.message||tx("ส่งข้อความ","Message");
+      previewTime.dateTime=latest.message.created_at||"";
+      previewTime.textContent=latest.message.created_at?new Date(latest.message.created_at).toLocaleString(currentLanguage==="en"?"en-US":"th-TH",{dateStyle:"short",timeStyle:"short"}):"";
+    }else{
+      previewText.textContent=tx("ยังไม่มีข้อความ เริ่มทักทายเป็นคนแรกได้เลย","No messages yet. Be the first to say hello!");
+      previewText.classList.add("room-latest-empty");
+    }
+    preview.append(previewText,previewTime);
     const button=document.createElement("button");button.textContent=tx("เข้าห้องแชท","Enter room");button.onclick=()=>openCommunityRoom(room.id);
-    card.append(top,button);el("communityRoomsList").append(card);
+    card.append(top,preview,button);el("communityRoomsList").append(card);
   });
 }
 async function openCommunityRoom(roomId){
