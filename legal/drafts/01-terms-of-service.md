@@ -2,7 +2,7 @@
 
 **สถานะ:** ฉบับร่างเพื่อทบทวน ยังไม่ใช่เอกสารที่มีผลใช้บังคับ  
 **เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** 23 พฤศจิกายน 2569  
-**ชื่อบริการ:** ACHI | **ผู้ให้บริการตามกฎหมาย:** ACHI CHAT | **ติดต่อ:** achichatapp@gmail.com
+**ชื่อบริการ:** ACHI | **ชื่อทางการค้า:** ACHI CHAT | **ติดต่อ:** achichatapp@gmail.com
 
 > เอกสารนี้เป็นร่างสำหรับผลิตภัณฑ์ ACHI ต้องตรวจสอบชื่อผู้ให้บริการ รายละเอียดการดำเนินงาน และให้ที่ปรึกษากฎหมายตรวจทานก่อนเผยแพร่
 
@@ -40,7 +40,7 @@ ACHI อาจปรับปรุง ระงับ หรือยุติ�
 
 ### 11. ติดต่อ
 ข้อสงสัยเกี่ยวกับข้อกำหนด: [อีเมลติดต่อ]  
-ที่อยู่ผู้ให้บริการ: [ยังต้องระบุที่อยู่จดทะเบียนหรือที่อยู่ติดต่อของผู้ให้บริการ]
+ที่อยู่ผู้ให้บริการ: [ต้องระบุชื่อบุคคล/นิติบุคคลผู้ให้บริการและที่อยู่]
 
 ---
 
@@ -78,4 +78,4 @@ You may contact Settings → Account → Delete my account, or email achichatapp
 
 ### 11. Contact
 Terms inquiries: achichatapp@gmail.com  
-Service provider address: [Provider's registered or contact address — still required]
+Service provider address: [Legal provider's name and registered/contact address required]
