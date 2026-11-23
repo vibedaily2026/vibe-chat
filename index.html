@@ -114,6 +114,10 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .room-latest-time{font-size:11px;color:#929BB0;white-space:nowrap;flex:none}
 .room-latest-empty{color:#929BB0;font-style:italic}
 
+.direct-emoji-picker{display:flex;flex-wrap:wrap;gap:6px;padding:10px;margin:8px 0;border:1px solid #e5e8f2;border-radius:12px;background:#fff;max-width:100%}
+.direct-emoji-picker button{min-width:38px;min-height:38px;padding:4px;font-size:22px;line-height:1;background:#f7f8ff;border:1px solid #eceef7;border-radius:9px;box-shadow:none}
+.direct-emoji-picker button:hover{background:#ecebff}
+
 .room-unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 7px;margin-left:7px;border-radius:999px;background:#e5485d;color:#fff;font-size:11px;font-weight:700;vertical-align:middle}
 
 </style>
@@ -202,10 +206,12 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <input id="directImageInput" type="file" accept="image/*" class="hidden" onchange="previewDirectImage(event)">
       <button class="secondary" type="button" onclick="shareDirectLocation()">📍 <span data-i18n="shareLocation">แชร์พิกัด</span></button>
     </div>
-    <div class="row">
-      <input id="directMessageInput" maxlength="2000" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendDirectMessage()">
+    <div class="row" style="align-items:center">
+      <button class="secondary" type="button" id="directEmojiToggle" onclick="toggleDirectEmojiPicker()" aria-label="Choose emoji" title="Emoji">😊</button>
+      <input id="directMessageInput" maxlength="2000" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDirectMessage()}">
       <button onclick="sendDirectMessage()" data-i18n="send">ส่ง</button>
     </div>
+    <div id="directEmojiPicker" class="direct-emoji-picker hidden" aria-label="Emoji picker"></div>
     <p id="directStatus" class="muted"></p>
   </section>
   <section id="chatPage" class="card">
@@ -876,6 +882,32 @@ async function unsendDirectMessage(messageId,messageType,mediaPath){
   await loadDirectMessages();await loadConversations();
 }
 
+const directChatEmojis=["😀","😃","😄","😁","😆","😅","😂","🤣","🥹","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤩","🥳","🤗","🤔","🫡","😭","🥺","😴","😤","😡","🤯","🤭","🫣","👍","👎","👏","🙌","🙏","💪","🤝","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💞","💖","💗","💓","💯","🔥","✨","⭐","🎉","🎊","🌈","☀️","🌙","☕","🍰","🍕","🎮","🎵","🐱","🐶"];
+function toggleDirectEmojiPicker(){
+  const picker=el("directEmojiPicker");
+  if(!picker)return;
+  if(!picker.dataset.ready){
+    directChatEmojis.forEach(emoji=>{
+      const button=document.createElement("button");
+      button.type="button";button.textContent=emoji;button.title=emoji;
+      button.setAttribute("aria-label",emoji);
+      button.onclick=()=>insertDirectEmoji(emoji);
+      picker.append(button);
+    });
+    picker.dataset.ready="true";
+  }
+  picker.classList.toggle("hidden");
+}
+function insertDirectEmoji(emoji){
+  const input=el("directMessageInput");
+  if(!input)return;
+  const start=input.selectionStart??input.value.length;
+  const end=input.selectionEnd??input.value.length;
+  input.value=input.value.slice(0,start)+emoji+input.value.slice(end);
+  const cursor=start+emoji.length;
+  input.focus();input.setSelectionRange(cursor,cursor);
+  el("directEmojiPicker").classList.add("hidden");
+}
 async function sendDirectMessage(){
   if(!activeConversationId||!currentUser)return;
   const body=el("directMessageInput").value.trim();
