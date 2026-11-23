@@ -492,7 +492,9 @@ async function loadBlockedUsers(){
     if(singleProfileError)console.warn("Blocked member profile lookup:",missingId,singleProfileError.message);
     if(person?.id)byId[String(person.id).toLowerCase()]=person;
   }
-  status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length;
+  const matchedProfileCount=blocks.filter(block=>!!byId[String(block.blocked_id).toLowerCase()]).length;
+  status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length+
+    " · profiles: "+(profiles||[]).length+" · matched: "+matchedProfileCount;
   blocks.forEach(block=>{
     const person=byId[String(block.blocked_id).toLowerCase()];
     const row=document.createElement("div");row.className="person";row.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0";
