@@ -978,7 +978,7 @@ async function ensureCallChannel(conversationId){
     })
     .on("broadcast",{event:"call-end"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
-      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");stopCallTimeout();await cleanupDirectCall(false);
+      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");stopCallTimeout();if(isCallInitiator)await saveCallHistory(callConnectedAt?"ended":"missed");await cleanupDirectCall(false);
     })
     .on("broadcast",{event:"call-busy"},async({payload})=>{
       if(payload?.from===currentUser?.id)return;
