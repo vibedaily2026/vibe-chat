@@ -162,7 +162,28 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button class="secondary" onclick="showPage('inbox')" data-i18n="backToInbox">← กลับข้อความส่วนตัว</button>
     <div class="person-top" style="margin-top:16px">
       <img id="directPeerAvatar" class="person-avatar" alt="Profile">
-      <div><div id="directPeerName" class="person-name"></div><div id="directChatStatus" class="person-username"></div></div>
+      <div style="flex:1;min-width:0"><div id="directPeerName" class="person-name"></div><div id="directChatStatus" class="person-username"></div></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">
+        <button class="secondary" type="button" onclick="startDirectCall('audio')" title="โทรเสียง" aria-label="โทรเสียง">📞</button>
+        <button class="secondary" type="button" onclick="startDirectCall('video')" title="วิดีโอคอล" aria-label="วิดีโอคอล">📹</button>
+      </div>
+    </div>
+    <div id="directCallPanel" class="hidden" style="border:1px solid #dedbff;background:#f5f3ff;border-radius:14px;padding:14px;margin:12px 0">
+      <div id="directCallStatus" style="font-weight:700;margin-bottom:10px">กำลังโทร...</div>
+      <div id="directCallVideos" class="hidden" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px">
+        <video id="directRemoteVideo" autoplay playsinline style="width:100%;max-height:220px;background:#202943;border-radius:10px"></video>
+        <video id="directLocalVideo" autoplay muted playsinline style="width:100%;max-height:220px;background:#202943;border-radius:10px"></video>
+      </div>
+      <audio id="directRemoteAudio" autoplay></audio>
+      <div id="directIncomingActions" class="row hidden" style="gap:8px;flex-wrap:wrap">
+        <button type="button" onclick="acceptDirectCall()">รับสาย</button>
+        <button type="button" class="secondary" onclick="rejectDirectCall()">ปฏิเสธ</button>
+      </div>
+      <div id="directActiveActions" class="row hidden" style="gap:8px;flex-wrap:wrap">
+        <button type="button" class="secondary" id="directMuteButton" onclick="toggleDirectMute()">🎙️ ปิดไมค์</button>
+        <button type="button" class="secondary" id="directCameraButton" onclick="toggleDirectCamera()">📷 ปิดกล้อง</button>
+        <button type="button" style="background:#dc3545" onclick="endDirectCall()">วางสาย</button>
+      </div>
     </div>
     <div id="directMessages" style="height:390px;overflow-y:auto;background:#f7f9fc;border-radius:12px;padding:15px;margin:15px 0"></div>
     <div id="directImagePreview" class="hidden" style="margin:10px 0">
@@ -647,6 +668,16 @@ let activeConversationId=null;
 let activePeerId=null;
 let directRealtimeChannel=null;
 let directPeerCache={};
+let callChannel=null;
+let callChannelConversationId=null;
+let callPeerConnection=null;
+let callLocalStream=null;
+let callRemoteStream=null;
+let callState="idle";
+let callType="audio";
+let pendingCallOffer=null;
+let queuedIceCandidates=[];
+let callPeerName="";
 
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
@@ -718,6 +749,10 @@ async function openDirectChat(peerId,existingId){
     if(error){el("directStatus").textContent=tx("เปิดแชตไม่สำเร็จ: ","Could not open chat: ")+error.message;return}
     conversationId=data;
   }
+  if(activeConversationId&&activeConversationId!==conversationId){
+    await endDirectCall(true);
+    if(callChannel){await db.removeChannel(callChannel);callChannel=null;callChannelConversationId=null}
+  }
   activeConversationId=conversationId;activePeerId=peerId;
   let peer=directPeerCache[peerId];
   if(!peer){
@@ -729,6 +764,7 @@ async function openDirectChat(peerId,existingId){
   el("directChatStatus").textContent="";
   el("directStatus").textContent="";
   showPage("directChat");await loadDirectMessages();await markConversationRead(conversationId);
+  try{await ensureCallChannel(conversationId)}catch(error){el("directStatus").textContent=tx("ระบบโทรยังเชื่อมต่อไม่ได้: ","Calling service could not connect: ")+(error.message||error)}
 }
 
 async function startDirectChatFromProfile(){
@@ -820,6 +856,138 @@ async function shareDirectLocation(){
     if(error)throw error;
     await loadDirectMessages();await loadConversations();
   }catch(error){el("directStatus").textContent=tx("แชร์พิกัดไม่สำเร็จ: ","Could not share location: ")+(error.message||"")}
+}
+
+async function ensureCallChannel(conversationId){
+  if(!conversationId||!currentUser)throw new Error("No active conversation");
+  if(callChannel&&callChannelConversationId===conversationId)return;
+  if(callChannel)await db.removeChannel(callChannel);
+  callChannelConversationId=conversationId;
+  const channel=db.channel("achi-call:"+conversationId,{config:{private:true}});
+  callChannel=channel;
+  channel
+    .on("broadcast",{event:"call-offer"},async({payload})=>{
+      if(!payload||payload.callerId===currentUser?.id)return;
+      if(callState!=="idle"){await sendCallSignal("call-busy",{to:payload.callerId,from:currentUser.id});return}
+      pendingCallOffer=payload;callType=payload.callType==="video"?"video":"audio";
+      callPeerName=payload.callerName||el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
+      callState="ringing";showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);
+      el("directIncomingActions").classList.remove("hidden");el("directActiveActions").classList.add("hidden");
+      el("directCallVideos").classList.toggle("hidden",callType!=="video");
+      el("directCameraButton").classList.toggle("hidden",callType!=="video");
+    })
+    .on("broadcast",{event:"call-answer"},async({payload})=>{
+      if(!payload||payload.from===currentUser?.id||!callPeerConnection)return;
+      try{await callPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));await flushQueuedIceCandidates();callState="connected";showDirectCallPanel(tx("กำลังสนทนา","In call"))}
+      catch(error){console.error("Call answer error",error);el("directCallStatus").textContent=tx("เชื่อมต่อสายไม่สำเร็จ: ","Could not connect call: ")+error.message}
+    })
+    .on("broadcast",{event:"ice-candidate"},async({payload})=>{
+      if(!payload||payload.from===currentUser?.id||!payload.candidate||!callPeerConnection)return;
+      try{const candidate=new RTCIceCandidate(payload.candidate);if(callPeerConnection.remoteDescription)await callPeerConnection.addIceCandidate(candidate);else queuedIceCandidates.push(candidate)}
+      catch(error){console.warn("ICE candidate error",error)}
+    })
+    .on("broadcast",{event:"call-reject"},async({payload})=>{
+      if(payload?.from===currentUser?.id)return;
+      el("directCallStatus").textContent=tx("อีกฝ่ายปฏิเสธสาย","The call was declined");await cleanupDirectCall(false);
+    })
+    .on("broadcast",{event:"call-end"},async({payload})=>{
+      if(payload?.from===currentUser?.id)return;
+      el("directCallStatus").textContent=tx("อีกฝ่ายวางสายแล้ว","The other person ended the call");await cleanupDirectCall(false);
+    })
+    .on("broadcast",{event:"call-busy"},async({payload})=>{
+      if(payload?.from===currentUser?.id)return;
+      el("directCallStatus").textContent=tx("สมาชิกกำลังติดสายอื่น","This member is busy");await cleanupDirectCall(false);
+    });
+  await new Promise((resolve,reject)=>{
+    const timeout=setTimeout(()=>reject(new Error("Realtime subscription timed out")),12000);
+    channel.subscribe(status=>{
+      if(status==="SUBSCRIBED"){clearTimeout(timeout);resolve()}
+      else if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){clearTimeout(timeout);reject(new Error("Realtime channel: "+status))}
+    });
+  });
+}
+async function sendCallSignal(event,payload){
+  if(!callChannel)throw new Error("Call channel is not connected");
+  const result=await callChannel.send({type:"broadcast",event,payload});
+  if(result!=="ok")throw new Error("Signal could not be sent: "+result);
+}
+function showDirectCallPanel(status){el("directCallPanel").classList.remove("hidden");el("directCallStatus").textContent=status}
+function createDirectPeerConnection(){
+  const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
+  pc.onicecandidate=event=>{if(event.candidate)sendCallSignal("ice-candidate",{from:currentUser.id,candidate:event.candidate.toJSON()}).catch(error=>console.warn("Could not send ICE candidate",error))};
+  pc.ontrack=event=>{
+    if(!callRemoteStream)callRemoteStream=new MediaStream();
+    if(event.streams?.[0])callRemoteStream=event.streams[0];else callRemoteStream.addTrack(event.track);
+    if(callType==="video"){el("directRemoteVideo").srcObject=callRemoteStream;el("directCallVideos").classList.remove("hidden")}
+    else el("directRemoteAudio").srcObject=callRemoteStream;
+  };
+  pc.onconnectionstatechange=()=>{
+    if(pc.connectionState==="connected"){callState="connected";el("directCallStatus").textContent=tx("กำลังสนทนา","In call")}
+    else if(pc.connectionState==="failed")el("directCallStatus").textContent=tx("การเชื่อมต่อล้มเหลว อาจต้องใช้ TURN Server","Connection failed. A TURN server may be required.");
+  };
+  return pc;
+}
+async function acquireCallMedia(){
+  if(!navigator.mediaDevices?.getUserMedia)throw new Error(tx("เบราว์เซอร์ไม่รองรับการโทร หรือไม่ได้เปิดผ่าน HTTPS","Calling requires a supported browser and HTTPS"));
+  callLocalStream=await navigator.mediaDevices.getUserMedia({audio:true,video:callType==="video"});
+  if(callType==="video"){el("directLocalVideo").srcObject=callLocalStream;el("directCallVideos").classList.remove("hidden")}
+}
+async function startDirectCall(type){
+  if(!activeConversationId||!currentUser)return;
+  if(callState!=="idle"){el("directStatus").textContent=tx("มีสายที่กำลังดำเนินอยู่แล้ว","A call is already in progress");return}
+  callType=type==="video"?"video":"audio";callPeerName=el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
+  try{
+    await ensureCallChannel(activeConversationId);callState="outgoing";
+    showDirectCallPanel(tx("กำลังโทรหา ","Calling ")+callPeerName+"...");
+    el("directIncomingActions").classList.add("hidden");el("directActiveActions").classList.remove("hidden");
+    el("directCallVideos").classList.toggle("hidden",callType!=="video");el("directCameraButton").classList.toggle("hidden",callType!=="video");
+    await acquireCallMedia();callPeerConnection=createDirectPeerConnection();
+    callLocalStream.getTracks().forEach(track=>callPeerConnection.addTrack(track,callLocalStream));
+    const offer=await callPeerConnection.createOffer();await callPeerConnection.setLocalDescription(offer);
+    await sendCallSignal("call-offer",{callerId:currentUser.id,callerName:currentProfile?.display_name||"ACHI member",callType,offer:callPeerConnection.localDescription.toJSON()});
+    el("directCallStatus").textContent=tx("กำลังเรียก... รออีกฝ่ายรับสาย","Ringing... Waiting for answer");
+  }catch(error){el("directCallStatus").textContent=tx("เริ่มโทรไม่สำเร็จ: ","Could not start call: ")+(error.message||error);await cleanupDirectCall(false)}
+}
+async function acceptDirectCall(){
+  if(!pendingCallOffer||callState!=="ringing")return;
+  try{
+    callState="connecting";el("directIncomingActions").classList.add("hidden");el("directActiveActions").classList.remove("hidden");
+    await acquireCallMedia();callPeerConnection=createDirectPeerConnection();
+    await callPeerConnection.setRemoteDescription(new RTCSessionDescription(pendingCallOffer.offer));
+    callLocalStream.getTracks().forEach(track=>callPeerConnection.addTrack(track,callLocalStream));
+    const answer=await callPeerConnection.createAnswer();await callPeerConnection.setLocalDescription(answer);
+    await sendCallSignal("call-answer",{from:currentUser.id,answer:callPeerConnection.localDescription.toJSON()});
+    await flushQueuedIceCandidates();pendingCallOffer=null;el("directCallStatus").textContent=tx("กำลังเชื่อมต่อ...","Connecting...");
+  }catch(error){el("directCallStatus").textContent=tx("รับสายไม่สำเร็จ: ","Could not answer call: ")+(error.message||error);await cleanupDirectCall(false)}
+}
+async function flushQueuedIceCandidates(){
+  if(!callPeerConnection?.remoteDescription)return;
+  const candidates=queuedIceCandidates.splice(0);
+  for(const candidate of candidates){try{await callPeerConnection.addIceCandidate(candidate)}catch(error){console.warn("Queued ICE candidate error",error)}}
+}
+async function rejectDirectCall(){try{await sendCallSignal("call-reject",{from:currentUser.id})}catch(error){console.warn(error)}await cleanupDirectCall(false)}
+async function cleanupDirectCall(hidePanel=true){
+  if(callLocalStream){callLocalStream.getTracks().forEach(track=>track.stop());callLocalStream=null}
+  if(callPeerConnection){callPeerConnection.ontrack=null;callPeerConnection.onicecandidate=null;callPeerConnection.close();callPeerConnection=null}
+  callRemoteStream=null;queuedIceCandidates=[];pendingCallOffer=null;callState="idle";
+  if(el("directLocalVideo"))el("directLocalVideo").srcObject=null;
+  if(el("directRemoteVideo"))el("directRemoteVideo").srcObject=null;
+  if(el("directRemoteAudio"))el("directRemoteAudio").srcObject=null;
+  el("directIncomingActions").classList.add("hidden");el("directActiveActions").classList.add("hidden");
+  if(hidePanel)el("directCallPanel").classList.add("hidden");
+}
+async function endDirectCall(sendSignal=true){
+  if(callState==="idle")return;
+  if(sendSignal){try{await sendCallSignal("call-end",{from:currentUser?.id})}catch(error){console.warn("Could not send call end",error)}}
+  await cleanupDirectCall(true);
+}
+function toggleDirectMute(){
+  if(!callLocalStream)return;const track=callLocalStream.getAudioTracks()[0];if(!track)return;
+  track.enabled=!track.enabled;el("directMuteButton").textContent=track.enabled?tx("🎙️ ปิดไมค์","🎙️ Mute"):tx("🔇 เปิดไมค์","🔇 Unmute");
+}
+function toggleDirectCamera(){
+  if(!callLocalStream)return;const track=callLocalStream.getVideoTracks()[0];if(!track)return;
+  track.enabled=!track.enabled;el("directCameraButton").textContent=track.enabled?tx("📷 ปิดกล้อง","📷 Turn camera off"):tx("📷 เปิดกล้อง","📷 Turn camera on");
 }
 
 function subscribeDirectMessages(){
@@ -1020,6 +1188,8 @@ function subscribeMessages(){
 }
 
 async function logout(){
+  await endDirectCall(true);
+  if(callChannel){await db.removeChannel(callChannel);callChannel=null;callChannelConversationId=null}
   if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null}
   await db.auth.signOut();
   currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
