@@ -479,22 +479,12 @@ async function loadBlockedUsers(){
   const {data:blocks,error}=await db.from("user_blocks").select("id,blocked_id").eq("blocker_id",currentUser.id).order("created_at",{ascending:false});
   if(error){status.textContent=tx("โหลดรายการไม่สำเร็จ: ","Could not load list: ")+error.message;return}
   if(!blocks||!blocks.length){status.textContent=tx("คุณยังไม่ได้บล็อกสมาชิก","You haven't blocked anyone");return}
-  const ids=blocks.map(x=>x.blocked_id);
-  const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",ids);
+  // Read only the profiles for members this user blocked through a narrowly scoped SECURITY DEFINER RPC.
+  // The RPC bypasses the mutual-block profile SELECT policy without exposing other profiles.
+  const {data:profiles,error:profileError}=await db.rpc("get_my_blocked_profiles");
   if(profileError){status.textContent=tx("โหลดข้อมูลสมาชิกไม่สำเร็จ: ","Could not load profiles: ")+profileError.message;return}
-  // Normalize UUID keys before matching block records to profiles.
   const byId={};(profiles||[]).forEach(p=>{if(p?.id)byId[String(p.id).toLowerCase()]=p});
-  // Retry missing profiles individually in case the batch lookup omits rows.
-  const missingIds=ids.filter(id=>!byId[String(id).toLowerCase()]);
-  for(const missingId of missingIds){
-    const {data:person,error:singleProfileError}=await db.from("profiles")
-      .select("id,display_name,username,avatar_url").eq("id",missingId).maybeSingle();
-    if(singleProfileError)console.warn("Blocked member profile lookup:",missingId,singleProfileError.message);
-    if(person?.id)byId[String(person.id).toLowerCase()]=person;
-  }
-  const matchedProfileCount=blocks.filter(block=>!!byId[String(block.blocked_id).toLowerCase()]).length;
-  status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length+
-    " · profiles: "+(profiles||[]).length+" · matched: "+matchedProfileCount;
+  status.textContent=tx("สมาชิกที่บล็อกไว้ ","Blocked members: ")+blocks.length;
   blocks.forEach(block=>{
     const person=byId[String(block.blocked_id).toLowerCase()];
     const row=document.createElement("div");row.className="person";row.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0";
