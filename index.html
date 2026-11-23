@@ -491,9 +491,8 @@ async function loadBlockedUsers(){
     const info=document.createElement("div");info.style.cssText="display:flex;align-items:center;gap:10px;min-width:0";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person?.avatar_url,person?.display_name||"ACHI member");img.alt="";
     const labels=document.createElement("div");
-    const name=document.createElement("div");name.className="person-name";name.textContent=person?.display_name?.trim()||(person?.username?"@"+person.username:tx("สมาชิก ACHI","ACHI member"));
-    const username=document.createElement("div");username.className="person-username";username.textContent=person?.username?"@"+person.username:"";
-    labels.append(name,username);info.append(img,labels);
+    const name=document.createElement("div");name.className="person-name";name.textContent=person?.display_name?.trim()||tx("สมาชิก ACHI","ACHI member");
+    labels.append(name);info.append(img,labels);
     const button=document.createElement("button");button.className="secondary";button.textContent=tx("เลิกบล็อก","Unblock");button.onclick=()=>unblockMember(block.id,person?.display_name||"ACHI member");
     row.append(info,button);list.appendChild(row);
   });
@@ -533,7 +532,7 @@ async function searchPeople(){
   if(term){
     const safeTerm=term.replace(/[,%()]/g," ").trim();
     if(!safeTerm){
-      el("peopleStatus").textContent=tx("กรุณาพิมพ์ชื่อหรือ Username","Please enter a name or username");
+      el("peopleStatus").textContent=tx("กรุณาพิมพ์ชื่อที่แสดง","Please enter a display name");
       return;
     }
     query=query.or("display_name.ilike.%"+safeTerm+"%,username.ilike.%"+safeTerm+"%");
@@ -570,10 +569,7 @@ async function searchPeople(){
     const name=document.createElement("div");
     name.className="person-name";
     name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
-    const username=document.createElement("div");
-    username.className="person-username";
-    username.textContent="@"+(person.username||"user");
-    names.append(name,username);
+    names.append(name);
     top.append(img,names);
 
     const bio=document.createElement("p");
@@ -605,7 +601,7 @@ function showPerson(id){
   el("detailAvatar").src=safeImage(person.avatar_url,name);
   el("detailAvatar").onerror=()=>{el("detailAvatar").src=fallbackAvatar(name)};
   el("detailName").textContent=name;
-  el("detailUsername").textContent="@"+(person.username||"user");
+  el("detailUsername").textContent="";
   el("detailBio").textContent=person.bio||tx("สมาชิกคนนี้ยังไม่ได้เขียนแนะนำตัว","This member has not added a bio yet");
   el("detailInterests").innerHTML="";
   const interests=person.interests||[];
@@ -680,7 +676,7 @@ async function loadConversations(){
     row.dataset.conversationId=conv.id;
     row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left";
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
-    const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left";label.textContent=(peer.display_name||"ACHI member")+"  @"+(peer.username||"user");
+    const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left";label.textContent=peer.display_name||"ACHI member";
     const unread=document.createElement("span");unread.className="unread-badge conversation-unread-badge hidden";unread.textContent="0";unread.setAttribute("aria-label","Unread messages from this member");
     row.append(img,label,unread);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
   }
@@ -704,7 +700,7 @@ async function openDirectChat(peerId,existingId){
   }
   el("directPeerName").textContent=peer.display_name||tx("สมาชิก ACHI","ACHI member");
   el("directPeerAvatar").src=safeImage(peer.avatar_url,peer.display_name);
-  el("directChatStatus").textContent="@"+(peer.username||"user");
+  el("directChatStatus").textContent="";
   el("directStatus").textContent="";
   showPage("directChat");await loadDirectMessages();await markConversationRead(conversationId);
 }
@@ -835,8 +831,7 @@ async function loadNearbyFriends(){
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
     const names=document.createElement("div");names.style.minWidth="0";
     const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
-    const username=document.createElement("div");username.className="person-username";username.textContent="@"+(person.username||"user");
-    names.append(name,username);top.append(img,names);
+    names.append(name);top.append(img,names);
     const distance=document.createElement("div");distance.className="nearby-distance";distance.textContent=tx("ระยะทางโดยประมาณ: ","Approx. distance: ")+item.distance_km+tx(" กม."," km");
     const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||tx("ยังไม่ได้เขียนแนะนำตัว","No bio yet");
     const actions=document.createElement("div");actions.className="nearby-actions";
@@ -886,7 +881,7 @@ async function loadMessages(){
 function addMessage(message){
   if(document.getElementById("message-"+message.id))return;
   const profile=profileCache[message.user_id]||{};
-  const name=profile.display_name||profile.username||"สมาชิก";
+  const name=profile.display_name||"สมาชิก";
   const item=document.createElement("div");
   item.className="msg";
   item.id="message-"+message.id;
