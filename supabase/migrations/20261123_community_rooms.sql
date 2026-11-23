@@ -86,7 +86,7 @@ on public.messages
 for insert
 to authenticated
 with check (
-  user_id = auth.uid()
+  user_id = auth.uid()::text
   and exists (
     select 1 from public.community_rooms r
     where r.id = messages.room_id
