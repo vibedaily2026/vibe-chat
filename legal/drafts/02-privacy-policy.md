@@ -1,15 +1,15 @@
 # ACHI — นโยบายความเป็นส่วนตัว (ฉบับร่าง)
 
 **สถานะ:** ฉบับร่างเพื่อทบทวน ยังไม่ใช่ประกาศความเป็นส่วนตัวฉบับสมบูรณ์  
-**เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** [กำหนดวันที่ก่อนเผยแพร่]  
-**ชื่อบริการ:** ACHI | **ผู้ควบคุมข้อมูล/ผู้ให้บริการตามกฎหมาย:** [ระบุชื่อบุคคล/นิติบุคคลก่อนเผยแพร่] | **ติดต่อ:** [อีเมลความเป็นส่วนตัว]
+**เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** 23 พฤศจิกายน 2569  
+**ชื่อบริการ:** ACHI | **ผู้ควบคุมข้อมูล/ผู้ให้บริการตามกฎหมาย:** [ระบุชื่อบุคคล/นิติบุคคลก่อนเผยแพร่] | **ติดต่อ:** achichatapp@gmail.com
 
 > ต้องเติมข้อมูลผู้ให้บริการ ผู้ประมวลผลข้อมูล ระยะเวลาเก็บจริง การโอนข้อมูลข้ามประเทศ และช่องทางใช้สิทธิให้ตรงกับระบบที่เปิดใช้งาน ก่อนเผยแพร่
 
 ## ภาษาไทย
 
 ### 1. ขอบเขตและผู้รับผิดชอบ
-นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ชื่อบริการคือ ACHI ส่วนผู้ให้บริการ/ผู้ควบคุมข้อมูลตามกฎหมายคือ [ระบุชื่อและที่อยู่ก่อนเผยแพร่] ติดต่อได้ที่ [อีเมล]
+นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ชื่อบริการคือ ACHI ส่วนผู้ให้บริการ/ผู้ควบคุมข้อมูลตามกฎหมายคือ ACHI CHAT (ที่อยู่ผู้ให้บริการ: [ยังต้องระบุ]) ติดต่อได้ที่ achichatapp@gmail.com
 
 ### 2. ข้อมูลที่อาจเก็บ
 - **บัญชี:** อีเมล ตัวระบุบัญชี และข้อมูลยืนยันตัวตนที่จำเป็นจากผู้ให้บริการเข้าสู่ระบบ
@@ -39,7 +39,7 @@
 ใช้มาตรการทางเทคนิคและองค์กรที่เหมาะสม เช่น การควบคุมสิทธิ์ การยืนยันตัวตน และการจำกัดการเข้าถึงข้อมูล อย่างไรก็ดี ไม่มีระบบใดรับประกันความปลอดภัยได้อย่างสมบูรณ์
 
 ### 8. สิทธิของเจ้าของข้อมูล
-ภายใต้กฎหมายที่ใช้บังคับ คุณอาจมีสิทธิขอเข้าถึง สำเนา แก้ไข ลบ ระงับ/คัดค้านการประมวลผล โอนย้ายข้อมูล ถอนความยินยอม และร้องเรียนต่อหน่วยงานกำกับ โดยติดต่อ [อีเมล/ช่องทาง] เราจะตรวจสอบคำขอและดำเนินการภายในระยะเวลาตามกฎหมาย
+ภายใต้กฎหมายที่ใช้บังคับ คุณอาจมีสิทธิขอเข้าถึง สำเนา แก้ไข ลบ ระงับ/คัดค้านการประมวลผล โอนย้ายข้อมูล ถอนความยินยอม และร้องเรียนต่อหน่วยงานกำกับ โดยติดต่อ achichatapp@gmail.com เราจะตรวจสอบคำขอและดำเนินการภายในระยะเวลาตามกฎหมาย
 
 ### 9. ผู้เยาว์
 ACHI ให้บริการเฉพาะผู้มีอายุ 18 ปีขึ้นไป หากพบว่ามีการเก็บข้อมูลของบุคคลอายุต่ำกว่า 18 ปีโดยไม่เหมาะสม โปรดติดต่อ [อีเมล] เพื่อให้เราตรวจสอบและดำเนินการตามกฎหมาย
@@ -48,7 +48,7 @@ ACHI ให้บริการเฉพาะผู้มีอายุ 18 �
 ข้อมูลอาจถูกประมวลผลในประเทศที่ผู้ให้บริการระบบของเราให้บริการ ต้องระบุประเทศ มาตรการคุ้มครอง และกลไกการโอนข้อมูลจริงก่อนเผยแพร่ เราอาจปรับปรุงนโยบายและแจ้งการเปลี่ยนแปลงที่มีสาระสำคัญตามสมควร
 
 ### 11. ติดต่อและร้องเรียน
-ผู้ควบคุมข้อมูล: [ชื่อ/ที่อยู่]  
+ผู้ควบคุมข้อมูล: ACHI CHAT / [ยังต้องระบุที่อยู่ผู้ให้บริการ]  
 อีเมลความเป็นส่วนตัว: [อีเมล]  
 หน่วยงานกำกับดูแลที่เกี่ยวข้อง: [ระบุหน่วยงาน/ช่องทางร้องเรียนตามเขตอำนาจ]
 
@@ -57,7 +57,7 @@ ACHI ให้บริการเฉพาะผู้มีอายุ 18 �
 ## English
 
 ### 1. Scope and controller
-This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The service is ACHI. The legal controller/service provider is [name and address to be completed before publication], contactable at [privacy email].
+This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The service is ACHI. The legal controller/service provider is ACHI CHAT (provider address: [still required]), contactable at achichatapp@gmail.com.
 
 ### 2. Categories of data
 - **Account:** email, account identifiers, and necessary authentication information.
@@ -87,7 +87,7 @@ We retain data only as necessary for its purposes and applicable law. Complete t
 We use appropriate technical and organizational measures, such as access controls, authentication, and restrictions on data access. No system can guarantee absolute security.
 
 ### 8. Your rights
-Subject to applicable law, you may have rights to access, obtain a copy, correct, erase, restrict or object to processing, data portability, withdraw consent, and lodge a complaint with a regulator. Contact [email/channel]. We will verify and respond within legally required periods.
+Subject to applicable law, you may have rights to access, obtain a copy, correct, erase, restrict or object to processing, data portability, withdraw consent, and lodge a complaint with a regulator. Contact achichatapp@gmail.com. We will verify and respond within legally required periods.
 
 ### 9. Children
 ACHI is intended only for people aged 18 or older. If you believe we have improperly collected data from someone under 18, contact [email] so we can investigate and take action required by law.
@@ -98,4 +98,4 @@ Data may be processed in countries where our service providers operate. Identify
 ### 11. Contact and complaints
 Controller: [name/address]  
 Privacy contact: [email]  
-Relevant supervisory authority: [identify authority and complaint channel for the applicable jurisdiction]
+Relevant supervisory authority: [identify the competent regulator and complaint channel after confirming the provider's jurisdiction]
