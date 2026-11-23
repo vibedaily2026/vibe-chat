@@ -121,6 +121,13 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .room-latest-empty{color:#929BB0;font-style:italic}
 
 .direct-emoji-picker{display:flex;flex-wrap:wrap;gap:6px;padding:10px;margin:8px 0;border:1px solid #e5e8f2;border-radius:12px;background:#fff;max-width:100%}
+.direct-sticker-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:12px;margin:8px 0;border:1px solid #e5e3fb;border-radius:15px;background:#fff;max-height:330px;overflow:auto}
+.direct-sticker-option{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;padding:7px 4px!important;background:#f8f7ff!important;color:#49427e!important;border:1px solid #eeecff!important;box-shadow:none!important;border-radius:12px!important}
+.direct-sticker-option img{width:100%;max-width:76px;aspect-ratio:1;object-fit:contain}
+.direct-sticker-option span{font-size:11px;line-height:1.2;text-align:center}
+.direct-sticker-image{display:block;width:min(190px,48vw);height:auto;max-height:210px;object-fit:contain}
+@media(max-width:420px){.direct-sticker-picker{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 .direct-emoji-picker button{min-width:38px;min-height:38px;padding:4px;font-size:22px;line-height:1;background:#f7f8ff;border:1px solid #eceef7;border-radius:9px;box-shadow:none}
 .direct-emoji-picker button:hover{background:#ecebff}
 
@@ -233,11 +240,12 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <button class="secondary" type="button" onclick="shareDirectLocation()">📍 <span data-i18n="shareLocation">แชร์พิกัด</span></button>
     </div>
     <div class="row" style="align-items:center">
-      <button class="secondary" type="button" id="directEmojiToggle" onclick="toggleDirectEmojiPicker()" aria-label="Choose emoji" title="Emoji">😊</button>
+      <button class="secondary" type="button" id="directEmojiToggle" onclick="toggleDirectEmojiPicker()" aria-label="Choose emoji" title="Emoji">😊</button><button class="secondary" type="button" id="directStickerToggle" onclick="toggleDirectStickerPicker()" aria-label="ACHI stickers" title="ACHI Stickers">💜</button>
       <input id="directMessageInput" maxlength="2000" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDirectMessage()}">
       <button onclick="sendDirectMessage()" data-i18n="send">ส่ง</button>
     </div>
     <div id="directEmojiPicker" class="direct-emoji-picker hidden" aria-label="Emoji picker"></div>
+    <div id="directStickerPicker" class="direct-sticker-picker hidden" aria-label="ACHI stickers"></div>
     <p id="directStatus" class="muted"></p>
   </section>
   <section id="chatPage" class="card">
@@ -968,6 +976,10 @@ async function loadDirectMessages(){
       link.target="_blank";link.rel="noopener noreferrer";link.textContent=tx("📍 เปิดตำแหน่งที่แชร์","📍 Open shared location");
       bubble.append(link);
     }
+    const stickerId=typeof m.body==="string"&&m.body.startsWith("ACHI_STICKER:")?m.body.slice("ACHI_STICKER:".length):null;
+    if(stickerId&&achiStickerItems.some(x=>x[0]===stickerId)){
+      const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI "+(achiStickerItems.find(x=>x[0]===stickerId)?.[1]||"sticker");sticker.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg(stickerId));bubble.style.background="transparent";bubble.style.border="0";bubble.style.padding="3px";bubble.append(sticker);
+    }
     let callEvent=null;
     if(typeof m.body==="string"&&m.body.startsWith("ACHI_CALL_EVENT:")){
       try{callEvent=JSON.parse(m.body.slice("ACHI_CALL_EVENT:".length))}catch(error){console.warn("Invalid call history entry",error)}
@@ -985,7 +997,7 @@ async function loadDirectMessages(){
         sub.textContent=isTh?("ระยะเวลา "+mins+" นาที "+rem+" วินาที"):("Duration "+mins+"m "+rem+"s");
       }else sub.textContent=isTh?"ไม่มีการเชื่อมต่อสาย":"No connection";
       details.append(heading,sub);line.append(icon,details);bubble.append(line);
-    }else if(m.body){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
+    }else if(m.body&&!stickerId){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
     const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
     bubble.append(time);
     if(m.sender_id===currentUser.id){
@@ -1017,6 +1029,67 @@ async function unsendDirectMessage(messageId,messageType,mediaPath){
 }
 
 const directChatEmojis=["😀","😃","😄","😁","😆","😅","😂","🤣","🥹","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤩","🥳","🤗","🤔","🫡","😭","🥺","😴","😤","😡","🤯","🤭","🫣","👍","👎","👏","🙌","🙏","💪","🤝","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💞","💖","💗","💓","💯","🔥","✨","⭐","🎉","🎊","🌈","☀️","🌙","☕","🍰","🍕","🎮","🎵","🐱","🐶"];
+
+const achiStickerItems=[
+  ["hello","ทักทาย","Hello!","👋"],["love","รักนะ","Love you","💗"],["laugh","ขำ","Haha!","😂"],["wink","ขยิบตา","Wink!","😉"],
+  ["cool","เท่","Cool!","😎"],["cry","ร้องไห้","Boohoo","😭"],["angry","งอน","Hmph!","😤"],["shy","เขิน","Shy","🥰"],
+  ["wow","ว้าว","Wow!","🤩"],["think","สงสัย","Hmm?","🤔"],["sleep","ง่วง","Zzz","😴"],["party","เย้","Yay!","🎉"],
+  ["sorry","ขอโทษ","Sorry","🥺"],["thanks","ขอบคุณ","Thanks!","🙏"],["yes","โอเค","OK!","👌"],["no","ไม่เอา","Nope","🙅"],
+  ["hug","กอด","Hug!","🫂"],["miss","คิดถึง","Miss you","💜"],["goodjob","เก่งมาก","Good job!","⭐"],["tease","แกล้ง","Hehe!","😜"],
+  ["welcome","ยินดีต้อนรับ","Welcome","✨"],["huh","ห๊ะ","Huh?!","😳"],["heart","ส่งใจ","For you","❤️"],["bye","บ๊ายบาย","Bye bye","👋"]
+];
+function achiStickerSvg(id){
+  const item=achiStickerItems.find(x=>x[0]===id);if(!item)return "";
+  const face={
+    hello:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M49 61q7 9 14 0" fill="none" stroke="#202943" stroke-width="3" stroke-linecap="round"/>',
+    love:'<path d="M43 49q-7-9-13 0t13 16q20-12 8-18q-5-3-8 2" fill="#ff78b5"/><path d="M64 49q-7-9-13 0t13 16q20-12 8-18q-5-3-8 2" fill="#ff78b5"/>',
+    laugh:'<path d="M36 47q7-9 14 0M62 47q7-9 14 0" fill="none" stroke="#202943" stroke-width="4" stroke-linecap="round"/><path d="M43 59q13 19 26 0z" fill="#f45b91"/>',
+    wink:'<circle cx="43" cy="48" r="5" fill="#202943"/><path d="M62 49q8-9 16 0" fill="none" stroke="#202943" stroke-width="4" stroke-linecap="round"/><path d="M50 61q7 8 14 0" fill="none" stroke="#202943" stroke-width="3" stroke-linecap="round"/>',
+    cool:'<rect x="31" y="41" width="25" height="14" rx="6" fill="#202943"/><rect x="57" y="41" width="25" height="14" rx="6" fill="#202943"/><path d="M55 47h4" stroke="#202943" stroke-width="3"/><path d="M51 64q7 4 14 0" fill="none" stroke="#202943" stroke-width="3"/>',
+    cry:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 67q7-9 14 0" fill="none" stroke="#202943" stroke-width="3"/><path d="M34 54q-8 9 0 15" stroke="#72baff" stroke-width="4" fill="none"/>',
+    angry:'<path d="M35 42l16 6M78 42l-16 6" stroke="#202943" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="52" r="4" fill="#202943"/><circle cx="69" cy="52" r="4" fill="#202943"/><path d="M51 67q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    shy:'<path d="M37 49q6-7 12 0M63 49q6-7 12 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M51 61q7 6 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    wow:'<circle cx="43" cy="48" r="7" fill="#202943"/><circle cx="69" cy="48" r="7" fill="#202943"/><ellipse cx="56" cy="65" rx="6" ry="8" fill="#f45b91"/>',
+    think:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M51 64q7-5 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    sleep:'<path d="M36 49q7 6 14 0M62 49q7 6 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M51 64q7 4 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    party:'<path d="M36 48q7-9 14 0M62 48q7-9 14 0" stroke="#202943" stroke-width="4" fill="none"/><path d="M43 59q13 17 26 0z" fill="#f45b91"/>',
+    sorry:'<circle cx="43" cy="49" r="5" fill="#202943"/><circle cx="69" cy="49" r="5" fill="#202943"/><path d="M51 66q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    thanks:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    yes:'<path d="M36 49q7-8 14 0M62 49q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    no:'<path d="M36 49q7-8 14 0M62 49q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M50 66q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    hug:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    miss:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    goodjob:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    tease:'<circle cx="43" cy="48" r="5" fill="#202943"/><path d="M62 49q8-9 16 0" stroke="#202943" stroke-width="4" fill="none"/><path d="M50 60q13 17 20 0" fill="#f45b91"/>',
+    welcome:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    huh:'<circle cx="43" cy="48" r="7" fill="#202943"/><circle cx="69" cy="48" r="7" fill="#202943"/><ellipse cx="56" cy="65" rx="5" ry="7" fill="#f45b91"/>',
+    heart:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
+    bye:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>'
+  }[id];
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#b4aaff"/><stop offset="1" stop-color="#6859df"/></linearGradient></defs><ellipse cx="56" cy="101" rx="35" ry="5" fill="#7770c9" opacity=".15"/><path d="M42 26C29 8 48 3 58 18c20-7 36 10 36 34 0 29-16 42-38 42S18 81 18 53c0-22 10-33 24-27z" fill="url(#g)" stroke="#5145c5" stroke-width="3"/><path d="M43 30q-2-17 12-18q14 0 13 15" fill="none" stroke="#7668ed" stroke-width="8" stroke-linecap="round"/><path d="M29 39q27-15 54 0v35q-27 20-54 0z" fill="#fff"/><ellipse cx="35" cy="65" rx="7" ry="4" fill="#ffb4ce"/><ellipse cx="77" cy="65" rx="7" ry="4" fill="#ffb4ce"/>'+face+'</svg>';
+}
+function toggleDirectStickerPicker(){
+  const picker=el("directStickerPicker");if(!picker)return;
+  if(!picker.dataset.ready){
+    achiStickerItems.forEach(item=>{
+      const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";
+      const img=document.createElement("img");img.alt=item[1];img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg(item[0]));
+      const label=document.createElement("span");label.textContent=currentLanguage==="th"?item[1]:item[2];
+      button.append(img,label);button.title=item[2];button.onclick=()=>sendDirectSticker(item[0]);picker.append(button);
+    });picker.dataset.ready="true";
+  }
+  picker.classList.toggle("hidden");
+}
+async function sendDirectSticker(id){
+  if(!activeConversationId||!currentUser)return;
+  const item=achiStickerItems.find(x=>x[0]===id);if(!item)return;
+  el("directStatus").textContent=tx("กำลังส่งสติกเกอร์...","Sending sticker...");
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body:"ACHI_STICKER:"+id});
+  if(error){el("directStatus").textContent=tx("ส่งสติกเกอร์ไม่สำเร็จ: ","Could not send sticker: ")+error.message;return}
+  el("directStickerPicker").classList.add("hidden");el("directStatus").textContent="";
+  await loadDirectMessages();await loadConversations();
+}
+
 function toggleDirectEmojiPicker(){
   const picker=el("directEmojiPicker");
   if(!picker)return;
