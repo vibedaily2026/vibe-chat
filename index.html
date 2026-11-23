@@ -728,7 +728,7 @@ async function loadDirectMessages(){
   const {data,error}=await db.from("direct_messages").select("id,sender_id,message_type,body,media_path,latitude,longitude,created_at").eq("conversation_id",activeConversationId).order("created_at",{ascending:true}).limit(200);
   if(error){el("directStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
   const box=el("directMessages");box.innerHTML="";
-  (data||[]).forEach(m=>{
+  for(const m of (data||[])){
     const wrap=document.createElement("div");wrap.style.cssText="display:flex;margin:8px 0;justify-content:"+(m.sender_id===currentUser.id?"flex-end":"flex-start");
     const bubble=document.createElement("div");bubble.style.cssText="max-width:82%;padding:10px 13px;border-radius:13px;background:"+(m.sender_id===currentUser.id?"#e7efff":"white")+";border:1px solid #e5ebf4;overflow-wrap:anywhere";
     if(m.message_type==="image"&&m.media_path){
@@ -748,7 +748,7 @@ async function loadDirectMessages(){
     if(m.body){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
     const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
     bubble.append(time);wrap.append(bubble);box.append(wrap);
-  });
+  }
   box.scrollTop=box.scrollHeight;
 }
 
