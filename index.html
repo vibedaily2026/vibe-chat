@@ -871,7 +871,7 @@ async function ensureCallChannel(conversationId){
       if(callState!=="idle"){await sendCallSignal("call-busy",{to:payload.callerId,from:currentUser.id});return}
       pendingCallOffer=payload;callType=payload.callType==="video"?"video":"audio";
       callPeerName=payload.callerName||el("directPeerName").textContent||tx("สมาชิก ACHI","ACHI member");
-      callState="ringing";showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);
+      callState="ringing";showPage("directChat");showDirectCallPanel(tx("สายเรียกเข้าจาก ","Incoming call from ")+callPeerName);
       el("directIncomingActions").classList.remove("hidden");el("directActiveActions").classList.add("hidden");
       el("directCallVideos").classList.toggle("hidden",callType!=="video");
       el("directCameraButton").classList.toggle("hidden",callType!=="video");
