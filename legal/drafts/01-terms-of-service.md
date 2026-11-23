@@ -1,8 +1,8 @@
 # ACHI — ข้อกำหนดและเงื่อนไขการใช้บริการ (ฉบับร่าง)
 
 **สถานะ:** ฉบับร่างเพื่อทบทวน ยังไม่ใช่เอกสารที่มีผลใช้บังคับ  
-**เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** [กำหนดวันที่ก่อนเผยแพร่]  
-**ชื่อบริการ:** ACHI | **ผู้ให้บริการตามกฎหมาย:** [ระบุชื่อบุคคล/นิติบุคคลก่อนเผยแพร่] | **ติดต่อ:** [อีเมลติดต่อ]
+**เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** 23 พฤศจิกายน 2569  
+**ชื่อบริการ:** ACHI | **ผู้ให้บริการตามกฎหมาย:** ACHI CHAT | **ติดต่อ:** achichatapp@gmail.com
 
 > เอกสารนี้เป็นร่างสำหรับผลิตภัณฑ์ ACHI ต้องตรวจสอบชื่อผู้ให้บริการ รายละเอียดการดำเนินงาน และให้ที่ปรึกษากฎหมายตรวจทานก่อนเผยแพร่
 
@@ -36,11 +36,11 @@ ACHI อาจปรับปรุง ระงับ หรือยุติ�
 ข้อกำหนดนี้ไม่ตัดสิทธิหรือจำกัดความรับผิดที่กฎหมายห้ามจำกัด ACHI ไม่รับประกันว่าบริการจะต่อเนื่อง ปราศจากข้อผิดพลาด หรือสมาชิกทุกคนเป็นบุคคลตามที่กล่าวอ้าง รายละเอียดขอบเขตความรับผิดต้องได้รับการตรวจทานทางกฎหมายก่อนเผยแพร่
 
 ### 10. การยกเลิกบัญชีและกฎหมายที่ใช้บังคับ
-สมาชิกสามารถติดต่อ [ช่องทางลบบัญชี] เพื่อขอยกเลิกบัญชีและดำเนินการเกี่ยวกับข้อมูลส่วนบุคคลตามกฎหมาย ข้อกำหนดนี้อยู่ภายใต้กฎหมาย [ระบุประเทศ/เขตอำนาจศาล] และข้อพิพาทให้ดำเนินการตามกฎหมายดังกล่าว โดยไม่กระทบสิทธิผู้บริโภคที่ไม่อาจสละได้
+สมาชิกสามารถติดต่อ เมนู ตั้งค่า → บัญชี → ลบบัญชีของฉัน หรืออีเมล achichatapp@gmail.com เพื่อขอยกเลิกบัญชีและดำเนินการเกี่ยวกับข้อมูลส่วนบุคคลตามกฎหมาย ข้อกำหนดนี้อยู่ภายใต้กฎหมาย [ระบุประเทศ/เขตอำนาจศาล] และข้อพิพาทให้ดำเนินการตามกฎหมายดังกล่าว โดยไม่กระทบสิทธิผู้บริโภคที่ไม่อาจสละได้
 
 ### 11. ติดต่อ
 ข้อสงสัยเกี่ยวกับข้อกำหนด: [อีเมลติดต่อ]  
-ที่อยู่ผู้ให้บริการ: [ที่อยู่จดทะเบียน/ที่อยู่ติดต่อ หากจำเป็น]
+ที่อยู่ผู้ให้บริการ: [ยังต้องระบุที่อยู่จดทะเบียนหรือที่อยู่ติดต่อของผู้ให้บริการ]
 
 ---
 
@@ -74,8 +74,8 @@ ACHI may modify, suspend, or discontinue parts of the service for maintenance, s
 Nothing in these Terms excludes or limits liability where such exclusion or limitation is prohibited by law. ACHI does not warrant uninterrupted or error-free service or the accuracy of identity claims made by members. Liability language must be reviewed by counsel before publication.
 
 ### 10. Account closure and governing law
-You may contact [account deletion channel] to request account closure and exercise applicable data rights. These Terms are governed by the laws of [jurisdiction], without limiting non-waivable consumer rights.
+You may contact Settings → Account → Delete my account, or email achichatapp@gmail.com to request account closure and exercise applicable data rights. These Terms are governed by the laws of [jurisdiction], without limiting non-waivable consumer rights.
 
 ### 11. Contact
-Terms inquiries: [contact email]  
-Service provider address: [registered/contact address, if required]
+Terms inquiries: achichatapp@gmail.com  
+Service provider address: [Provider's registered or contact address — still required]
