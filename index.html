@@ -802,9 +802,33 @@ async function loadDirectMessages(){
     }
     if(m.body){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
     const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
-    bubble.append(time);wrap.append(bubble);box.append(wrap);
+    bubble.append(time);
+    if(m.sender_id===currentUser.id){
+      const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent=tx("ยกเลิก","Unsend");
+      remove.style.cssText="padding:5px 9px;margin-top:7px;font-size:11px;box-shadow:none";
+      remove.onclick=()=>unsendDirectMessage(m.id,m.message_type,m.media_path);
+      bubble.append(remove);
+    }
+    wrap.append(bubble);box.append(wrap);
   }
   box.scrollTop=box.scrollHeight;
+}
+
+async function unsendDirectMessage(messageId,messageType,mediaPath){
+  if(!activeConversationId||!currentUser||!messageId)return;
+  const promptText=tx("ยกเลิกข้อความนี้สำหรับทุกคนใช่ไหม? ข้อความจะถูกลบออกจากแชตของทั้งสองฝ่าย","Unsend this message for everyone? It will be removed from both participants' chat.");
+  if(!confirm(promptText))return;
+  const {data,error}=await db.from("direct_messages").delete()
+    .eq("id",messageId).eq("conversation_id",activeConversationId).eq("sender_id",currentUser.id)
+    .select("id").maybeSingle();
+  if(error){el("directStatus").textContent=tx("ยกเลิกไม่สำเร็จ: ","Could not unsend: ")+error.message;return}
+  if(!data){el("directStatus").textContent=tx("ไม่พบข้อความ หรือไม่มีสิทธิ์ยกเลิกข้อความนี้","Message not found or you are not allowed to unsend it");return}
+  if(messageType==="image"&&mediaPath){
+    const {error:storageError}=await db.storage.from("private-chat-media").remove([mediaPath]);
+    if(storageError)console.warn("Image row was removed but its storage object could not be deleted:",storageError.message);
+  }
+  el("directStatus").textContent="";
+  await loadDirectMessages();await loadConversations();
 }
 
 async function sendDirectMessage(){
@@ -1035,8 +1059,9 @@ function subscribeDirectMessages(){
   directRealtimeChannel=db.channel("private-chat-"+currentUser.id)
     .on("postgres_changes",{event:"*",schema:"public",table:"direct_messages"},payload=>{
       if(payload.eventType==="INSERT"&&payload.new?.sender_id!==currentUser?.id)playAchiNotification();
-      if(payload.new&&payload.new.conversation_id===activeConversationId){
-        loadDirectMessages().then(()=>{if(!el("directChatPage").classList.contains("hidden"))markConversationRead(activeConversationId)});
+      const changedMessage=payload.new||payload.old;
+      if(changedMessage?.conversation_id===activeConversationId || payload.eventType==="DELETE"){
+        if(!el("directChatPage").classList.contains("hidden"))loadDirectMessages();
       }
       updatePrivateUnreadBadge();loadConversations();
     })
