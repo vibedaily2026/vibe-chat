@@ -678,6 +678,9 @@ let callType="audio";
 let pendingCallOffer=null;
 let queuedIceCandidates=[];
 let callPeerName="";
+let callRingbackContext=null;
+let callRingbackTimer=null;
+let callRingbackOscillator=null;
 
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
@@ -858,6 +861,40 @@ async function shareDirectLocation(){
   }catch(error){el("directStatus").textContent=tx("แชร์พิกัดไม่สำเร็จ: ","Could not share location: ")+(error.message||"")}
 }
 
+function stopCallRingback(){
+  if(callRingbackTimer){clearInterval(callRingbackTimer);callRingbackTimer=null}
+  if(callRingbackOscillator){try{callRingbackOscillator.stop()}catch(error){}callRingbackOscillator=null}
+  if(callRingbackContext){const context=callRingbackContext;callRingbackContext=null;context.close().catch(()=>{})}
+}
+function playCallRingbackBurst(){
+  if(!callRingbackContext||callRingbackContext.state!=="running")return;
+  try{
+    const context=callRingbackContext;
+    const oscillator=context.createOscillator();
+    const gain=context.createGain();
+    oscillator.type="sine";
+    oscillator.frequency.setValueAtTime(440,context.currentTime);
+    gain.gain.setValueAtTime(0.0001,context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12,context.currentTime+0.04);
+    gain.gain.setValueAtTime(0.12,context.currentTime+1.15);
+    gain.gain.exponentialRampToValueAtTime(0.0001,context.currentTime+1.25);
+    oscillator.connect(gain);gain.connect(context.destination);
+    callRingbackOscillator=oscillator;
+    oscillator.start();oscillator.stop(context.currentTime+1.27);
+    oscillator.onended=()=>{if(callRingbackOscillator===oscillator)callRingbackOscillator=null};
+  }catch(error){console.warn("Call ringback tone error",error)}
+}
+async function startCallRingback(){
+  stopCallRingback();
+  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+  if(!AudioContextClass)return;
+  try{
+    callRingbackContext=new AudioContextClass();
+    if(callRingbackContext.state==="suspended")await callRingbackContext.resume();
+    playCallRingbackBurst();
+    callRingbackTimer=setInterval(playCallRingbackBurst,4000);
+  }catch(error){console.warn("Could not start call ringback tone",error);stopCallRingback()}
+}
 async function ensureCallChannel(conversationId){
   if(!conversationId||!currentUser)throw new Error("No active conversation");
   if(callChannel&&callChannelConversationId===conversationId)return;
@@ -878,6 +915,7 @@ async function ensureCallChannel(conversationId){
     })
     .on("broadcast",{event:"call-answer"},async({payload})=>{
       if(!payload||payload.from===currentUser?.id||!callPeerConnection)return;
+      stopCallRingback();
       try{await callPeerConnection.setRemoteDescription(new RTCSessionDescription(payload.answer));await flushQueuedIceCandidates();callState="connected";showDirectCallPanel(tx("กำลังสนทนา","In call"))}
       catch(error){console.error("Call answer error",error);el("directCallStatus").textContent=tx("เชื่อมต่อสายไม่สำเร็จ: ","Could not connect call: ")+error.message}
     })
@@ -922,7 +960,7 @@ function createDirectPeerConnection(){
     else el("directRemoteAudio").srcObject=callRemoteStream;
   };
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==="connected"){callState="connected";el("directCallStatus").textContent=tx("กำลังสนทนา","In call")}
+    if(pc.connectionState==="connected"){stopCallRingback();callState="connected";el("directCallStatus").textContent=tx("กำลังสนทนา","In call")}
     else if(pc.connectionState==="failed")el("directCallStatus").textContent=tx("การเชื่อมต่อล้มเหลว อาจต้องใช้ TURN Server","Connection failed. A TURN server may be required.");
   };
   return pc;
@@ -946,6 +984,7 @@ async function startDirectCall(type){
     const offer=await callPeerConnection.createOffer();await callPeerConnection.setLocalDescription(offer);
     await sendCallSignal("call-offer",{callerId:currentUser.id,callerName:currentProfile?.display_name||"ACHI member",callType,offer:callPeerConnection.localDescription.toJSON()});
     el("directCallStatus").textContent=tx("กำลังเรียก... รออีกฝ่ายรับสาย","Ringing... Waiting for answer");
+    await startCallRingback();
   }catch(error){el("directCallStatus").textContent=tx("เริ่มโทรไม่สำเร็จ: ","Could not start call: ")+(error.message||error);await cleanupDirectCall(false)}
 }
 async function acceptDirectCall(){
@@ -967,6 +1006,7 @@ async function flushQueuedIceCandidates(){
 }
 async function rejectDirectCall(){try{await sendCallSignal("call-reject",{from:currentUser.id})}catch(error){console.warn(error)}await cleanupDirectCall(false)}
 async function cleanupDirectCall(hidePanel=true){
+  stopCallRingback();
   if(callLocalStream){callLocalStream.getTracks().forEach(track=>track.stop());callLocalStream=null}
   if(callPeerConnection){callPeerConnection.ontrack=null;callPeerConnection.onicecandidate=null;callPeerConnection.close();callPeerConnection=null}
   callRemoteStream=null;queuedIceCandidates=[];pendingCallOffer=null;callState="idle";
