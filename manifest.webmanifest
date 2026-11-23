@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "ACHI — Your World, Your People.",
+  "short_name": "ACHI",
+  "description": "Connect, chat and discover new friends.",
+  "lang": "th",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F7FF",
+  "theme_color": "#7467F0",
+  "icons": [
+    {
+      "src": "/achi-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
