@@ -2,14 +2,14 @@
 
 **สถานะ:** ฉบับร่างเพื่อทบทวน ยังไม่ใช่ประกาศความเป็นส่วนตัวฉบับสมบูรณ์  
 **เวอร์ชันร่าง:** 0.1 | **วันที่มีผล:** [กำหนดวันที่ก่อนเผยแพร่]  
-**ผู้ควบคุมข้อมูล/ผู้ให้บริการ:** [ชื่อบุคคล/นิติบุคคล] | **ติดต่อ:** [อีเมลความเป็นส่วนตัว]
+**ชื่อบริการ:** ACHI | **ผู้ควบคุมข้อมูล/ผู้ให้บริการตามกฎหมาย:** [ระบุชื่อบุคคล/นิติบุคคลก่อนเผยแพร่] | **ติดต่อ:** [อีเมลความเป็นส่วนตัว]
 
 > ต้องเติมข้อมูลผู้ให้บริการ ผู้ประมวลผลข้อมูล ระยะเวลาเก็บจริง การโอนข้อมูลข้ามประเทศ และช่องทางใช้สิทธิให้ตรงกับระบบที่เปิดใช้งาน ก่อนเผยแพร่
 
 ## ภาษาไทย
 
 ### 1. ขอบเขตและผู้รับผิดชอบ
-นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ผู้ให้บริการ/ผู้ควบคุมข้อมูลคือ [ชื่อและที่อยู่] ติดต่อได้ที่ [อีเมล]
+นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ชื่อบริการคือ ACHI ส่วนผู้ให้บริการ/ผู้ควบคุมข้อมูลตามกฎหมายคือ [ระบุชื่อและที่อยู่ก่อนเผยแพร่] ติดต่อได้ที่ [อีเมล]
 
 ### 2. ข้อมูลที่อาจเก็บ
 - **บัญชี:** อีเมล ตัวระบุบัญชี และข้อมูลยืนยันตัวตนที่จำเป็นจากผู้ให้บริการเข้าสู่ระบบ
@@ -57,7 +57,7 @@ ACHI ให้บริการเฉพาะผู้มีอายุ 18 �
 ## English
 
 ### 1. Scope and controller
-This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The controller/service provider is [name and address], contactable at [privacy email].
+This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The service is ACHI. The legal controller/service provider is [name and address to be completed before publication], contactable at [privacy email].
 
 ### 2. Categories of data
 - **Account:** email, account identifiers, and necessary authentication information.
