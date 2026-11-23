@@ -1577,23 +1577,28 @@ async function loadCommunityRooms(){
     return;
   }
   el("communityRoomsStatus").textContent=tx("เลือกห้องที่ต้องการเข้าไปพูดคุย","Choose a room to start chatting");
-  const [latestResults,readResult]=await Promise.all([
-    Promise.all(communityRooms.map(async room=>{
-      const result=await db.from("messages")
-        .select("message,created_at")
-        .eq("room_id",room.id)
-        .order("created_at",{ascending:false})
-        .limit(1);
-      return {roomId:room.id,message:result.data?.[0]||null,error:result.error};
-    })),
+  const [membershipResult,readResult]=await Promise.all([
+    db.from("community_room_members").select("room_id,joined_at").eq("user_id",currentUser.id),
     db.from("community_room_reads").select("room_id,last_read_at").eq("user_id",currentUser.id)
   ]);
+  if(membershipResult.error){
+    el("communityRoomsStatus").textContent=tx("โหลดข้อมูลสมาชิกห้องไม่สำเร็จ: ","Could not load room memberships: ")+membershipResult.error.message;
+    return;
+  }
+  const joinedByRoom={};
+  (membershipResult.data||[]).forEach(row=>joinedByRoom[row.room_id]=row.joined_at);
+  const latestResults=await Promise.all(communityRooms.map(async room=>{
+    if(!joinedByRoom[room.id])return {roomId:room.id,message:null,error:null};
+    const result=await db.from("messages").select("message,created_at").eq("room_id",room.id)
+      .order("created_at",{ascending:false}).limit(1);
+    return {roomId:room.id,message:result.data?.[0]||null,error:result.error};
+  }));
   const latestByRoom={};
   latestResults.forEach(result=>latestByRoom[result.roomId]=result);
   const readByRoom={};
   if(!readResult.error)(readResult.data||[]).forEach(row=>readByRoom[row.room_id]=row.last_read_at);
   const unreadCounts=await Promise.all(communityRooms.map(async room=>({
-    roomId:room.id,count:await getCommunityUnreadCount(room.id,readByRoom[room.id]||null)
+    roomId:room.id,count:joinedByRoom[room.id]?await getCommunityUnreadCount(room.id,readByRoom[room.id]||joinedByRoom[room.id]):0
   })));
   const unreadByRoom={};
   unreadCounts.forEach(item=>unreadByRoom[item.roomId]=item.count);
@@ -1624,7 +1629,9 @@ async function loadCommunityRooms(){
       previewTime.dateTime=latest.message.created_at||"";
       previewTime.textContent=latest.message.created_at?new Date(latest.message.created_at).toLocaleString(currentLanguage==="en"?"en-US":"th-TH",{dateStyle:"short",timeStyle:"short"}):"";
     }else{
-      previewText.textContent=tx("ยังไม่มีข้อความ เริ่มทักทายเป็นคนแรกได้เลย","No messages yet. Be the first to say hello!");
+      previewText.textContent=joinedByRoom[room.id]
+        ?tx("ยังไม่มีข้อความ เริ่มทักทายเป็นคนแรกได้เลย","No messages yet. Be the first to say hello!")
+        :tx("เข้าร่วมห้องเพื่อเริ่มเห็นข้อความใหม่","Join this room to see new messages");
       previewText.classList.add("room-latest-empty");
     }
     preview.append(previewText,previewTime);
@@ -1640,6 +1647,13 @@ async function openCommunityRoom(roomId){
   el("communityRoomDescription").textContent=currentLanguage==="en"?(room.description_en||room.description_th):(room.description_th||room.description_en);
   el("chatStatus").textContent="";
   showPage("communityRoom");
+  el("chatStatus").textContent=tx("กำลังเข้าร่วมห้อง...","Joining room...");
+  const {error:joinError}=await db.from("community_room_members")
+    .upsert({room_id:room.id,user_id:currentUser.id},{onConflict:"room_id,user_id",ignoreDuplicates:true});
+  if(joinError){
+    el("chatStatus").textContent=tx("เข้าร่วมห้องไม่สำเร็จ: ","Could not join room: ")+joinError.message;
+    return;
+  }
   await loadMessages(room.id);
   if(!el("chatStatus").textContent){
     await markCommunityRoomRead(room.id);
@@ -1647,9 +1661,15 @@ async function openCommunityRoom(roomId){
 }
 async function loadMessages(roomId=activeCommunityRoomId){
   if(!roomId)return;
+  const {data:membership,error:membershipError}=await db.from("community_room_members")
+    .select("joined_at").eq("room_id",roomId).eq("user_id",currentUser.id).maybeSingle();
+  if(membershipError||!membership){
+    el("chatStatus").textContent=tx("ไม่พบข้อมูลการเข้าร่วมห้อง กรุณาลองใหม่","Room membership not found. Please try again.");
+    return;
+  }
   const {data,error}=await db.from("messages")
     .select("id,created_at,message,user_id")
-    .eq("room_id",roomId)
+    .eq("room_id",roomId).gte("created_at",membership.joined_at)
     .order("created_at",{ascending:true}).limit(100);
   if(error){el("chatStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
   await loadProfiles((data||[]).map(m=>m.user_id));
