@@ -1,5 +1,21 @@
 -- ACHI private support chat: member conversations and admin inbox
--- Run once in Supabase SQL Editor.
+-- Corrected migration: adds a protected member/admin role to ACHI profiles.
+-- Run this updated file in Supabase SQL Editor.
+
+alter table public.profiles
+  add column if not exists role text not null default 'member';
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.profiles'::regclass
+      and conname = 'profiles_role_check'
+  ) then
+    alter table public.profiles
+      add constraint profiles_role_check check (role in ('admin','member'));
+  end if;
+end $$;
 
 create or replace function public.achi_is_admin()
 returns boolean
@@ -18,6 +34,30 @@ $$;
 
 revoke all on function public.achi_is_admin() from public;
 grant execute on function public.achi_is_admin() to authenticated;
+
+-- Prevent members from assigning themselves (or anyone else) the admin role.
+create or replace function public.achi_protect_profile_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is not null and not public.achi_is_admin() then
+    if tg_op = 'INSERT' and new.role <> 'member' then
+      raise exception 'Only an ACHI admin can assign admin roles';
+    elsif tg_op = 'UPDATE' and new.role is distinct from old.role then
+      raise exception 'Only an ACHI admin can change profile roles';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists achi_protect_profile_role on public.profiles;
+create trigger achi_protect_profile_role
+before insert or update of role on public.profiles
+for each row execute function public.achi_protect_profile_role();
 
 create table if not exists public.support_conversations (
   id uuid primary key default gen_random_uuid(),
