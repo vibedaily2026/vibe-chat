@@ -9,7 +9,7 @@
 ## ภาษาไทย
 
 ### 1. ขอบเขตและผู้รับผิดชอบ
-นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ชื่อบริการคือ ACHI ส่วนผู้ให้บริการ/ผู้ควบคุมข้อมูลตามกฎหมายคือ ACHI CHAT (ที่อยู่ผู้ให้บริการ: [ยังต้องระบุ]) ติดต่อได้ที่ achichatapp@gmail.com
+นโยบายนี้อธิบายการเก็บ ใช้ เปิดเผย และเก็บรักษาข้อมูลส่วนบุคคลเมื่อใช้เว็บไซต์และบริการ ACHI ชื่อบริการคือ ACHI ส่วนผู้ให้บริการ/ผู้ควบคุมข้อมูลตามกฎหมายคือ ACHI CHAT (ชื่อทางการค้า; ต้องระบุชื่อและที่อยู่ผู้ให้บริการตามกฎหมายก่อนเผยแพร่) ติดต่อได้ที่ achichatapp@gmail.com
 
 ### 2. ข้อมูลที่อาจเก็บ
 - **บัญชี:** อีเมล ตัวระบุบัญชี และข้อมูลยืนยันตัวตนที่จำเป็นจากผู้ให้บริการเข้าสู่ระบบ
@@ -48,7 +48,7 @@ ACHI ให้บริการเฉพาะผู้มีอายุ 18 �
 ข้อมูลอาจถูกประมวลผลในประเทศที่ผู้ให้บริการระบบของเราให้บริการ ต้องระบุประเทศ มาตรการคุ้มครอง และกลไกการโอนข้อมูลจริงก่อนเผยแพร่ เราอาจปรับปรุงนโยบายและแจ้งการเปลี่ยนแปลงที่มีสาระสำคัญตามสมควร
 
 ### 11. ติดต่อและร้องเรียน
-ผู้ควบคุมข้อมูล: ACHI CHAT / [ยังต้องระบุที่อยู่ผู้ให้บริการ]  
+ผู้ควบคุมข้อมูล: ACHI CHAT (ชื่อทางการค้า) / [ต้องระบุชื่อและที่อยู่ผู้ควบคุมข้อมูลตามกฎหมาย]  
 อีเมลความเป็นส่วนตัว: [อีเมล]  
 หน่วยงานกำกับดูแลที่เกี่ยวข้อง: [ระบุหน่วยงาน/ช่องทางร้องเรียนตามเขตอำนาจ]
 
@@ -57,7 +57,7 @@ ACHI ให้บริการเฉพาะผู้มีอายุ 18 �
 ## English
 
 ### 1. Scope and controller
-This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The service is ACHI. The legal controller/service provider is ACHI CHAT (provider address: [still required]), contactable at achichatapp@gmail.com.
+This notice explains how ACHI collects, uses, discloses, and retains personal data when you use its website and services. The service is ACHI. The legal controller/service provider is ACHI CHAT (trade name; legal provider's name and address must be added before publication), contactable at achichatapp@gmail.com.
 
 ### 2. Categories of data
 - **Account:** email, account identifiers, and necessary authentication information.
