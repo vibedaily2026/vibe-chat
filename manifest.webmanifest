@@ -12,7 +12,7 @@
   "theme_color": "#7467F0",
   "icons": [
     {
-      "src": "/achi-icon.svg",
+      "src": "/achi-icon.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
