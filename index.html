@@ -272,28 +272,66 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
  #landing .hero-mascot-cloud{overflow:visible}
 }
 
-/* ACHI Buddy landing hero: six separate, fully visible positions */
-#landing .hero-art{transform:none;min-width:0}
-#landing .hero-mascot-cloud{box-sizing:border-box;position:relative;width:min(100%,450px);height:310px;margin-inline:auto;padding:0;overflow:hidden}
-#landing .hero-mascot-cloud img{position:absolute;display:block;width:clamp(92px,8.2vw,112px);height:auto;max-width:28%;max-height:44%;object-fit:contain;transform:none}
-#landing .hero-mascot-cloud img:nth-child(1){left:2%;top:4%;z-index:1}
-#landing .hero-mascot-cloud img:nth-child(2){left:36%;top:4%;z-index:1}
-#landing .hero-mascot-cloud img:nth-child(3){right:2%;top:4%;z-index:1}
-#landing .hero-mascot-cloud img:nth-child(4){left:2%;bottom:4%;z-index:1}
-#landing .hero-mascot-cloud img:nth-child(5){left:36%;bottom:4%;z-index:1}
-#landing .hero-mascot-cloud img:nth-child(6){right:2%;bottom:4%;z-index:1}
-@media(max-width:800px){
- #landing .hero-art{transform:none;min-height:0}
- #landing .hero-mascot-cloud{width:min(100%,330px);height:230px;overflow:hidden}
- #landing .hero-mascot-cloud img{width:clamp(76px,24vw,88px);max-width:28%;max-height:43%}
- #landing .hero-mascot-cloud img:nth-child(1){left:2%;top:3%}
- #landing .hero-mascot-cloud img:nth-child(2){left:36%;top:3%}
- #landing .hero-mascot-cloud img:nth-child(3){right:2%;top:3%}
- #landing .hero-mascot-cloud img:nth-child(4){left:2%;bottom:3%}
- #landing .hero-mascot-cloud img:nth-child(5){left:36%;bottom:3%}
- #landing .hero-mascot-cloud img:nth-child(6){right:2%;bottom:3%}
+/* ACHI landing hero: six large, separate mascots with a balanced music panel */
+#landing .hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  grid-template-rows:auto auto;
+  align-items:center;
+  column-gap:clamp(20px,3vw,42px);
+  row-gap:10px;
 }
-
+#landing .hero>div:first-child{grid-column:1;grid-row:1 / span 2;min-width:0}
+#landing .hero-art{grid-column:2;grid-row:1;min-width:0;min-height:0;justify-content:center}
+#landing #achiMusicPlayer{grid-column:2;grid-row:2;width:100%;max-width:510px;margin:0;align-self:start}
+#landing .hero-mascot-cloud{
+  box-sizing:border-box;display:grid;position:relative;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:clamp(8px,1.1vw,14px);
+  width:min(100%,510px);height:350px;margin-inline:auto;
+  padding:4px;overflow:visible;
+}
+#landing .hero-mascot-cloud img{
+  position:static;display:block;width:100%;height:100%;
+  max-width:160px;max-height:166px;min-width:0;min-height:0;
+  justify-self:center;align-self:center;object-fit:contain;
+  filter:drop-shadow(0 12px 15px #52658a25);
+  animation:achi-float 4.8s ease-in-out infinite;
+  transform:none;
+}
+#landing .hero-mascot-cloud img:nth-child(2){animation-delay:-1s}
+#landing .hero-mascot-cloud img:nth-child(3){animation-delay:-2s}
+#landing .hero-mascot-cloud img:nth-child(4){animation-delay:-.7s}
+#landing .hero-mascot-cloud img:nth-child(5){animation-delay:-1.8s}
+#landing .hero-mascot-cloud img:nth-child(6){animation-delay:-2.6s}
+#landing .achi-music-player{display:flex;flex-direction:column;gap:8px}
+#landing .achi-music-panel{width:100%;box-sizing:border-box;justify-content:center;gap:10px;padding:12px 14px}
+#landing .achi-lyrics{max-height:220px;overflow:auto}
+.achi-member-music{display:flex;flex-direction:column;gap:10px;width:100%;margin:12px 0 20px;padding:0 14px}
+.achi-member-music .achi-music-panel{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px;background:#fff;border:1px solid #e9e8f7;border-radius:16px;box-shadow:0 6px 22px #2029430b}
+.achi-member-music .achi-music-title{font-weight:900;color:#39336f}
+.achi-member-music .achi-music-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.achi-member-music .achi-music-controls select{width:auto;min-width:150px;margin:0}
+.achi-member-music .achi-lyrics{max-height:360px;overflow:auto;padding:16px 18px;border:1px solid #e9e8f7;border-radius:14px;background:#fafaff}
+.achi-member-music #achiLyricsText{white-space:pre-wrap;line-height:1.75;color:#39445e}
+@media(max-width:800px){
+  #landing .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;text-align:center;row-gap:14px;padding:30px 18px}
+  #landing .hero>div:first-child{grid-column:1;grid-row:1}
+  #landing .hero-art{grid-column:1;grid-row:2;min-height:0}
+  #landing #achiMusicPlayer{grid-column:1;grid-row:3;max-width:510px;margin-inline:auto}
+  #landing .hero-mascot-cloud{width:min(100%,360px);height:250px;gap:8px;padding:2px}
+  #landing .hero-mascot-cloud img{width:100%;height:100%;max-width:112px;max-height:118px}
+  .achi-member-music{padding:0 10px}
+  .achi-member-music .achi-music-panel{justify-content:center}
+  .achi-member-music .achi-music-title{flex-basis:100%;text-align:center}
+  .achi-member-music .achi-music-controls{justify-content:center}
+  .achi-member-music .achi-music-status{text-align:center;flex-basis:100%}
+}
+@media(max-width:420px){
+  #landing .hero-mascot-cloud{width:min(100%,330px);height:224px;gap:6px}
+  #landing .hero-mascot-cloud img{max-width:100px;max-height:106px}
+}
 </style>
 </head>
 <body>
@@ -769,11 +807,15 @@ async function completePasswordReset(){
 }
 
 async function startApp(user){
+  stopAchiThemeMusic();
   currentUser=user;
   el("landing").classList.add("hidden");
   el("authBox").classList.add("hidden");
   el("app").classList.remove("hidden");
   el("userArea").classList.remove("hidden");
+  const musicPlayer=el("achiMusicPlayer");
+  const appTopbar=document.querySelector("#app .achi-topbar");
+  if(musicPlayer&&appTopbar){appTopbar.after(musicPlayer);musicPlayer.classList.add("achi-member-music")}
   updateAchiMusicUI();
   el("userEmail").textContent=user.email||"";
   setLanguage(currentLanguage);
@@ -2179,6 +2221,9 @@ async function logout(){
   if(supportRealtimeChannel){await db.removeChannel(supportRealtimeChannel);supportRealtimeChannel=null}
   await db.auth.signOut();
   currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
+  const musicPlayer=el("achiMusicPlayer");
+  const landingHeroArt=document.querySelector("#landing .hero-art");
+  if(musicPlayer&&landingHeroArt){landingHeroArt.after(musicPlayer);musicPlayer.classList.remove("achi-member-music")}
   initAchiThemeMusic();
   el("app").classList.add("hidden");
   el("userArea").classList.add("hidden");
@@ -2385,19 +2430,35 @@ let achiThemeStarted=false;
 function achiTrackUrl(file){return "https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/"+encodeURIComponent(file).replace(/%2F/g,"/")}
 function updateAchiMusicUI(){
   const member=!!currentUser;
-  const select=el("achiMusicTrack"),label=el("achiMusicTrackLabel"),lyrics=el("achiLyricsToggle");
+  const select=el("achiMusicTrack"),label=el("achiMusicTrackLabel"),lyricsButton=el("achiLyricsToggle");
   if(select){select.classList.toggle("hidden",!member);label?.classList.toggle("hidden",!member);select.value=achiSelectedTrack?.file||""}
-  lyrics?.classList.toggle("hidden",!member||!achiSelectedTrack||!achiThemeLyrics[achiSelectedTrack.lang]);
-  if(!member){el("achiLyricsPanel")?.classList.add("hidden")}
+  const hasLyrics=!!(member&&achiSelectedTrack&&achiThemeLyrics[achiSelectedTrack.lang]);
+  lyricsButton?.classList.toggle("hidden",!hasLyrics);
+  const panel=el("achiLyricsPanel");
+  if(hasLyrics&&panel){
+    el("achiLyricsTitle").textContent=achiSelectedTrack.lang==="th"?"เนื้อเพลงภาษาไทย":"English Lyrics";
+    el("achiLyricsText").textContent=achiThemeLyrics[achiSelectedTrack.lang];
+    panel.classList.remove("hidden");
+    lyricsButton.textContent=currentLanguage==="en"?"♫ Hide lyrics":"♫ ซ่อนเนื้อเพลง";
+  }else{
+    panel?.classList.add("hidden");
+    if(lyricsButton)lyricsButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
+  }
   const status=el("achiMusicStatus");
   if(status)status.textContent=member
-    ?(currentLanguage==="en"?"Choose from all 7 versions.":"เลือกฟังได้ครบ 7 เวอร์ชัน")
+    ?(currentLanguage==="en"?"Choose any of the 7 versions below.":"เลือกฟังเพลงได้ครบทั้ง 7 เวอร์ชัน")
     :(currentLanguage==="en"?"A random track is ready.":"สุ่มเพลงให้คุณแล้ว");
   const loginHint=el("achiMusicLoginHint");
-  if(loginHint){loginHint.classList.toggle("hidden",member);loginHint.innerHTML=currentLanguage==="en"?'Hear the other 7 versions? <a href="#" onclick="openAuth(\'login\');return false"><strong>Log in</strong></a>':'ฟังอีก 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false"><strong>เข้าสู่ระบบ</strong></a>';}
-  const play=el("achiMusicPlay");if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
-  const stop=el("achiMusicStop");if(stop){stop.textContent="■";stop.setAttribute("aria-label",currentLanguage==="en"?"Stop music":"หยุดเพลง");stop.title=currentLanguage==="en"?"Stop music":"หยุดเพลง"}
-  const lyricButton=el("achiLyricsToggle");if(lyricButton)lyricButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
+  if(loginHint){
+    loginHint.classList.toggle("hidden",member);
+    loginHint.innerHTML=currentLanguage==="en"
+      ?'Log in to choose from all 7 versions and view lyrics.'
+      :'เข้าสู่ระบบเพื่อเลือกเพลงทั้ง 7 เวอร์ชันและดูเนื้อเพลง';
+  }
+  const play=el("achiMusicPlay");
+  if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
+  const stop=el("achiMusicStop");
+  if(stop){stop.textContent="■";stop.setAttribute("aria-label",currentLanguage==="en"?"Stop music":"หยุดเพลง");stop.title=currentLanguage==="en"?"Stop music":"หยุดเพลง"}
 }
 function setAchiThemeTrack(track,shouldPlay=true){
   const audio=el("achiThemeAudio");if(!audio||!track)return;
@@ -2421,17 +2482,16 @@ function selectAchiThemeTrack(file){
   if(!currentUser)return;
   const track=achiThemeTracks.find(item=>item.file===file);if(!track)return;
   setAchiThemeTrack(track,true);
-  el("achiLyricsPanel").classList.add("hidden");
+  updateAchiMusicUI();
 }
 function toggleAchiLyrics(){
   if(!currentUser||!achiSelectedTrack)return;
-  const panel=el("achiLyricsPanel"),isOpen=panel.classList.contains("hidden");
-  if(!isOpen){panel.classList.add("hidden");return}
-  const lang=achiSelectedTrack.lang,lyrics=achiThemeLyrics[lang];
-  el("achiLyricsTitle").textContent=lang==="th"?"เนื้อเพลงภาษาไทย":"English Lyrics";
-  if(!lyrics)return;
-  el("achiLyricsText").textContent=lyrics;
-  panel.classList.remove("hidden");
+  const panel=el("achiLyricsPanel"),button=el("achiLyricsToggle");
+  const isHidden=panel.classList.contains("hidden");
+  panel.classList.toggle("hidden",!isHidden);
+  if(button)button.textContent=isHidden
+    ?(currentLanguage==="en"?"♫ Hide lyrics":"♫ ซ่อนเนื้อเพลง")
+    :(currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง");
 }
 function initAchiThemeMusic(){
   updateAchiMusicUI();
@@ -2457,11 +2517,11 @@ async function init(){
     return;
   }
   if(session?.user)await startApp(session.user);
+  else initAchiThemeMusic();
 }
 el("authButton").onclick=login;
 setLanguage(currentLanguage);
 applyAchiMascotBranding();
-initAchiThemeMusic();
 init();
 </script>
 </body>
