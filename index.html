@@ -1081,30 +1081,30 @@ async function unsendDirectMessage(messageId,messageType,mediaPath){
 const directChatEmojis=["😀","😃","😄","😁","😆","😅","😂","🤣","🥹","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤩","🥳","🤗","🤔","🫡","😭","🥺","😴","😤","😡","🤯","🤭","🫣","👍","👎","👏","🙌","🙏","💪","🤝","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💞","💖","💗","💓","💯","🔥","✨","⭐","🎉","🎊","🌈","☀️","🌙","☕","🍰","🍕","🎮","🎵","🐱","🐶"];
 
 const achiStickerItems=[
-  ["hello","achi-buddy-03.png"],
-  ["love","achi-buddy-02.png"],
-  ["laugh","achi-buddy-04.png"],
-  ["wink","achi-buddy-10.png"],
-  ["cool","achi-buddy-06.png"],
-  ["cry","achi-buddy-23.png"],
-  ["angry","achi-buddy-07.png"],
-  ["shy","achi-buddy-13.png"],
-  ["wow","achi-buddy-22.png"],
-  ["think","achi-buddy-05.png"],
-  ["sleep","achi-buddy-09.png"],
-  ["party","achi-buddy-08.png"],
-  ["sorry","achi-buddy-23.png"],
-  ["thanks","achi-buddy-16.png"],
-  ["yes","achi-buddy-01.png"],
-  ["no","achi-buddy-07.png"],
-  ["hug","achi-buddy-18.png"],
-  ["miss","achi-buddy-18.png"],
-  ["goodjob","achi-buddy-01.png"],
-  ["tease","achi-buddy-21.png"],
-  ["welcome","achi-buddy-17.png"],
-  ["huh","achi-buddy-13.png"],
-  ["heart","achi-buddy-14.png"],
-  ["bye","achi-buddy-17.png"],
+  ["buddy01","achi-buddy-01.png"],
+  ["buddy02","achi-buddy-02.png"],
+  ["buddy03","achi-buddy-03.png"],
+  ["buddy04","achi-buddy-04.png"],
+  ["buddy05","achi-buddy-05.png"],
+  ["buddy06","achi-buddy-06.png"],
+  ["buddy07","achi-buddy-07.png"],
+  ["buddy08","achi-buddy-08.png"],
+  ["buddy09","achi-buddy-09.png"],
+  ["buddy10","achi-buddy-10.png"],
+  ["buddy11","achi-buddy-11.png"],
+  ["buddy12","achi-buddy-12.png"],
+  ["buddy13","achi-buddy-13.png"],
+  ["buddy14","achi-buddy-14.png"],
+  ["buddy15","achi-buddy-15.png"],
+  ["buddy16","achi-buddy-16.png"],
+  ["buddy17","achi-buddy-17.png"],
+  ["buddy18","achi-buddy-18.png"],
+  ["buddy19","achi-buddy-19.png"],
+  ["buddy20","achi-buddy-20.png"],
+  ["buddy21","achi-buddy-21.png"],
+  ["buddy22","achi-buddy-22.png"],
+  ["buddy23","achi-buddy-23.png"],
+  ["buddy24","achi-buddy-24.png"],
   ["buddy25","achi-buddy-25.png"],
   ["buddy26","achi-buddy-26.png"],
   ["buddy27","achi-buddy-27.png"],
@@ -1115,18 +1115,13 @@ const achiStickerItems=[
   ["buddy32","achi-buddy-32.png"],
   ["buddy33","achi-buddy-33.png"]
 ];
-function achiStickerImage(id){const aliases={sleepy:"sleep"};const key=aliases[id]||id;const item=achiStickerItems.find(x=>x[0]===key);return item?"/"+item[1]:"/achi-buddy-03.png"}
-function renderAchiSticker(parent,id){
-  const item=achiStickerItems.find(x=>x[0]===id);if(!item)return false;
-  const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI Buddy sticker";sticker.src=achiStickerImage(id);parent.append(sticker);return true;
-}
-function toggleAchiStickerPicker(pickerId,onPick){
-  const picker=el(pickerId);if(!picker)return;
-  if(!picker.dataset.ready){achiStickerItems.forEach(item=>{const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";const img=document.createElement("img");img.alt="ACHI Buddy sticker";img.src=achiStickerImage(item[0]);button.append(img);button.setAttribute("aria-label","ACHI Buddy sticker");button.onclick=()=>onPick(item[0]);picker.append(button)});picker.dataset.ready="true"}
-  picker.classList.toggle("hidden");
-}
+// Legacy IDs remain readable for stickers already sent in existing chats.
+const achiLegacyStickerFiles={hello:"achi-buddy-03.png",love:"achi-buddy-02.png",laugh:"achi-buddy-04.png",wink:"achi-buddy-10.png",cool:"achi-buddy-06.png",cry:"achi-buddy-23.png",angry:"achi-buddy-07.png",shy:"achi-buddy-13.png",wow:"achi-buddy-22.png",think:"achi-buddy-05.png",sleep:"achi-buddy-09.png",sleepy:"achi-buddy-09.png",party:"achi-buddy-08.png",sorry:"achi-buddy-23.png",thanks:"achi-buddy-16.png",yes:"achi-buddy-01.png",no:"achi-buddy-07.png",hug:"achi-buddy-18.png",miss:"achi-buddy-18.png",goodjob:"achi-buddy-01.png",tease:"achi-buddy-21.png",welcome:"achi-buddy-17.png",huh:"achi-buddy-13.png",heart:"achi-buddy-14.png",bye:"achi-buddy-17.png"};
+function achiStickerImage(id){const item=achiStickerItems.find(x=>x[0]===id);const file=item?.[1]||achiLegacyStickerFiles[id];return file?"/"+file:"/achi-buddy-03.png"}
+function renderAchiSticker(parent,id){const src=achiStickerImage(id);if(!src)return false;const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI Buddy sticker";sticker.src=src;parent.append(sticker);return true}
+function toggleAchiStickerPicker(pickerId,onPick){const picker=el(pickerId);if(!picker)return;if(!picker.dataset.ready){achiStickerItems.forEach(item=>{const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";const img=document.createElement("img");img.alt="ACHI Buddy sticker";img.src=achiStickerImage(item[0]);button.append(img);button.setAttribute("aria-label","ACHI Buddy sticker");button.onclick=()=>onPick(item[0]);picker.append(button)});picker.dataset.ready="true"}picker.classList.toggle("hidden")}
 async function sendCommunitySticker(id){
-  if(!currentUser||!activeCommunityRoomId||!achiStickerItems.some(x=>x[0]===id))return;
+  if(!currentUser||!activeCommunityRoomId||!Boolean(achiStickerImage(id)))return;
   const {error}=await db.from("messages").insert({message:"ACHI_STICKER:"+id,user_id:currentUser.id,room_id:activeCommunityRoomId,reply_to_id:pendingCommunityReply?.id||null});
   if(error){el("chatStatus").textContent=tx("ส่งสติกเกอร์ไม่สำเร็จ: ","Could not send sticker: ")+error.message;return}
   playAchiNotification();el("communityStickerPicker").classList.add("hidden");pendingCommunityReply=null;el("communityReplyPreview").classList.add("hidden");el("chatStatus").textContent="";
@@ -1166,7 +1161,7 @@ function toggleDirectStickerPicker(){
 }
 async function sendDirectSticker(id){
   if(!activeConversationId||!currentUser)return;
-  const item=achiStickerItems.find(x=>x[0]===id);if(!item)return;
+  if(!achiStickerImage(id))return;
   el("directStatus").textContent=tx("กำลังส่งสติกเกอร์...","Sending sticker...");
   const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body:"ACHI_STICKER:"+id});
   if(error){el("directStatus").textContent=tx("ส่งสติกเกอร์ไม่สำเร็จ: ","Could not send sticker: ")+error.message;return}
