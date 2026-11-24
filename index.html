@@ -2468,8 +2468,8 @@ function updateAchiMusicUI(){
   if(loginHint){
     loginHint.classList.toggle("hidden",member);
     loginHint.innerHTML=currentLanguage==="en"
-      ?'Log in to choose from all 7 versions and view lyrics.'
-      :'เข้าสู่ระบบเพื่อเลือกเพลงทั้ง 7 เวอร์ชันและดูเนื้อเพลง';
+      ?'<span>Listen to all 7 versions</span> <a href="#" onclick="openAuth(\'login\');return false"><strong>[Log in]</strong></a>'
+      :'<span>ฟังทั้ง 7 เวอร์ชั่น</span> <a href="#" onclick="openAuth(\'login\');return false"><strong>[เข้าสู่ระบบ]</strong></a>'
   }
   const play=el("achiMusicPlay");
   if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
