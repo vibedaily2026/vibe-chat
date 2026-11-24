@@ -1512,7 +1512,7 @@ async function loadNearbyFriends(){
     const person=byId[item.user_id];
     const card=document.createElement("div");card.className="person";
     const top=document.createElement("div");top.className="person-top";
-    const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person.avatar_url,person.display_name);img.alt="รูปโปรไฟล์";
+    const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
     const names=document.createElement("div");names.style.minWidth="0";
     const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
@@ -1521,7 +1521,7 @@ async function loadNearbyFriends(){
     const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||tx("ยังไม่ได้เขียนแนะนำตัว","No bio yet");
     const actions=document.createElement("div");actions.className="nearby-actions";
     const view=document.createElement("button");view.textContent=tx("ดูโปรไฟล์","View profile");view.onclick=()=>{peopleResults=[person];showPerson(person.id)};
-    const block=document.createElement("button");block.className="secondary";block.textContent=tx("บล็อก","Block");block.onclick=()=>blockNearbyUser(person.id,person.display_name||"สมาชิก");
+    const block=document.createElement("button");block.className="secondary";block.textContent=tx("บล็อก","Block");block.onclick=()=>blockNearbyUser(person.id,person.display_name||tx("สมาชิก ACHI","ACHI member"));
     const report=document.createElement("button");report.className="secondary";report.textContent=tx("รายงาน","Report");report.onclick=()=>reportNearbyUser(person.id,person.display_name||"สมาชิก");
     actions.append(view,block,report);card.append(top,distance,bio,actions);el("nearbyList").appendChild(card);
   });
