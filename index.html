@@ -281,7 +281,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   column-gap:clamp(20px,3vw,42px);
   row-gap:10px;
 }
-#landing .hero>div:first-child{grid-column:1;grid-row:1 / span 2;min-width:0}
+#landing .hero>div:first-child{grid-column:1;grid-row:1;min-width:0}
 #landing .hero-art{grid-column:2;grid-row:1;min-width:0;min-height:0;justify-content:center}
 #landing #achiMusicPlayer{
   grid-column:1 / -1;grid-row:2;
@@ -368,7 +368,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       </select>
       <button id="achiLyricsToggle" type="button" class="secondary hidden" onclick="toggleAchiLyrics()">♫ <span data-i18n="musicLyrics">ดูเนื้อเพลง</span></button>
     </div>
-    <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลง ACHI ให้คุณฟัง</div>
+    <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลงให้คุณแล้ว</div>
     <p id="achiMusicLoginHint" class="achi-music-login-hint">ฟังอีก 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false"><strong>เข้าสู่ระบบ</strong></a></p>
   </div>
   <div id="achiLyricsPanel" class="achi-lyrics hidden" aria-live="polite">
@@ -2487,7 +2487,7 @@ function playAchiThemeMusic(){
   const audio=el("achiThemeAudio");if(!audio)return;
   if(!achiSelectedTrack){const track=achiThemeTracks[Math.floor(Math.random()*achiThemeTracks.length)];setAchiThemeTrack(track,false)}
   audio.play().then(()=>{achiThemeStarted=true;el("achiMusicStatus").textContent=currentLanguage==="en"?"Now playing: "+achiSelectedTrack.label:"กำลังเล่น: "+achiSelectedTrack.label})
-    .catch(()=>{el("achiMusicStatus").textContent=currentLanguage==="en"?"Tap Play to start music (your browser blocked autoplay).":"เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะปุ่มเล่นเพลงเพื่อเริ่มฟัง"})
+    .catch(()=>{el("achiMusicStatus").textContent=currentLanguage==="en"?"Tap ▶ to play":"กด ▶ เพื่อฟังเพลง"})
 }
 function stopAchiThemeMusic(){
   const audio=el("achiThemeAudio");if(!audio)return;
