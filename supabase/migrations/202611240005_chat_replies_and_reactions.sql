@@ -198,14 +198,14 @@ language sql
 stable
 security definer
 set search_path=''
-as $
+as $$
   select p_user_id=(select auth.uid()) and exists (
     select 1
     from public.direct_messages parent
     where parent.id=p_reply_id
       and parent.conversation_id=p_conversation_id
   );
-$;
+$$;
 revoke all on function public.achi_can_reply_to_direct_message(uuid,uuid,uuid) from public,anon;
 grant execute on function public.achi_can_reply_to_direct_message(uuid,uuid,uuid) to authenticated;
 
