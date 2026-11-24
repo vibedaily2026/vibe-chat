@@ -184,7 +184,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 #directMessages{background:#F5F5FF!important}
 #privateChatTab{display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:#FF3158;color:#fff;font-size:12px;font-weight:900;line-height:1;box-shadow:0 2px 9px #FF315866;border:2px solid #fff}
-.unread-badge.hidden{display:none!important}
+.unread-badge.hidden{display:none!important}.achi-nav-badge-host{position:relative}.achi-nav-badge-host .unread-badge{position:absolute;top:-7px;right:-13px;z-index:2;min-width:19px;height:19px;font-size:10px;padding:0 4px}.achi-topbar .unread-badge{margin-left:5px;vertical-align:middle}
 @media(max-width:800px){.hero{background:linear-gradient(145deg,#F0EFFF,#F7F8FF 65%,#EAF1FF)}}
 .room-latest{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:2px 0 12px;padding:10px 11px;border-radius:12px;background:#F7F7FF;border:1px solid #EFEEFF;min-width:0}
 .room-latest-text{font-size:13px;color:#56617A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
@@ -273,7 +273,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button type="button" class="secondary" onclick="showPage('inbox')" data-i18n="topNotifications">🔔 แจ้งเตือน / แชท</button><button type="button" class="secondary" onclick="showPage('nearby')" data-i18n="topNearby">เพื่อนใกล้ฉัน</button><button type="button" class="secondary" onclick="focusPeopleFilters()" data-i18n="topFilters">ตัวกรอง</button><button type="button" class="secondary" onclick="pickRandomMember()" data-i18n="topRandom">สุ่มสมาชิก</button><button type="button" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button><label class="top-limit-label" for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดง</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option></select></div>
+  <div class="achi-topbar"><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary" onclick="showPage('inbox')" data-i18n="topNotifications">🔔 แจ้งเตือน / แชท <span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary" onclick="showPage('nearby')" data-i18n="topNearby">เพื่อนใกล้ฉัน</button><button type="button" class="secondary" onclick="focusPeopleFilters()" data-i18n="topFilters">ตัวกรอง</button><button type="button" class="secondary" onclick="pickRandomMember()" data-i18n="topRandom">สุ่มสมาชิก</button><button type="button" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button><label class="top-limit-label" for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดง</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option></select></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -283,7 +283,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="settingsTab" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button>
     <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
-  <nav class="achi-bottom-nav" aria-label="Main navigation"><button type="button" onclick="showPage('chat')" data-page="chat"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span>💬</span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหา</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button></nav>
+  <nav class="achi-bottom-nav" aria-label="Main navigation"><button type="button" onclick="showPage('chat')" data-page="chat"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหา</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button></nav>
 
   <section id="inboxPage" class="card hidden">
     <h2 data-i18n="privateChatHeading">ข้อความส่วนตัว</h2>
@@ -560,6 +560,17 @@ function updateNotificationSoundButton(){
   }
 }
   
+let notificationAudioUnlocked=false;
+function unlockAchiNotificationAudio(){
+  if(notificationAudioUnlocked)return;
+  const audio=el("achiNotificationSound");if(!audio)return;
+  audio.muted=true;
+  const attempt=audio.play();
+  if(attempt&&typeof attempt.then==="function")attempt.then(()=>{audio.pause();audio.currentTime=0;audio.muted=false;notificationAudioUnlocked=true}).catch(()=>{audio.muted=false});
+}
+document.addEventListener("pointerdown",unlockAchiNotificationAudio,{once:true,capture:true});
+document.addEventListener("keydown",unlockAchiNotificationAudio,{once:true,capture:true});
+
 async function playAchiNotification(){
   if(!notificationSoundEnabled)return;
   const audio=el("achiNotificationSound");
@@ -989,7 +1000,6 @@ let isCallInitiator=false;
 
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
-  const badge=el("privateUnreadBadge");if(!badge)return;
   const {data:conversations,error}=await db.from("conversations").select("id").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).limit(100);
   if(error){console.warn("Unread conversations:",error.message);return}
   const ids=(conversations||[]).map(c=>c.id);
@@ -1007,7 +1017,7 @@ async function updatePrivateUnreadBadge(){
     });
   }
   const total=Object.values(unreadByConversation).reduce((sum,count)=>sum+count,0);
-  badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0);
+  [el("privateUnreadBadge"),el("notificationUnreadBadge"),el("bottomChatUnreadBadge")].filter(Boolean).forEach(badge=>{badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0)});
   document.querySelectorAll("[data-conversation-id]").forEach(row=>{
     const count=unreadByConversation[row.dataset.conversationId]||0;
     const rowBadge=row.querySelector(".conversation-unread-badge");
