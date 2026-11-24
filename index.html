@@ -1320,6 +1320,9 @@ async function loadDirectMessages(){
   if(error){el("directStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
   const box=el("directMessages");box.innerHTML="";directMessageCache={};(data||[]).forEach(m=>directMessageCache[m.id]=m);
   const directIds=(data||[]).map(m=>m.id);const directReactions={};if(directIds.length){const {data:rows,error:reactionError}=await db.from("direct_message_reactions").select("message_id,user_id,emoji").in("message_id",directIds);if(!reactionError)(rows||[]).forEach(r=>(directReactions[r.message_id]||(directReactions[r.message_id]=[])).push(r))}
+  let peerLastReadAt=null;
+  const {data:participantRows,error:participantReadError}=await db.from("conversation_participants").select("user_id,last_read_at").eq("conversation_id",activeConversationId).neq("user_id",currentUser.id);
+  if(!participantReadError)peerLastReadAt=(participantRows||[]).map(row=>row.last_read_at).filter(Boolean).sort().pop()||null;
   let lastDirectDateKey=null;
   for(const m of (data||[])){
     if(m.created_at)lastDirectDateKey=appendChatDateDivider(box,m.created_at,lastDirectDateKey);
@@ -1361,7 +1364,16 @@ async function loadDirectMessages(){
       }else sub.textContent=isTh?"ไม่มีการเชื่อมต่อสาย":"No connection";
       details.append(heading,sub);line.append(icon,details);bubble.append(line);
     }else if(m.body&&!stickerId){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
-    const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
+    const time=document.createElement("small");time.style.cssText="display:flex;align-items:center;justify-content:flex-end;gap:6px;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
+    if(m.sender_id===currentUser.id){
+      const receipt=document.createElement("span");
+      const isRead=Boolean(peerLastReadAt&&new Date(peerLastReadAt).getTime()>=new Date(m.created_at).getTime());
+      receipt.textContent=isRead?"//":"/";
+      receipt.title=isRead?tx("อ่านข้อความแล้ว","Read"):tx("ส่งถึงอีกฝ่ายแล้ว แต่ยังไม่อ่าน","Delivered, not read yet");
+      receipt.setAttribute("aria-label",receipt.title);
+      receipt.style.cssText="font-weight:700;letter-spacing:-2px;color:"+(isRead?"#2563eb":"#91a0b4")+";font-size:13px";
+      time.append(receipt);
+    }
     bubble.append(time);
     const tools=buildMessageTools(m,"direct");const reactions=document.createElement("div");renderMessageReactions(reactions,m.id,"direct",directReactions[m.id]||[]);bubble.append(tools,reactions);bubble.addEventListener("click",()=>tools.classList.toggle("visible"));
     if(m.sender_id===currentUser.id){
