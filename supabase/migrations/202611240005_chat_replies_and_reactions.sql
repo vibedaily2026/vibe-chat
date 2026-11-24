@@ -191,6 +191,24 @@ with check (
   )
 );
 
+-- Validate direct-message reply targets without recursively invoking direct_messages RLS.
+create or replace function public.achi_can_reply_to_direct_message(p_reply_id uuid,p_conversation_id uuid,p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path=''
+as $
+  select p_user_id=(select auth.uid()) and exists (
+    select 1
+    from public.direct_messages parent
+    where parent.id=p_reply_id
+      and parent.conversation_id=p_conversation_id
+  );
+$;
+revoke all on function public.achi_can_reply_to_direct_message(uuid,uuid,uuid) from public,anon;
+grant execute on function public.achi_can_reply_to_direct_message(uuid,uuid,uuid) to authenticated;
+
 drop policy if exists direct_messages_insert_sender on public.direct_messages;
 create policy direct_messages_insert_sender on public.direct_messages
 for insert to authenticated
@@ -206,11 +224,7 @@ with check (
   )
   and (
     reply_to_id is null
-    or exists (
-      select 1 from public.direct_messages parent
-      where parent.id=direct_messages.reply_to_id
-        and parent.conversation_id=direct_messages.conversation_id
-    )
+    or public.achi_can_reply_to_direct_message(reply_to_id,conversation_id,auth.uid())
   )
 );
 
