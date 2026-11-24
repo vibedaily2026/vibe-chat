@@ -103,9 +103,37 @@ privilege_rows as (
       || '; SELECT=' || has_table_privilege('authenticated', 'public.direct_messages', 'SELECT')::text
       || '; INSERT=' || has_table_privilege('authenticated', 'public.direct_messages', 'INSERT')::text as status,
     'Unsend requires DELETE privilege plus a matching DELETE RLS policy.'::text as details
+),
+launch_guard_rows as (
+  select
+    'LAUNCH GUARD'::text as section,
+    'Minimum age trigger on auth.users'::text as object_name,
+    case when exists (
+      select 1 from pg_trigger t
+      join pg_class c on c.oid = t.tgrelid
+      join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'auth' and c.relname = 'users'
+        and t.tgname = 'achi_minimum_age_on_signup' and not t.tgisinternal
+    ) then 'INSTALLED' else 'MISSING' end as status,
+    'Rejects new accounts whose date_of_birth metadata is missing, invalid, or under 18.'::text as details
+  union all
+  select
+    'LAUNCH GUARD',
+    'Profile role protection',
+    case when exists (
+      select 1 from pg_trigger t
+      join pg_class c on c.oid = t.tgrelid
+      join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public' and c.relname = 'profiles'
+        and t.tgname = 'achi_guard_profile_sensitive_fields' and not t.tgisinternal
+    ) and not has_table_privilege('authenticated','public.profiles','UPDATE')
+      and not has_column_privilege('authenticated','public.profiles','role','UPDATE')
+      then 'INSTALLED' else 'MISSING OR INCOMPLETE' end,
+    'Members can update only profile fields; browser clients cannot change role.'::text
 )
 select * from function_rows
 union all select * from bucket_rows
 union all select * from policy_rows
 union all select * from privilege_rows
+union all select * from launch_guard_rows
 order by section, object_name;
