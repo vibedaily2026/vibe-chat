@@ -1,0 +1,151 @@
+-- ACHI: add reply threads and emoji reactions to private and community messages.
+-- Safe to apply more than once in Supabase SQL Editor.
+
+alter table public.messages
+  add column if not exists reply_to_id uuid
+  references public.messages(id) on delete set null;
+
+alter table public.direct_messages
+  add column if not exists reply_to_id uuid
+  references public.direct_messages(id) on delete set null;
+
+create index if not exists messages_reply_to_id_idx
+  on public.messages(reply_to_id);
+create index if not exists direct_messages_reply_to_id_idx
+  on public.direct_messages(reply_to_id);
+
+create table if not exists public.community_message_reactions (
+  id uuid primary key default gen_random_uuid(),
+  message_id uuid not null references public.messages(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  emoji text not null check (emoji in ('❤️','😂','😍','👍','😢','😮','🔥','👏')),
+  created_at timestamptz not null default now(),
+  unique (message_id,user_id)
+);
+
+create table if not exists public.direct_message_reactions (
+  id uuid primary key default gen_random_uuid(),
+  message_id uuid not null references public.direct_messages(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  emoji text not null check (emoji in ('❤️','😂','😍','👍','😢','😮','🔥','👏')),
+  created_at timestamptz not null default now(),
+  unique (message_id,user_id)
+);
+
+create index if not exists community_message_reactions_message_idx
+  on public.community_message_reactions(message_id);
+create index if not exists direct_message_reactions_message_idx
+  on public.direct_message_reactions(message_id);
+
+alter table public.community_message_reactions enable row level security;
+alter table public.direct_message_reactions enable row level security;
+
+drop policy if exists community_reactions_read_visible_messages on public.community_message_reactions;
+create policy community_reactions_read_visible_messages
+on public.community_message_reactions for select to authenticated
+using (
+  exists (
+    select 1
+    from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid())
+      and m.created_at >= crm.joined_at
+  )
+);
+
+drop policy if exists community_reactions_insert_own on public.community_message_reactions;
+create policy community_reactions_insert_own
+on public.community_message_reactions for insert to authenticated
+with check (
+  user_id=(select auth.uid())
+  and exists (
+    select 1
+    from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid())
+      and m.created_at >= crm.joined_at
+  )
+);
+
+drop policy if exists community_reactions_update_own on public.community_message_reactions;
+create policy community_reactions_update_own
+on public.community_message_reactions for update to authenticated
+using (user_id=(select auth.uid()))
+with check (
+  user_id=(select auth.uid())
+  and exists (
+    select 1
+    from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid())
+      and m.created_at >= crm.joined_at
+  )
+);
+
+drop policy if exists community_reactions_delete_own on public.community_message_reactions;
+create policy community_reactions_delete_own
+on public.community_message_reactions for delete to authenticated
+using (user_id=(select auth.uid()));
+
+drop policy if exists direct_reactions_read_participants on public.direct_message_reactions;
+create policy direct_reactions_read_participants
+on public.direct_message_reactions for select to authenticated
+using (
+  exists (
+    select 1
+    from public.direct_messages dm
+    join public.conversation_participants cp on cp.conversation_id=dm.conversation_id
+    join public.conversations c on c.id=dm.conversation_id
+    where dm.id=direct_message_reactions.message_id
+      and cp.user_id=(select auth.uid())
+      and (c.user_a=(select auth.uid()) or c.user_b=(select auth.uid()))
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+);
+
+drop policy if exists direct_reactions_insert_own on public.direct_message_reactions;
+create policy direct_reactions_insert_own
+on public.direct_message_reactions for insert to authenticated
+with check (
+  user_id=(select auth.uid())
+  and exists (
+    select 1
+    from public.direct_messages dm
+    join public.conversation_participants cp on cp.conversation_id=dm.conversation_id
+    join public.conversations c on c.id=dm.conversation_id
+    where dm.id=direct_message_reactions.message_id
+      and cp.user_id=(select auth.uid())
+      and (c.user_a=(select auth.uid()) or c.user_b=(select auth.uid()))
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+);
+
+drop policy if exists direct_reactions_update_own on public.direct_message_reactions;
+create policy direct_reactions_update_own
+on public.direct_message_reactions for update to authenticated
+using (user_id=(select auth.uid()))
+with check (user_id=(select auth.uid()));
+
+drop policy if exists direct_reactions_delete_own on public.direct_message_reactions;
+create policy direct_reactions_delete_own
+on public.direct_message_reactions for delete to authenticated
+using (user_id=(select auth.uid()));
+
+grant select,insert,update,delete on public.community_message_reactions to authenticated;
+grant select,insert,update,delete on public.direct_message_reactions to authenticated;
+
+-- Keep reaction updates live for clients subscribed to Supabase Realtime.
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname='supabase_realtime') then
+    if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='community_message_reactions') then
+      alter publication supabase_realtime add table public.community_message_reactions;
+    end if;
+    if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='direct_message_reactions') then
+      alter publication supabase_realtime add table public.direct_message_reactions;
+    end if;
+  end if;
+end $$;
