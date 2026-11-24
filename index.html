@@ -2279,8 +2279,8 @@ function updateAchiMusicUI(){
     :(currentLanguage==="en"?"A random track is ready.":"สุ่มเพลงให้คุณแล้ว");
   const loginHint=el("achiMusicLoginHint");
   if(loginHint){loginHint.classList.toggle("hidden",member);loginHint.innerHTML=currentLanguage==="en"?'Want to hear the other theme versions? <a href="#" onclick="openAuth(\'login\');return false">Log in</a> to choose from all 7 versions.':'อยากฟังเพลงธีมเวอร์ชันอื่น ๆ ทั้ง 7 เวอร์ชัน? <a href="#" onclick="openAuth(\'login\');return false">เข้าสู่ระบบ</a> เพื่อเลือกฟังได้เลย';}
-  const play=el("achiMusicPlay");if(play)play.innerHTML=(currentLanguage==="en"?"▶ Play":"▶ เล่น");
-  const stop=el("achiMusicStop");if(stop)stop.innerHTML=(currentLanguage==="en"?"■ Stop":"■ หยุด");
+  const play=el("achiMusicPlay");if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
+  const stop=el("achiMusicStop");if(stop){stop.textContent="■";stop.setAttribute("aria-label",currentLanguage==="en"?"Stop music":"หยุดเพลง");stop.title=currentLanguage==="en"?"Stop music":"หยุดเพลง"}
   const lyricButton=el("achiLyricsToggle");if(lyricButton)lyricButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
 }
 function setAchiThemeTrack(track,shouldPlay=true){
