@@ -3,7 +3,7 @@
 
 -- Community messages use bigint IDs; private direct_messages use UUID IDs.
 -- Repair an earlier partially-applied version that may have created this column as UUID.
-do $
+do $$
 declare
   v_type text;
 begin
@@ -17,7 +17,7 @@ begin
     end if;
     alter table public.messages drop column reply_to_id;
   end if;
-end $;
+end $$;
 
 alter table public.messages
   add column if not exists reply_to_id bigint
