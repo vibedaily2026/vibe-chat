@@ -1369,9 +1369,10 @@ async function loadDirectMessages(){
       const receipt=document.createElement("span");
       const isRead=Boolean(peerLastReadAt&&new Date(peerLastReadAt).getTime()>=new Date(m.created_at).getTime());
       receipt.textContent=isRead?"//":"/";
-      receipt.title=isRead?tx("อ่านข้อความแล้ว","Read"):tx("ส่งถึงอีกฝ่ายแล้ว แต่ยังไม่อ่าน","Delivered, not read yet");
+      receipt.title=isRead?tx("อ่านข้อความแล้ว","Read"):tx("ส่งข้อความแล้ว รออีกฝ่ายอ่าน","Sent, waiting to be read");
       receipt.setAttribute("aria-label",receipt.title);
-      receipt.style.cssText="font-weight:700;letter-spacing:-2px;color:"+(isRead?"#2563eb":"#91a0b4")+";font-size:13px";
+      receipt.className="direct-message-read-receipt";
+      receipt.style.cssText="display:inline-block;min-width:14px;text-align:center;font-weight:800;letter-spacing:0;color:"+(isRead?"#2563eb":"#64748b")+";font-size:14px;line-height:1.2;opacity:1;visibility:visible";
       time.append(receipt);
     }
     bubble.append(time);
@@ -1804,7 +1805,11 @@ function subscribeDirectMessages(){
       loadConversations();
     })
     .on("postgres_changes",{event:"*",schema:"public",table:"direct_message_reactions"},payload=>{const changed=payload.new||payload.old;if(changed?.message_id&&directMessageCache[changed.message_id]&&!el("directChatPage").classList.contains("hidden"))loadDirectMessages()})
-    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"conversation_participants",filter:"user_id=eq."+currentUser.id},()=>updatePrivateUnreadBadge())
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"conversation_participants"},payload=>{
+      const changed=payload.new||payload.old;
+      if(changed?.conversation_id===activeConversationId&&!el("directChatPage").classList.contains("hidden"))loadDirectMessages();
+      if(changed?.user_id===currentUser.id)updatePrivateUnreadBadge();
+    })
     .subscribe();
 }
 
