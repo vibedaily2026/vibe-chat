@@ -2,6 +2,23 @@
 -- Safe to apply more than once in Supabase SQL Editor.
 
 -- Community messages use bigint IDs; private direct_messages use UUID IDs.
+-- Repair an earlier partially-applied version that may have created this column as UUID.
+do $
+declare
+  v_type text;
+begin
+  select data_type into v_type
+  from information_schema.columns
+  where table_schema='public' and table_name='messages' and column_name='reply_to_id';
+
+  if v_type='uuid' then
+    if exists (select 1 from public.messages where reply_to_id is not null) then
+      raise exception 'public.messages.reply_to_id is UUID and contains values; manual review is required before converting it to bigint';
+    end if;
+    alter table public.messages drop column reply_to_id;
+  end if;
+end $;
+
 alter table public.messages
   add column if not exists reply_to_id bigint
   references public.messages(id) on delete set null;
