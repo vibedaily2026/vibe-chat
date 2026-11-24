@@ -1115,7 +1115,7 @@ const achiStickerItems=[
   ["buddy32","ง่วง","Sleepy","", "achi-buddy-32.png"],
   ["buddy33","ทักทาย","Hi","", "achi-buddy-33.png"]
 ];
-function achiStickerImage(id){const item=achiStickerItems.find(x=>x[0]===id);return item?'/'+item[4]:'/achi-buddy-03.png'}
+function achiStickerImage(id){const aliases={sleepy:"sleep"};const key=aliases[id]||id;const item=achiStickerItems.find(x=>x[0]===key);return item?"/"+item[4]:"/achi-buddy-03.png"}
 function achiStickerSvg(id){
   const item=achiStickerItems.find(x=>x[0]===id);if(!item)return "";
   const face={
@@ -1188,7 +1188,7 @@ function toggleDirectStickerPicker(){
   if(!picker.dataset.ready){
     achiStickerItems.forEach(item=>{
       const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";
-      const img=document.createElement("img");img.alt=item[1];img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg(item[0]));
+      const img=document.createElement("img");img.alt=item[1];img.src=achiStickerImage(item[0]);
       const label=document.createElement("span");label.textContent=currentLanguage==="th"?item[1]:item[2];
       button.append(img,label);button.title=item[2];button.onclick=()=>sendDirectSticker(item[0]);picker.append(button);
     });picker.dataset.ready="true";
