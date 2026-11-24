@@ -1,8 +1,9 @@
 -- ACHI: add reply threads and emoji reactions to private and community messages.
 -- Safe to apply more than once in Supabase SQL Editor.
 
+-- Community messages use bigint IDs; private direct_messages use UUID IDs.
 alter table public.messages
-  add column if not exists reply_to_id uuid
+  add column if not exists reply_to_id bigint
   references public.messages(id) on delete set null;
 
 alter table public.direct_messages
@@ -16,7 +17,7 @@ create index if not exists direct_messages_reply_to_id_idx
 
 create table if not exists public.community_message_reactions (
   id uuid primary key default gen_random_uuid(),
-  message_id uuid not null references public.messages(id) on delete cascade,
+  message_id bigint not null references public.messages(id) on delete cascade,
   user_id uuid not null references auth.users(id) on delete cascade,
   emoji text not null check (emoji in ('❤️','😂','😍','👍','😢','😮','🔥','👏')),
   created_at timestamptz not null default now(),
@@ -138,7 +139,7 @@ using (user_id=(select auth.uid()));
 
 
 -- Validate community reply targets in a SECURITY DEFINER helper to avoid recursive RLS on messages.
-create or replace function public.achi_can_reply_to_community_message(p_reply_id uuid,p_room_id uuid,p_user_id uuid)
+create or replace function public.achi_can_reply_to_community_message(p_reply_id bigint,p_room_id uuid,p_user_id uuid)
 returns boolean
 language sql
 stable
@@ -155,8 +156,8 @@ as $$
       and parent.created_at>=crm.joined_at
   );
 $$;
-revoke all on function public.achi_can_reply_to_community_message(uuid,uuid,uuid) from public,anon;
-grant execute on function public.achi_can_reply_to_community_message(uuid,uuid,uuid) to authenticated;
+revoke all on function public.achi_can_reply_to_community_message(bigint,uuid,uuid) from public,anon;
+grant execute on function public.achi_can_reply_to_community_message(bigint,uuid,uuid) to authenticated;
 
 drop policy if exists "ACHI members can send community room messages" on public.messages;
 create policy "ACHI members can send community room messages"
