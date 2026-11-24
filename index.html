@@ -1548,9 +1548,11 @@ async function markCommunityRoomRead(roomId){
   if(error)console.warn("Could not mark community room as read:",error.message);
 }
 
-async function getCommunityUnreadCount(roomId,lastReadAt){
+async function getCommunityUnreadCount(roomId,joinedAt,lastReadAt){
+  if(!joinedAt)return 0;
   let query=db.from("messages").select("id",{count:"exact",head:true})
-    .eq("room_id",roomId).neq("user_id",currentUser.id);
+    .eq("room_id",roomId).neq("user_id",currentUser.id)
+    .gt("created_at",joinedAt);
   if(lastReadAt)query=query.gt("created_at",lastReadAt);
   const {count,error}=await query;
   if(error){
@@ -1598,7 +1600,7 @@ async function loadCommunityRooms(){
   const readByRoom={};
   if(!readResult.error)(readResult.data||[]).forEach(row=>readByRoom[row.room_id]=row.last_read_at);
   const unreadCounts=await Promise.all(communityRooms.map(async room=>({
-    roomId:room.id,count:joinedByRoom[room.id]?await getCommunityUnreadCount(room.id,readByRoom[room.id]||joinedByRoom[room.id]):0
+    roomId:room.id,count:joinedByRoom[room.id]?await getCommunityUnreadCount(room.id,joinedByRoom[room.id],readByRoom[room.id]):0
   })));
   const unreadByRoom={};
   unreadCounts.forEach(item=>unreadByRoom[item.roomId]=item.count);
