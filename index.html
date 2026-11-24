@@ -118,6 +118,19 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #nearbyList .nearby-person-card .person-bio{display:none}
 #nearbyList .nearby-actions{display:none!important}
 @media(max-width:600px){#nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#nearbyList .nearby-person-card{padding:4px;border-radius:10px}}
+
+/* ACHI theme music player */
+.achi-music-player{max-width:1180px;margin:14px auto;padding:0 22px}
+.achi-music-panel{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;border:1px solid #e8e7f8;border-radius:18px;background:#ffffffed;box-shadow:0 8px 24px #2029430b}
+.achi-music-title{font-weight:800;color:#293b61;min-width:150px}
+.achi-music-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1}
+.achi-music-controls button,.achi-music-controls select{margin:0}
+.achi-music-controls select{width:auto;max-width:220px;min-width:155px;padding:10px;border:1px solid #e1e5f0;border-radius:11px;background:#fff;color:#405579}
+.achi-music-status{font-size:12px;color:#7b879c;flex-basis:100%;min-height:16px}
+.achi-lyrics{margin-top:10px;padding:15px 17px;border:1px solid #e9e8f7;border-radius:16px;background:#fff;white-space:pre-wrap;line-height:1.75;color:#4d5b75;max-height:340px;overflow:auto}
+.achi-lyrics h3{margin:0 0 9px;color:#293b61}
+@media(max-width:600px){.achi-music-player{padding:0 13px}.achi-music-panel{gap:9px;padding:12px}.achi-music-title{width:100%}.achi-music-controls{width:100%}.achi-music-controls select{flex:1;min-width:0;max-width:none}}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -233,6 +246,29 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   <button id="updatePasswordButton" style="width:100%" onclick="completePasswordReset()" data-i18n="updatePassword">บันทึกรหัสผ่านใหม่</button>
   <p id="passwordUpdateMessage" class="notice hidden"></p>
 </div>
+
+
+<section id="achiMusicPlayer" class="achi-music-player" aria-label="ACHI theme music">
+  <div class="achi-music-panel">
+    <div class="achi-music-title">🎵 HEY! ACHI! ACHI! ACHI!</div>
+    <div class="achi-music-controls">
+      <button id="achiMusicPlay" type="button" onclick="playAchiThemeMusic()">▶ <span data-i18n="musicPlay">เล่นเพลง</span></button>
+      <button id="achiMusicStop" type="button" class="secondary" onclick="stopAchiThemeMusic()">■ <span data-i18n="musicStop">หยุดเพลง</span></button>
+      <label id="achiMusicTrackLabel" class="hidden" for="achiMusicTrack">เพลง</label>
+      <select id="achiMusicTrack" class="hidden" aria-label="Choose ACHI theme song" onchange="selectAchiThemeTrack(this.value)">
+        <option value="ACHI TH01.mp3">ไทย 01</option><option value="ACHI TH02.mp3">ไทย 02</option><option value="ACHI TH03.mp3">ไทย 03</option><option value="ACHI TH04.mp3">ไทย 04</option>
+        <option value="ACHI EN01.mp3">English 01</option><option value="ACHI EN02.mp3">English 02</option><option value="ACHI EN03.mp3">English 03</option>
+      </select>
+      <button id="achiLyricsToggle" type="button" class="secondary hidden" onclick="toggleAchiLyrics()">♫ <span data-i18n="musicLyrics">ดูเนื้อเพลง</span></button>
+    </div>
+    <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลง ACHI ให้คุณฟัง</div>
+  </div>
+  <div id="achiLyricsPanel" class="achi-lyrics hidden" aria-live="polite">
+    <h3 id="achiLyricsTitle">เนื้อเพลง ACHI</h3>
+    <div id="achiLyricsText"></div>
+  </div>
+  <audio id="achiThemeAudio" preload="auto"></audio>
+</section>
 
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
@@ -636,6 +672,7 @@ async function startApp(user){
   el("authBox").classList.add("hidden");
   el("app").classList.remove("hidden");
   el("userArea").classList.remove("hidden");
+  updateAchiMusicUI();
   el("userEmail").textContent=user.email||"";
   setLanguage(currentLanguage);
   updateNotificationSoundButton();
@@ -1997,6 +2034,7 @@ async function logout(){
   if(supportRealtimeChannel){await db.removeChannel(supportRealtimeChannel);supportRealtimeChannel=null}
   await db.auth.signOut();
   currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
+  stopAchiThemeMusic();updateAchiMusicUI();
   el("app").classList.add("hidden");
   el("userArea").classList.add("hidden");
   el("authBox").classList.add("hidden");
@@ -2005,6 +2043,80 @@ async function logout(){
   activeCommunityRoomId=null;activeCommunityRoom=null;communityRooms=[];activeSupportConversationId=null;pendingSupportImage=null;
   el("email").value="";
   el("password").value="";
+}
+
+
+/* ACHI theme music: public visitors receive one random version; members can choose all seven. */
+const achiThemeTracks=[
+  {file:"ACHI TH01.mp3",lang:"th",label:"ไทย 01"},
+  {file:"ACHI TH02.mp3",lang:"th",label:"ไทย 02"},
+  {file:"ACHI TH03.mp3",lang:"th",label:"ไทย 03"},
+  {file:"ACHI TH04.mp3",lang:"th",label:"ไทย 04"},
+  {file:"ACHI EN01.mp3",lang:"en",label:"English 01"},
+  {file:"ACHI EN02.mp3",lang:"en",label:"English 02"},
+  {file:"ACHI EN03.mp3",lang:"en",label:"English 03"}
+];
+// The two approved lyric texts are intentionally kept as shared language-level sets,
+// rather than duplicated per audio arrangement. Populate only with the user's verbatim approved lyrics.
+const achiThemeLyrics={th:"",en:""};
+let achiSelectedTrack=null;
+let achiThemeStarted=false;
+function achiTrackUrl(file){return "https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/"+encodeURIComponent(file).replace(/%2F/g,"/")}
+function updateAchiMusicUI(){
+  const member=!!currentUser;
+  const select=el("achiMusicTrack"),label=el("achiMusicTrackLabel"),lyrics=el("achiLyricsToggle");
+  if(select){select.classList.toggle("hidden",!member);label?.classList.toggle("hidden",!member);select.value=achiSelectedTrack?.file||""}
+  lyrics?.classList.toggle("hidden",!member);
+  if(!member){el("achiLyricsPanel")?.classList.add("hidden")}
+  const status=el("achiMusicStatus");
+  if(status)status.textContent=member
+    ?(currentLanguage==="en"?"Choose any of the 7 versions. Thai versions share one Thai lyric set; English versions share one English lyric set.":"เลือกฟังได้ทั้ง 7 เวอร์ชัน เพลงไทยใช้เนื้อเพลงไทยชุดเดียวกัน และเพลงอังกฤษใช้เนื้อเพลงอังกฤษชุดเดียวกัน")
+    :(currentLanguage==="en"?"A random ACHI theme version is selected for you.":"สุ่มเพลง ACHI ให้คุณฟัง");
+  const play=el("achiMusicPlay");if(play)play.innerHTML=(currentLanguage==="en"?"▶ Play":"▶ เล่นเพลง");
+  const stop=el("achiMusicStop");if(stop)stop.innerHTML=(currentLanguage==="en"?"■ Stop":"■ หยุดเพลง");
+  const lyricButton=el("achiLyricsToggle");if(lyricButton)lyricButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
+}
+function setAchiThemeTrack(track,shouldPlay=true){
+  const audio=el("achiThemeAudio");if(!audio||!track)return;
+  achiSelectedTrack=track;audio.src=achiTrackUrl(track.file);audio.loop=true;audio.load();
+  if(el("achiMusicTrack"))el("achiMusicTrack").value=track.file;
+  if(shouldPlay)playAchiThemeMusic();
+}
+function playAchiThemeMusic(){
+  const audio=el("achiThemeAudio");if(!audio)return;
+  if(!achiSelectedTrack){const track=achiThemeTracks[Math.floor(Math.random()*achiThemeTracks.length)];setAchiThemeTrack(track,false)}
+  audio.play().then(()=>{achiThemeStarted=true;el("achiMusicStatus").textContent=currentLanguage==="en"?"Now playing: "+achiSelectedTrack.label:"กำลังเล่น: "+achiSelectedTrack.label})
+    .catch(()=>{el("achiMusicStatus").textContent=currentLanguage==="en"?"Tap Play to start music (your browser blocked autoplay).":"เบราว์เซอร์บล็อกการเล่นอัตโนมัติ แตะปุ่มเล่นเพลงเพื่อเริ่มฟัง"})
+}
+function stopAchiThemeMusic(){
+  const audio=el("achiThemeAudio");if(!audio)return;
+  audio.pause();audio.currentTime=0;
+  el("achiMusicStatus").textContent=currentLanguage==="en"?"Music stopped":"หยุดเพลงแล้ว";
+}
+function selectAchiThemeTrack(file){
+  if(!currentUser)return;
+  const track=achiThemeTracks.find(item=>item.file===file);if(!track)return;
+  setAchiThemeTrack(track,true);
+  el("achiLyricsPanel").classList.add("hidden");
+}
+function toggleAchiLyrics(){
+  if(!currentUser||!achiSelectedTrack)return;
+  const panel=el("achiLyricsPanel"),isOpen=panel.classList.contains("hidden");
+  if(!isOpen){panel.classList.add("hidden");return}
+  const lang=achiSelectedTrack.lang,lyrics=achiThemeLyrics[lang];
+  el("achiLyricsTitle").textContent=lang==="th"?"เนื้อเพลงภาษาไทย":"English Lyrics";
+  el("achiLyricsText").textContent=lyrics||(lang==="th"
+    ?"เนื้อเพลงไทยฉบับที่ผู้ใช้อนุมัติจะใส่ไว้ที่นี่"
+    :"The user's approved English lyrics will appear here.");
+  panel.classList.remove("hidden");
+}
+function initAchiThemeMusic(){
+  updateAchiMusicUI();
+  if(!currentUser&&!new URLSearchParams(location.search).has("password-reset")){
+    const track=achiThemeTracks[Math.floor(Math.random()*achiThemeTracks.length)];
+    setAchiThemeTrack(track,false);
+    playAchiThemeMusic();
+  }
 }
 
 async function init(){
@@ -2026,6 +2138,7 @@ async function init(){
 el("authButton").onclick=login;
 setLanguage(currentLanguage);
 applyAchiMascotBranding();
+initAchiThemeMusic();
 init();
 </script>
 </body>
