@@ -445,7 +445,7 @@ let profileCache={};
 let peopleResults=[];
 let notificationSoundEnabled=localStorage.getItem("achiNotificationSoundEnabled")==="true";
 let pendingDirectImage=null;
-let pendingDirectReply=null,pendingCommunityReply=null,communityMessageCache={},communityReactionCache={},lastCommunityDateKey=null;
+let pendingDirectReply=null,pendingCommunityReply=null,communityMessageCache={},communityReactionCache={},directMessageCache={},lastCommunityDateKey=null;
 const messageReactionEmojis=['❤️','😂','😍','👍','😢','😮','🔥','👏'];
 let pendingProfileImage=null;
 let pendingProfileImagePreviewUrl=null;
@@ -960,12 +960,15 @@ let currentPersonId=null;
 
 async function loadDirectMessages(){
   if(!activeConversationId)return;
-  const {data,error}=await db.from("direct_messages").select("id,sender_id,message_type,body,media_path,latitude,longitude,created_at").eq("conversation_id",activeConversationId).order("created_at",{ascending:true}).limit(200);
+  const {data,error}=await db.from("direct_messages").select("id,sender_id,message_type,body,media_path,latitude,longitude,created_at,reply_to_id").eq("conversation_id",activeConversationId).order("created_at",{ascending:true}).limit(200);
   if(error){el("directStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
-  const box=el("directMessages");box.innerHTML="";
+  const box=el("directMessages");box.innerHTML="";directMessageCache={};(data||[]).forEach(m=>directMessageCache[m.id]=m);
+  const directIds=(data||[]).map(m=>m.id);const directReactions={};if(directIds.length){const {data:rows,error:reactionError}=await db.from("direct_message_reactions").select("message_id,user_id,emoji").in("message_id",directIds);if(!reactionError)(rows||[]).forEach(r=>(directReactions[r.message_id]||(directReactions[r.message_id]=[])).push(r))}
+  let lastDirectDateKey=null;
   for(const m of (data||[])){
+    if(m.created_at)lastDirectDateKey=appendChatDateDivider(box,m.created_at,lastDirectDateKey);
     const wrap=document.createElement("div");wrap.style.cssText="display:flex;margin:8px 0;justify-content:"+(m.sender_id===currentUser.id?"flex-end":"flex-start");
-    const bubble=document.createElement("div");bubble.style.cssText="max-width:82%;padding:10px 13px;border-radius:13px;background:"+(m.sender_id===currentUser.id?"#e7efff":"white")+";border:1px solid #e5ebf4;overflow-wrap:anywhere";
+    const bubble=document.createElement("div");bubble.style.cssText="max-width:82%;padding:10px 13px;border-radius:13px;background:"+(m.sender_id===currentUser.id?"#e7efff":"white")+";border:1px solid #e5ebf4;overflow-wrap:anywhere";appendReplyQuote(bubble,m.reply_to_id,directMessageCache);
     if(m.message_type==="image"&&m.media_path){
       const {data:fileData,error:fileError}=await db.storage.from("private-chat-media").createSignedUrl(m.media_path,3600);
       if(!fileError&&fileData?.signedUrl){
@@ -1004,6 +1007,7 @@ async function loadDirectMessages(){
     }else if(m.body&&!stickerId){const content=document.createElement("div");content.textContent=m.body;bubble.append(content)}
     const time=document.createElement("small");time.style.cssText="display:block;color:#91a0b4;margin-top:5px";time.textContent=new Date(m.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"});
     bubble.append(time);
+    const tools=buildMessageTools(m,"direct");const reactions=document.createElement("div");renderMessageReactions(reactions,m.id,"direct",directReactions[m.id]||[]);bubble.append(tools,reactions);bubble.addEventListener("click",()=>tools.classList.toggle("visible"));
     if(m.sender_id===currentUser.id){
       const remove=document.createElement("button");remove.type="button";remove.className="secondary";remove.textContent=tx("ยกเลิก","Unsend");
       remove.style.cssText="padding:5px 9px;margin-top:7px;font-size:11px;box-shadow:none";
@@ -1125,10 +1129,10 @@ async function sendDirectMessage(){
   if(pendingDirectImage){await sendDirectImage();return}
   if(!body)return;
   el("directMessageInput").disabled=true;
-  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body});
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"text",body,reply_to_id:pendingDirectReply?.id||null});
   el("directMessageInput").disabled=false;
   if(error){el("directStatus").textContent=tx("ส่งข้อความไม่สำเร็จ: ","Message failed: ")+error.message;return}
-  el("directMessageInput").value="";await loadDirectMessages();await loadConversations();
+  el("directMessageInput").value="";pendingDirectReply=null;el("directReplyPreview").classList.add("hidden");await loadDirectMessages();await loadConversations();
 }
 
 function previewDirectImage(event){
@@ -1152,12 +1156,12 @@ async function sendDirectImage(){
   el("directStatus").textContent=tx("กำลังอัปโหลดรูปภาพ...","Uploading image...");
   const {error:uploadError}=await db.storage.from("private-chat-media").upload(path,file,{contentType:file.type,upsert:false});
   if(uploadError){el("directStatus").textContent=tx("อัปโหลดรูปไม่สำเร็จ: ","Image upload failed: ")+uploadError.message;return}
-  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"image",media_path:path,body:null});
+  const {error}=await db.from("direct_messages").insert({conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"image",media_path:path,body:null,reply_to_id:pendingDirectReply?.id||null});
   if(error){
     await db.storage.from("private-chat-media").remove([path]);
     el("directStatus").textContent=tx("ส่งรูปไม่สำเร็จ: ","Could not send image: ")+error.message;return;
   }
-  clearDirectImage();el("directStatus").textContent="";await loadDirectMessages();await loadConversations();
+  clearDirectImage();pendingDirectReply=null;el("directReplyPreview").classList.add("hidden");el("directStatus").textContent="";await loadDirectMessages();await loadConversations();
 }
 async function shareDirectLocation(){
   if(!activeConversationId||!currentUser)return;
@@ -1166,10 +1170,10 @@ async function shareDirectLocation(){
     const position=await getCurrentPosition();
     const {error}=await db.from("direct_messages").insert({
       conversation_id:activeConversationId,sender_id:currentUser.id,message_type:"location",
-      body:null,latitude:position.coords.latitude,longitude:position.coords.longitude
+      body:null,latitude:position.coords.latitude,longitude:position.coords.longitude,reply_to_id:pendingDirectReply?.id||null
     });
     if(error)throw error;
-    await loadDirectMessages();await loadConversations();
+    pendingDirectReply=null;el("directReplyPreview").classList.add("hidden");await loadDirectMessages();await loadConversations();
   }catch(error){el("directStatus").textContent=tx("แชร์พิกัดไม่สำเร็จ: ","Could not share location: ")+(error.message||"")}
 }
 
