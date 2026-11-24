@@ -131,6 +131,23 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .achi-lyrics h3{margin:0 0 9px;color:#293b61}
 @media(max-width:600px){.achi-music-player{padding:0 13px}.achi-music-panel{gap:9px;padding:12px}.achi-music-title{width:100%}.achi-music-controls{width:100%}.achi-music-controls select{flex:1;min-width:0;max-width:none}}
 
+
+/* Compact ACHI music control, styled to blend with the landing hero */
+.hero-art{gap:8px}
+.hero-art .achi-music-player{width:min(100%,390px);max-width:390px;margin:0;padding:0}
+.hero-art .achi-music-panel{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 11px;border:1px solid #dce5f2;border-radius:14px;background:linear-gradient(135deg,#f8fbffed,#f4f1ffed);box-shadow:0 5px 16px #34486b12}
+.hero-art .achi-music-title{width:100%;min-width:0;text-align:center;font-size:13px;line-height:1.25;color:#405477}
+.hero-art .achi-music-controls{width:100%;flex:0 0 100%;justify-content:center;gap:6px}
+.hero-art .achi-music-controls button{padding:6px 10px;font-size:11px;line-height:1.2;border-radius:9px;box-shadow:none;transform:none}
+.hero-art .achi-music-controls button:hover{transform:none}
+.hero-art .achi-music-controls button.secondary{background:#e8edf7;color:#526581}
+.hero-art .achi-music-controls select{min-width:0;max-width:125px;padding:6px 8px;font-size:11px;border-radius:9px}
+.hero-art .achi-music-status{flex-basis:100%;min-height:0;text-align:center;font-size:10px;line-height:1.3;color:#78869c}
+.hero-art .achi-music-login-hint{flex-basis:100%;margin:0;text-align:center;font-size:11px;line-height:1.35;color:#65748c}
+.hero-art .achi-music-login-hint a{color:#6659b8}
+.hero-art .achi-lyrics{max-height:180px;margin-top:7px;padding:10px 12px;font-size:12px;line-height:1.55;border-color:#dce5f2;background:#fbfcff}
+@media(max-width:700px){.hero-art .achi-music-player{width:min(100%,350px)}.hero-art .achi-music-panel{padding:8px 9px}.hero-art .achi-music-title{font-size:12px}}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -211,7 +228,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 
 <header><div class="logo"><img class="brand-mark" id="landingBrandMascot" alt="ACHI Buddy mascot"><span>ACHI</span></div><div class="header-actions"><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></header>
 
-<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR WORLD. YOUR PEOPLE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มีสไตล์เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><div class="hero-mascot-cloud" id="landingHeroMascot" aria-label="ACHI Buddy in different moods"><img data-landing-pose="hello" alt="ACHI Buddy waving"><img data-landing-pose="love" alt="ACHI Buddy showing love"><img data-landing-pose="party" alt="ACHI Buddy celebrating"><img data-landing-pose="think" alt="ACHI Buddy thinking"><img data-landing-pose="tease" alt="ACHI Buddy playful"><img data-landing-pose="sleepy" alt="ACHI Buddy sleepy"></div><div class="achi-hero-music-promo"><div class="achi-hero-music-title">🎵 HEY! ACHI! ACHI! ACHI!</div></div></div><section id="achiMusicPlayer" class="achi-music-player" aria-label="ACHI theme music">
+<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR WORLD. YOUR PEOPLE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มีสไตล์เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><div class="hero-mascot-cloud" id="landingHeroMascot" aria-label="ACHI Buddy in different moods"><img data-landing-pose="hello" alt="ACHI Buddy waving"><img data-landing-pose="love" alt="ACHI Buddy showing love"><img data-landing-pose="party" alt="ACHI Buddy celebrating"><img data-landing-pose="think" alt="ACHI Buddy thinking"><img data-landing-pose="tease" alt="ACHI Buddy playful"><img data-landing-pose="sleepy" alt="ACHI Buddy sleepy"></div></div><section id="achiMusicPlayer" class="achi-music-player" aria-label="ACHI theme music">
   <div class="achi-music-panel">
     <div class="achi-music-title">🎵 HEY! ACHI! ACHI! ACHI!</div>
     
@@ -226,14 +243,14 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <button id="achiLyricsToggle" type="button" class="secondary hidden" onclick="toggleAchiLyrics()">♫ <span data-i18n="musicLyrics">ดูเนื้อเพลง</span></button>
     </div>
     <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลง ACHI ให้คุณฟัง</div>
-    <p id="achiMusicLoginHint" class="achi-music-login-hint">อยากฟังเพลงธีมเวอร์ชันอื่น ๆ ทั้ง 7 เวอร์ชัน? <a href="#" onclick="openAuth('login');return false">เข้าสู่ระบบ</a> เพื่อเลือกฟังได้เลย</p>
+    <p id="achiMusicLoginHint" class="achi-music-login-hint">เข้าสู่ระบบเพื่อเลือกฟังครบ 7 เวอร์ชัน</p>
   </div>
   <div id="achiLyricsPanel" class="achi-lyrics hidden" aria-live="polite">
     <h3 id="achiLyricsTitle">เนื้อเพลง ACHI</h3>
     <div id="achiLyricsText"></div>
   </div>
   <audio id="achiThemeAudio" preload="auto"></audio>
-</section></div><div class="section-heading"><h2 data-i18n="features">ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย</h2><p data-i18n="featureSub">พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่</p></div><div class="feature-grid"><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="hello"></div><h3 data-i18n="chatTitle">พูดคุยและแบ่งปัน</h3><p data-i18n="chatText">เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="love"></div><h3 data-i18n="friendsTitle">ค้นพบเพื่อนใหม่</h3><p data-i18n="friendsText">ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="think"></div><h3 data-i18n="nearbyTitle">เพื่อนใกล้ตัว</h3><p data-i18n="nearbyText">เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="party"></div><h3 data-i18n="communityTitle">ชุมชนที่เป็นมิตร</h3><p data-i18n="communityText">พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย</p></article></div><div class="landing-bottom"><h2 data-i18n="bottomTitle">พร้อมพบเพื่อนใหม่ที่เข้ากับคุณหรือยัง?</h2><p data-i18n="bottomText">เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้</p><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button></div><p style="text-align:center;margin:25px 0 0;font-size:13px"><a href="/policies.html" style="color:#6256d9;font-weight:700">เอกสารนโยบายและข้อกำหนดของ ACHI / ACHI Policies</a></p></section><div id="authBox" class="card hidden">
+</section></div></div><div class="section-heading"><h2 data-i18n="features">ทุกความสัมพันธ์ดี ๆ เริ่มจากการทักทาย</h2><p data-i18n="featureSub">พื้นที่เล็ก ๆ ที่เปิดโอกาสให้คุณได้พบโลกใบใหม่</p></div><div class="feature-grid"><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="hello"></div><h3 data-i18n="chatTitle">พูดคุยและแบ่งปัน</h3><p data-i18n="chatText">เริ่มบทสนทนา แลกเปลี่ยนเรื่องราวกับผู้คนใหม่ ๆ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="love"></div><h3 data-i18n="friendsTitle">ค้นพบเพื่อนใหม่</h3><p data-i18n="friendsText">ทำความรู้จักคนที่มีความสนใจคล้ายกับคุณ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="think"></div><h3 data-i18n="nearbyTitle">เพื่อนใกล้ตัว</h3><p data-i18n="nearbyText">เลือกแชร์ตำแหน่งเพื่อค้นพบผู้คนใกล้เคียงอย่างสมัครใจ</p></article><article class="feature"><div class="feature-icon achi-feature-mascot" data-mascot="party"></div><h3 data-i18n="communityTitle">ชุมชนที่เป็นมิตร</h3><p data-i18n="communityText">พื้นที่สำหรับความสนใจและบทสนทนาที่หลากหลาย</p></article></div><div class="landing-bottom"><h2 data-i18n="bottomTitle">พร้อมพบเพื่อนใหม่ที่เข้ากับคุณหรือยัง?</h2><p data-i18n="bottomText">เริ่มต้นสร้างความสัมพันธ์ดี ๆ ได้วันนี้</p><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button></div><p style="text-align:center;margin:25px 0 0;font-size:13px"><a href="/policies.html" style="color:#6256d9;font-weight:700">เอกสารนโยบายและข้อกำหนดของ ACHI / ACHI Policies</a></p></section><div id="authBox" class="card hidden">
   <h2 id="authTitle">เข้าสู่ ACHI</h2>
   <p id="authSubtitle" class="muted">พื้นที่พูดคุยและพบเพื่อนใหม่</p>
   <label>อีเมล</label>
@@ -2258,12 +2275,12 @@ function updateAchiMusicUI(){
   if(!member){el("achiLyricsPanel")?.classList.add("hidden")}
   const status=el("achiMusicStatus");
   if(status)status.textContent=member
-    ?(currentLanguage==="en"?"Choose any of the 7 versions. Thai versions share one Thai lyric set; English versions share one English lyric set.":"เลือกฟังได้ทั้ง 7 เวอร์ชัน เพลงไทยใช้เนื้อเพลงไทยชุดเดียวกัน และเพลงอังกฤษใช้เนื้อเพลงอังกฤษชุดเดียวกัน")
-    :(currentLanguage==="en"?"A random ACHI theme version is selected for you.":"สุ่มเพลง ACHI ให้คุณฟัง");
+    ?(currentLanguage==="en"?"Choose from all 7 versions.":"เลือกฟังได้ครบ 7 เวอร์ชัน")
+    :(currentLanguage==="en"?"A random track is ready.":"สุ่มเพลงให้คุณแล้ว");
   const loginHint=el("achiMusicLoginHint");
   if(loginHint){loginHint.classList.toggle("hidden",member);loginHint.innerHTML=currentLanguage==="en"?'Want to hear the other theme versions? <a href="#" onclick="openAuth(\'login\');return false">Log in</a> to choose from all 7 versions.':'อยากฟังเพลงธีมเวอร์ชันอื่น ๆ ทั้ง 7 เวอร์ชัน? <a href="#" onclick="openAuth(\'login\');return false">เข้าสู่ระบบ</a> เพื่อเลือกฟังได้เลย';}
-  const play=el("achiMusicPlay");if(play)play.innerHTML=(currentLanguage==="en"?"▶ Play":"▶ เล่นเพลง");
-  const stop=el("achiMusicStop");if(stop)stop.innerHTML=(currentLanguage==="en"?"■ Stop":"■ หยุดเพลง");
+  const play=el("achiMusicPlay");if(play)play.innerHTML=(currentLanguage==="en"?"▶ Play":"▶ เล่น");
+  const stop=el("achiMusicStop");if(stop)stop.innerHTML=(currentLanguage==="en"?"■ Stop":"■ หยุด");
   const lyricButton=el("achiLyricsToggle");if(lyricButton)lyricButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
 }
 function setAchiThemeTrack(track,shouldPlay=true){
