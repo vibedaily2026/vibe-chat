@@ -1,5 +1,5 @@
-const CACHE_NAME = "achi-shell-v1";
-const APP_SHELL = ["/", "/achi-icon.svg"];
+const CACHE_NAME = "achi-shell-v2";
+const APP_SHELL = ["/", "/achi-buddy-03.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
