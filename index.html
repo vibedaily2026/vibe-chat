@@ -80,6 +80,18 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .chat-date-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#8794a6;font-size:12px}.chat-date-divider:before,.chat-date-divider:after{content:"";height:1px;background:#dfe6ef;flex:1}.chat-message-time{display:block;color:#91a0b4;font-size:11px;margin-top:6px}.chat-reply-preview{padding:9px 12px;margin:8px 0;background:#eef4fc;border-left:3px solid #5b8bd1;border-radius:8px;color:#52657f;font-size:13px}.chat-reply-preview button{float:right;padding:3px 8px;font-size:11px}.chat-reply-quote{padding:7px 9px;margin-bottom:8px;border-left:3px solid #8aa9d5;background:#f3f6fb;border-radius:6px;font-size:12px;color:#65758b}.chat-reply-quote strong{display:block;margin-bottom:3px}.chat-message-tools{display:none;gap:5px;flex-wrap:wrap;margin-top:8px}.chat-message-tools.visible{display:flex}.chat-message-tools button,.chat-reaction-pill{padding:4px 8px;font-size:12px;border-radius:14px;box-shadow:none}.chat-message-tools button{background:#edf3fb;color:#456b9d}.chat-reactions{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.chat-reaction-pill{background:#f3f6fb;color:#53657d;border:1px solid #e2e9f2}.chat-reaction-pill.mine{background:#e7efff;border-color:#8eb2ed;color:#315e9e}.msg-content{cursor:pointer}
 
 .achi-topbar{position:sticky;top:64px;z-index:8;display:flex;align-items:center;gap:8px;padding:10px 14px;margin:0 0 14px;background:#ffffffed;border:1px solid #e9e8f7;border-radius:16px;box-shadow:0 6px 22px #2029430b;overflow-x:auto}.achi-topbar-brand{font-size:20px;color:#7467F0;margin-right:8px}.top-limit-label{margin-left:auto}.achi-topbar button{white-space:nowrap;padding:9px 12px;font-size:12px;box-shadow:none}.top-limit-label{white-space:nowrap;font-size:11px}.top-limit-select{width:auto;min-width:54px;margin:0;padding:8px 6px;border:1px solid #e3e2f5;border-radius:10px;background:#fff;color:#5147c7;font-weight:700}.tabs{display:none!important}.achi-bottom-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,760px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#ffffffed;backdrop-filter:blur(16px);border:1px solid #e8e7f8;border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -8px 30px #20294312}.achi-bottom-nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;background:transparent;color:#77819a;box-shadow:none}.achi-bottom-nav button span{font-size:20px}.achi-bottom-nav button small{font-size:10px;font-weight:700}.achi-bottom-nav button.active{background:#efeeff;color:#554bcb}.profile-status-text{padding:12px 14px;background:#f4f2ff;border-radius:12px;white-space:pre-wrap}.profile-comments{margin-top:24px;padding-top:18px;border-top:1px solid #e9e8f7}.profile-comment{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid #edf0f6}.profile-comment img{width:36px;height:36px;border-radius:50%;object-fit:cover}.profile-comment-body{min-width:0;flex:1}.profile-comment-meta{font-size:12px;color:#8993a8}.profile-comment-text{white-space:pre-wrap;overflow-wrap:anywhere}.profile-comment-time{display:block;margin-top:5px;color:#929bb0;font-size:11px}.profile-comment-actions{margin-top:7px}.profile-comment-actions button{padding:5px 10px;font-size:11px;box-shadow:none}.discover-person-visual,.nearby-card-visual{cursor:pointer}
+.achi-watermark-host{position:relative;isolation:isolate;overflow:hidden}
+.achi-watermark-layer{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+.achi-watermark-layer img{position:absolute;width:clamp(54px,9vw,118px);height:auto;object-fit:contain;opacity:.105;filter:saturate(.9);user-select:none}
+.achi-watermark-layer img:nth-child(1){top:2%;left:2%;transform:rotate(-13deg)}
+.achi-watermark-layer img:nth-child(2){top:5%;right:3%;width:clamp(62px,10vw,132px);transform:rotate(12deg)}
+.achi-watermark-layer img:nth-child(3){bottom:8%;left:4%;width:clamp(48px,8vw,100px);transform:rotate(9deg)}
+.achi-watermark-layer img:nth-child(4){bottom:5%;right:4%;width:clamp(58px,9vw,116px);transform:rotate(-10deg)}
+.achi-watermark-host>.achi-watermark-content{position:relative;z-index:1}
+#chatPage .achi-watermark-layer img{opacity:.13;width:clamp(70px,12vw,150px)}
+#directChatPage .achi-watermark-layer,#communityRoomPage .achi-watermark-layer{position:fixed;inset:auto 0 7vh auto;width:min(32vw,260px);height:230px;z-index:0}
+#directChatPage .achi-watermark-layer img,#communityRoomPage .achi-watermark-layer img{opacity:.075;width:clamp(65px,11vw,130px)}
+@media(max-width:600px){.achi-watermark-layer img{opacity:.075}.achi-watermark-layer img:nth-child(2){top:1%;right:1%}.achi-watermark-layer img:nth-child(3){bottom:3%;left:1%}.achi-watermark-layer img:nth-child(4){bottom:2%;right:1%}}
 .nearby-card-visual{position:relative;width:100%;height:170px;border-radius:13px;overflow:hidden;background:#efeeff;margin-bottom:12px}
 .nearby-card-visual img{width:100%;height:100%;object-fit:cover;display:block}
 .nearby-card-visual:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#15152dcc);pointer-events:none}
@@ -1131,6 +1143,16 @@ function applyAchiMascotBranding(){
   const mascot="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg("hello"));
   ["landingBrandMascot","achiTopMascot","landingHeroMascot"].forEach(id=>{const node=el(id);if(node)node.src=mascot});
   document.querySelectorAll(".achi-feature-mascot").forEach(node=>{const id=node.dataset.mascot||"hello";node.innerHTML='<img alt="ACHI Buddy" src="'+("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg(id)))+'">'});
+  const watermarkTargets=[["chatPage",["hello","love","party","think"]],["directChatPage",["hello","tease","heart","huh"]],["communityRoomPage",["party","goodjob","sleepy","bye"]]];
+  watermarkTargets.forEach(([target,poses])=>{
+    const host=el(target);if(!host||host.querySelector(":scope > .achi-watermark-layer"))return;
+    host.classList.add("achi-watermark-host");
+    const layer=document.createElement("div");layer.className="achi-watermark-layer";layer.setAttribute("aria-hidden","true");
+    poses.forEach(id=>{const img=document.createElement("img");img.alt="";img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(achiStickerSvg(id));layer.append(img)});
+    const content=document.createElement("div");content.className="achi-watermark-content";
+    while(host.firstChild)content.append(host.firstChild);
+    host.append(layer,content);
+  });
 }
 function toggleDirectStickerPicker(){
   const picker=el("directStickerPicker");if(!picker)return;
@@ -1647,9 +1669,9 @@ async function loadNearbyFriends(){
     const {error:updateError}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
     if(updateError)throw updateError;
   }catch(error){el("nearbyStatus").textContent=tx("อัปเดตตำแหน่งไม่สำเร็จ: ","Could not update location: ")+error.message;return}
-  const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:50});
+  const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:1000000});
   if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
-  if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่แชร์ตำแหน่งภายใน 50 กม. เมื่อมีสมาชิกใกล้เคียงเปิดแชร์ ระบบจะแสดงที่นี่","No members sharing their location within 50 km yet. They will appear here when they opt in.");return}
+  if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่เปิดแชร์ตำแหน่งในขณะนี้ เมื่อมีสมาชิกเปิดแชร์ ระบบจะแสดงที่นี่","No members sharing their location yet. They will appear here when they opt in.");return}
   const ids=data.map(x=>x.user_id);
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,username,display_name,avatar_url,bio,interests,age,gender,status").in("id",ids);
   if(profileError){el("nearbyStatus").textContent=tx("โหลดโปรไฟล์สมาชิกไม่สำเร็จ: ","Could not load member profiles: ")+profileError.message;return}
