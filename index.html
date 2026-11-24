@@ -366,6 +366,63 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   #landing .hero-mascot-cloud{width:min(100%,330px);height:224px;gap:6px}
   #landing .hero-mascot-cloud img{max-width:100px;max-height:106px}
 }
+
+/* Seamless member photo grid: edge-to-edge tiles, no card gutters */
+#peopleList.people-grid,
+#nearbyList.people-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:0!important;
+  row-gap:0!important;
+  column-gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  width:100%;
+}
+#peopleList.people-grid>.discover-person,
+#nearbyList.people-grid>.nearby-person-card{
+  min-width:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  gap:0!important;
+  overflow:hidden;
+}
+#peopleList .discover-person-visual,
+#nearbyList .nearby-card-visual{
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  height:auto!important;
+  aspect-ratio:1/1!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+}
+#peopleList .discover-person-visual img,
+#nearbyList .nearby-card-visual img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+}
+#peopleList .discover-person-caption,
+#nearbyList .nearby-card-caption{left:7px!important;right:7px!important;bottom:7px!important}
+#peopleList .discover-person .person-bio,
+#nearbyList .nearby-person-card .person-bio{display:none!important}
+@media(max-width:600px){
+  #peopleList.people-grid,
+  #nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
 </style>
 </head>
 <body>
