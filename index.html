@@ -272,25 +272,26 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
  #landing .hero-mascot-cloud{overflow:visible}
 }
 
-/* ACHI Buddy landing hero: spread the six poses into the open space without changing other sections */
-@media(min-width:801px){
- #landing .hero-art{transform:none;min-width:0}
- #landing .hero-mascot-cloud{width:min(100%,470px);height:410px}
- #landing .hero-mascot-cloud img:nth-child(1){left:36%;top:27%;width:clamp(148px,15vw,178px)}
- #landing .hero-mascot-cloud img:nth-child(2){left:1%;top:3%;width:clamp(104px,10vw,122px)}
- #landing .hero-mascot-cloud img:nth-child(3){right:1%;top:3%;width:clamp(104px,10vw,122px)}
- #landing .hero-mascot-cloud img:nth-child(4){left:0%;bottom:4%;width:clamp(92px,9vw,110px)}
- #landing .hero-mascot-cloud img:nth-child(5){right:0%;bottom:4%;width:clamp(96px,9.5vw,114px)}
- #landing .hero-mascot-cloud img:nth-child(6){left:41%;bottom:0%;width:clamp(82px,8vw,98px)}
-}
+/* ACHI Buddy landing hero: six separate, fully visible positions */
+#landing .hero-art{transform:none;min-width:0}
+#landing .hero-mascot-cloud{box-sizing:border-box;position:relative;width:min(100%,450px);height:310px;margin-inline:auto;padding:0;overflow:hidden}
+#landing .hero-mascot-cloud img{position:absolute;display:block;width:clamp(92px,8.2vw,112px);height:auto;max-width:28%;max-height:44%;object-fit:contain;transform:none}
+#landing .hero-mascot-cloud img:nth-child(1){left:2%;top:4%;z-index:1}
+#landing .hero-mascot-cloud img:nth-child(2){left:36%;top:4%;z-index:1}
+#landing .hero-mascot-cloud img:nth-child(3){right:2%;top:4%;z-index:1}
+#landing .hero-mascot-cloud img:nth-child(4){left:2%;bottom:4%;z-index:1}
+#landing .hero-mascot-cloud img:nth-child(5){left:36%;bottom:4%;z-index:1}
+#landing .hero-mascot-cloud img:nth-child(6){right:2%;bottom:4%;z-index:1}
 @media(max-width:800px){
- #landing .hero-mascot-cloud{width:min(100%,340px);height:285px}
- #landing .hero-mascot-cloud img:nth-child(1){left:34%;top:27%;width:clamp(116px,35vw,146px)}
- #landing .hero-mascot-cloud img:nth-child(2){left:2%;top:3%;width:clamp(78px,23vw,96px)}
- #landing .hero-mascot-cloud img:nth-child(3){right:2%;top:3%;width:clamp(78px,23vw,96px)}
- #landing .hero-mascot-cloud img:nth-child(4){left:1%;bottom:3%;width:clamp(70px,21vw,88px)}
- #landing .hero-mascot-cloud img:nth-child(5){right:1%;bottom:3%;width:clamp(72px,22vw,90px)}
- #landing .hero-mascot-cloud img:nth-child(6){left:40%;bottom:0;width:clamp(64px,19vw,80px)}
+ #landing .hero-art{transform:none;min-height:0}
+ #landing .hero-mascot-cloud{width:min(100%,330px);height:230px;overflow:hidden}
+ #landing .hero-mascot-cloud img{width:clamp(76px,24vw,88px);max-width:28%;max-height:43%}
+ #landing .hero-mascot-cloud img:nth-child(1){left:2%;top:3%}
+ #landing .hero-mascot-cloud img:nth-child(2){left:36%;top:3%}
+ #landing .hero-mascot-cloud img:nth-child(3){right:2%;top:3%}
+ #landing .hero-mascot-cloud img:nth-child(4){left:2%;bottom:3%}
+ #landing .hero-mascot-cloud img:nth-child(5){left:36%;bottom:3%}
+ #landing .hero-mascot-cloud img:nth-child(6){right:2%;bottom:3%}
 }
 
 </style>
