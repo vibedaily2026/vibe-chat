@@ -12,10 +12,10 @@
   "theme_color": "#7467F0",
   "icons": [
     {
-      "src": "/achi-icon.svg?v=2",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/achi-buddy-03.png?v=3",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
