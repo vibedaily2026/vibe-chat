@@ -936,7 +936,7 @@ async function openDirectChat(peerId,existingId){
     await endDirectCall(true);
     if(callChannel){await db.removeChannel(callChannel);callChannel=null;callChannelConversationId=null}
   }
-  activeConversationId=conversationId;activePeerId=peerId;
+  pendingDirectReply=null;el("directReplyPreview").classList.add("hidden");activeConversationId=conversationId;activePeerId=peerId;
   let peer=directPeerCache[peerId];
   if(!peer){
     const {data}=await db.from("profiles").select("id,display_name,username,avatar_url").eq("id",peerId).maybeSingle();
@@ -1653,7 +1653,7 @@ async function loadCommunityRooms(){
 async function openCommunityRoom(roomId){
   const room=communityRooms.find(item=>item.id===roomId);
   if(!room)return;
-  activeCommunityRoomId=room.id;activeCommunityRoom=room;
+  pendingCommunityReply=null;el("communityReplyPreview").classList.add("hidden");activeCommunityRoomId=room.id;activeCommunityRoom=room;
   el("communityRoomTitle").textContent=currentLanguage==="en"?(room.name_en||room.name_th):(room.name_th||room.name_en);
   el("communityRoomDescription").textContent=currentLanguage==="en"?(room.description_en||room.description_th):(room.description_th||room.description_en);
   el("chatStatus").textContent="";
