@@ -1982,11 +1982,9 @@ async function loadNearbyFriends(){
   const {data:enabled,error:statusError}=await db.rpc("my_location_enabled");
   if(statusError){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+statusError.message;return}
   if(!enabled){el("nearbyStatus").textContent=tx("กรุณากด “เปิดแชร์ตำแหน่ง” ก่อนค้นหาเพื่อนใกล้เคียง","Please enable location sharing to find nearby friends");return}
-  try{
-    const position=await getCurrentPosition();
-    const {error:updateError}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
-    if(updateError)throw updateError;
-  }catch(error){el("nearbyStatus").textContent=tx("อัปเดตตำแหน่งไม่สำเร็จ: ","Could not update location: ")+error.message;return}
+  // Location is acquired and saved only when the member explicitly enables sharing.
+  // Searching must use the already-consented server-side location; asking the browser
+  // for GPS again here can fail on another device and incorrectly block discovery.
   const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:1000000});
   if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
   if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่เปิดแชร์ตำแหน่งในขณะนี้ เมื่อมีสมาชิกเปิดแชร์ ระบบจะแสดงที่นี่","No members sharing their location yet. They will appear here when they opt in.");return}
