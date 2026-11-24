@@ -148,6 +148,27 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .hero-art .achi-lyrics{max-height:180px;margin-top:7px;padding:10px 12px;font-size:12px;line-height:1.55;border-color:#dce5f2;background:#fbfcff}
 @media(max-width:700px){.hero-art .achi-music-player{width:min(100%,350px)}.hero-art .achi-music-panel{padding:8px 9px}.hero-art .achi-music-title{font-size:12px}}
 
+
+/* ACHI music bar: balanced single-row layout with clear play/stop colors */
+.achi-music-player{width:min(100%,1180px);max-width:1180px;margin:14px auto;padding:0 22px}
+.achi-music-panel{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;flex-wrap:nowrap;gap:12px;width:100%;padding:10px 14px}
+.achi-music-title{width:auto;min-width:max-content;flex:0 0 auto;text-align:left;font-size:13px}
+.achi-music-controls{display:flex;flex:0 0 auto;flex-wrap:nowrap;align-items:center;justify-content:flex-start;width:auto;gap:7px}
+.achi-music-controls button{width:auto;min-width:36px;padding:8px 11px;font-size:14px}
+#achiMusicPlay{background:#22a65a!important;color:#fff!important}
+#achiMusicStop{background:#e5484d!important;color:#fff!important}
+.achi-music-controls select{width:auto;min-width:110px;max-width:150px;flex:0 1 150px}
+.achi-music-status,.achi-music-login-hint{flex:0 1 auto;flex-basis:auto;min-width:0;margin:0;text-align:left;white-space:nowrap;font-size:12px;line-height:1.35}
+.achi-music-status{min-height:0}
+.achi-music-login-hint{font-size:12px}
+@media(max-width:760px){
+ .achi-music-player{padding:0 13px}
+ .achi-music-panel{flex-wrap:wrap;justify-content:center;gap:8px}
+ .achi-music-title{flex-basis:100%;text-align:center}
+ .achi-music-controls{flex-wrap:wrap;justify-content:center}
+ .achi-music-status,.achi-music-login-hint{flex:1 1 100%;text-align:center;white-space:normal}
+}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
