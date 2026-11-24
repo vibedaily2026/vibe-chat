@@ -1,0 +1,200 @@
+[
+  {
+    "id": "buddy_01",
+    "file": "achi-buddy-01.png",
+    "label_th": "เก่งมาก / Good Job",
+    "label_en": "Good Job"
+  },
+  {
+    "id": "buddy_02",
+    "file": "achi-buddy-02.png",
+    "label_th": "ส่งความรัก / Love You",
+    "label_en": "Love You"
+  },
+  {
+    "id": "buddy_03",
+    "file": "achi-buddy-03.png",
+    "label_th": "สวัสดี / Hello",
+    "label_en": "Hello"
+  },
+  {
+    "id": "buddy_04",
+    "file": "achi-buddy-04.png",
+    "label_th": "หัวเราะ / Laughing",
+    "label_en": "Haha"
+  },
+  {
+    "id": "buddy_05",
+    "file": "achi-buddy-05.png",
+    "label_th": "สงสัย / Curious",
+    "label_en": "Hmm?"
+  },
+  {
+    "id": "buddy_06",
+    "file": "achi-buddy-06.png",
+    "label_th": "เท่ / Cool",
+    "label_en": "Cool"
+  },
+  {
+    "id": "buddy_07",
+    "file": "achi-buddy-07.png",
+    "label_th": "งอน / Angry",
+    "label_en": "Angry"
+  },
+  {
+    "id": "buddy_08",
+    "file": "achi-buddy-08.png",
+    "label_th": "ดีใจ / Yay",
+    "label_en": "Yay"
+  },
+  {
+    "id": "buddy_09",
+    "file": "achi-buddy-09.png",
+    "label_th": "ง่วง / Sleepy",
+    "label_en": "Sleepy"
+  },
+  {
+    "id": "buddy_10",
+    "file": "achi-buddy-10.png",
+    "label_th": "ชูสองนิ้ว / Peace",
+    "label_en": "Peace"
+  },
+  {
+    "id": "buddy_11",
+    "file": "achi-buddy-11.png",
+    "label_th": "มั่นใจ / Confident",
+    "label_en": "Confident"
+  },
+  {
+    "id": "buddy_12",
+    "file": "achi-buddy-12.png",
+    "label_th": "หัวเราะ / Laughing",
+    "label_en": "Laugh"
+  },
+  {
+    "id": "buddy_13",
+    "file": "achi-buddy-13.png",
+    "label_th": "แอบมอง / Peek",
+    "label_en": "Peek"
+  },
+  {
+    "id": "buddy_14",
+    "file": "achi-buddy-14.png",
+    "label_th": "ส่งใจ / Heart",
+    "label_en": "Heart"
+  },
+  {
+    "id": "buddy_15",
+    "file": "achi-buddy-15.png",
+    "label_th": "กระโดดดีใจ / Jump",
+    "label_en": "Jump"
+  },
+  {
+    "id": "buddy_16",
+    "file": "achi-buddy-16.png",
+    "label_th": "เก่งมาก / Good Job",
+    "label_en": "Good Job"
+  },
+  {
+    "id": "buddy_17",
+    "file": "achi-buddy-17.png",
+    "label_th": "ทักทาย / Hi",
+    "label_en": "Hi"
+  },
+  {
+    "id": "buddy_18",
+    "file": "achi-buddy-18.png",
+    "label_th": "รักนะ / Love",
+    "label_en": "Love"
+  },
+  {
+    "id": "buddy_19",
+    "file": "achi-buddy-19.png",
+    "label_th": "เท่ / Cool",
+    "label_en": "Cool"
+  },
+  {
+    "id": "buddy_20",
+    "file": "achi-buddy-20.png",
+    "label_th": "หัวเราะ / Laughing",
+    "label_en": "Laugh"
+  },
+  {
+    "id": "buddy_21",
+    "file": "achi-buddy-21.png",
+    "label_th": "ขี้เล่น / Hehe",
+    "label_en": "Hehe"
+  },
+  {
+    "id": "buddy_22",
+    "file": "achi-buddy-22.png",
+    "label_th": "ตาเป็นประกาย / Starry Eyes",
+    "label_en": "Starry Eyes"
+  },
+  {
+    "id": "buddy_23",
+    "file": "achi-buddy-23.png",
+    "label_th": "งอน / Sulky",
+    "label_en": "Sulky"
+  },
+  {
+    "id": "buddy_24",
+    "file": "achi-buddy-24.png",
+    "label_th": "เย้ / Yay",
+    "label_en": "Yay"
+  },
+  {
+    "id": "buddy_25",
+    "file": "achi-buddy-25.png",
+    "label_th": "เก่งมาก / Good Job",
+    "label_en": "Good Job"
+  },
+  {
+    "id": "buddy_26",
+    "file": "achi-buddy-26.png",
+    "label_th": "ส่งความรัก / Love You",
+    "label_en": "Love You"
+  },
+  {
+    "id": "buddy_27",
+    "file": "achi-buddy-27.png",
+    "label_th": "สวัสดี / Hello",
+    "label_en": "Hello"
+  },
+  {
+    "id": "buddy_28",
+    "file": "achi-buddy-28.png",
+    "label_th": "หัวเราะ / Laughing",
+    "label_en": "Haha"
+  },
+  {
+    "id": "buddy_29",
+    "file": "achi-buddy-29.png",
+    "label_th": "สงสัย / Curious",
+    "label_en": "Curious"
+  },
+  {
+    "id": "buddy_30",
+    "file": "achi-buddy-30.png",
+    "label_th": "เท่ / Cool",
+    "label_en": "Cool"
+  },
+  {
+    "id": "buddy_31",
+    "file": "achi-buddy-31.png",
+    "label_th": "งอน / Angry",
+    "label_en": "Angry"
+  },
+  {
+    "id": "buddy_32",
+    "file": "achi-buddy-32.png",
+    "label_th": "ดีใจ / Yay",
+    "label_en": "Yay"
+  },
+  {
+    "id": "buddy_33",
+    "file": "achi-buddy-33.png",
+    "label_th": "ง่วง / Sleepy",
+    "label_en": "Sleepy"
+  }
+]
