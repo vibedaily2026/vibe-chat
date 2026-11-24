@@ -291,12 +291,27 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 }
 #landing #achiMusicPlayer .achi-music-panel{
   width:100%;max-width:100%;box-sizing:border-box;
-  justify-content:center;align-items:center;text-align:center;
+  display:flex;flex-flow:row wrap;justify-content:center;align-items:center;
+  column-gap:8px;row-gap:5px;text-align:center;padding:8px 10px;
 }
-#landing #achiMusicPlayer .achi-music-title{width:auto;min-width:0;max-width:100%;flex:0 0 auto;text-align:center;font-size:13px;line-height:1.25;padding:5px 10px;border-radius:10px;background:#f1f4fc}
-#landing #achiMusicPlayer .achi-music-controls{justify-content:center;flex:1 1 100%;min-width:0}
-#landing #achiMusicPlayer .achi-music-status,
-#landing #achiMusicPlayer .achi-music-login-hint{text-align:center;white-space:normal;overflow-wrap:anywhere}
+#landing #achiMusicPlayer .achi-music-title{
+  width:auto;min-width:0;max-width:100%;flex:0 1 auto;
+  text-align:center;font-size:12px;line-height:1.2;padding:4px 8px;
+  border-radius:8px;background:#f1f4fc;white-space:nowrap;
+}
+#landing #achiMusicPlayer .achi-music-controls{
+  display:flex;flex:0 0 auto;width:auto;flex-flow:row nowrap;
+  justify-content:center;align-items:center;gap:4px;min-width:0;
+}
+#landing #achiMusicPlayer .achi-music-controls button{
+  padding:5px 8px;font-size:11px;line-height:1.15;border-radius:8px;
+}
+#landing #achiMusicPlayer .achi-music-status{display:none}
+#landing #achiMusicPlayer .achi-music-login-hint{
+  display:block;flex:1 0 100%;width:100%;margin:0;padding:0;
+  text-align:center;white-space:normal;overflow-wrap:anywhere;
+  font-size:10px;line-height:1.25;
+}
 #landing .hero-mascot-cloud{
   box-sizing:border-box;display:grid;position:relative;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -369,7 +384,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <button id="achiLyricsToggle" type="button" class="secondary hidden" onclick="toggleAchiLyrics()">♫ <span data-i18n="musicLyrics">ดูเนื้อเพลง</span></button>
     </div>
     <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลงให้คุณแล้ว</div>
-    <p id="achiMusicLoginHint" class="achi-music-login-hint">ฟังอีก 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false"><strong>เข้าสู่ระบบ</strong></a></p>
+    <p id="achiMusicLoginHint" class="achi-music-login-hint">ฟังทั้ง 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false"><strong>[เข้าสู่ระบบ]</strong></a></p>
   </div>
   <div id="achiLyricsPanel" class="achi-lyrics hidden" aria-live="polite">
     <h3 id="achiLyricsTitle">เนื้อเพลง ACHI</h3>
