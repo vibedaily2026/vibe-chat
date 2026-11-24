@@ -101,9 +101,8 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #nearbyList .nearby-card-name{font-size:12px;line-height:1.2}
 #nearbyList .nearby-card-distance,#nearbyList .nearby-online-label{font-size:10px;line-height:1.2;margin-top:3px}
 #nearbyList .nearby-person-card .person-bio{display:none}
-#nearbyList .nearby-actions{display:flex;gap:4px}
-#nearbyList .nearby-actions button{flex:1;min-width:0;padding:6px 2px;font-size:10px;margin:0}
-@media(max-width:600px){#nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#nearbyList .nearby-person-card{padding:4px;border-radius:10px}#nearbyList .nearby-actions button{font-size:9px}}
+#nearbyList .nearby-actions{display:none!important}
+@media(max-width:600px){#nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#nearbyList .nearby-person-card{padding:4px;border-radius:10px}}
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -1559,11 +1558,7 @@ function renderNearbyFriends(){
     const online=document.createElement("div");online.className="nearby-online-label";online.textContent=nearbyOnlineIds.has(person.id)?tx("● ออนไลน์","● Online"):tx("○ ออฟไลน์","○ Offline");
     caption.append(name,distance,online);visual.append(img,dot,caption);
     const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||tx("ยังไม่ได้เขียนแนะนำตัว","No bio yet");
-    const actions=document.createElement("div");actions.className="nearby-actions";
-    const view=document.createElement("button");view.textContent=tx("ดูโปรไฟล์","View profile");view.onclick=()=>{peopleResults=[person];showPerson(person.id)};
-    const block=document.createElement("button");block.className="secondary";block.textContent=tx("บล็อก","Block");block.onclick=()=>blockNearbyUser(person.id,person.display_name||tx("สมาชิก ACHI","ACHI member"));
-    const report=document.createElement("button");report.className="secondary";report.textContent=tx("รายงาน","Report");report.onclick=()=>reportNearbyUser(person.id,person.display_name||tx("สมาชิก ACHI","ACHI member"));
-    actions.append(view,block,report);card.append(visual,bio,actions);list.appendChild(card);
+    card.append(visual,bio);list.appendChild(card);
   });
 }
 
