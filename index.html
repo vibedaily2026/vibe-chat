@@ -1654,28 +1654,30 @@ async function openCommunityRoom(roomId){
     el("chatStatus").textContent=tx("เข้าร่วมห้องไม่สำเร็จ: ","Could not join room: ")+joinError.message;
     return;
   }
-  await loadMessages(room.id);
-  if(!el("chatStatus").textContent){
+  const messagesLoaded=await loadMessages(room.id);
+  if(messagesLoaded){
+    el("chatStatus").textContent="";
     await markCommunityRoomRead(room.id);
   }
 }
 async function loadMessages(roomId=activeCommunityRoomId){
-  if(!roomId)return;
+  if(!roomId)return false;
   const {data:membership,error:membershipError}=await db.from("community_room_members")
     .select("joined_at").eq("room_id",roomId).eq("user_id",currentUser.id).maybeSingle();
   if(membershipError||!membership){
     el("chatStatus").textContent=tx("ไม่พบข้อมูลการเข้าร่วมห้อง กรุณาลองใหม่","Room membership not found. Please try again.");
-    return;
+    return false;
   }
   const {data,error}=await db.from("messages")
     .select("id,created_at,message,user_id")
     .eq("room_id",roomId).gte("created_at",membership.joined_at)
     .order("created_at",{ascending:true}).limit(100);
-  if(error){el("chatStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
+  if(error){el("chatStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return false}
   await loadProfiles((data||[]).map(m=>m.user_id));
   el("messages").innerHTML="";
   (data||[]).forEach(addMessage);
   scrollMessages();
+  return true;
 }
 
 function addMessage(message){
