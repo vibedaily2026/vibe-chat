@@ -1560,6 +1560,14 @@ function nearbyDistanceLabel(value){
   const distance=Number(value);
   return Number.isFinite(distance)?distance.toFixed(2)+tx(" กม."," km"):tx("ไม่ทราบระยะทาง","Distance unavailable");
 }
+setInterval(()=>{
+  const now=Date.now();
+  let changed=false;
+  nearbyLastSeenAt.forEach((leftAt,id)=>{
+    if(now-leftAt>=5*60*1000){nearbyLastSeenAt.delete(id);changed=true}
+  });
+  if(changed)renderNearbyFriends();
+},15000);
 
 function setNearbyLimit(value){
   const requested=Number.parseInt(value,10)||12;
