@@ -56,9 +56,10 @@ declare
 begin
   -- Never allow a browser-authenticated member to create or promote an admin profile.
   if v_claim_role <> 'service_role'
-     and current_user not in ('postgres', 'supabase_admin') then
+     and current_user not in ('postgres', 'supabase_admin')
+     and not public.achi_is_admin() then
     if tg_op = 'INSERT' then
-      if new.role is not null and new.role not in ('member', 'user') then
+      if new.role is not null and new.role <> 'member' then
         raise exception 'Only a trusted administrator can assign an elevated profile role'
           using errcode = '42501';
       end if;
@@ -90,5 +91,12 @@ for each row execute function public.achi_guard_profile_sensitive_fields();
 
 revoke all on function public.achi_enforce_minimum_age_on_signup() from public, anon, authenticated;
 revoke all on function public.achi_guard_profile_sensitive_fields() from public, anon, authenticated;
+
+-- Remove broad row-level UPDATE permission and grant only member-editable fields.
+-- SELECT remains available (including existing profile reads); role is never client-editable.
+revoke update on table public.profiles from authenticated;
+revoke update (role) on table public.profiles from authenticated;
+grant update (username, display_name, age, gender, avatar_url, bio, interests, status)
+  on table public.profiles to authenticated;
 
 notify pgrst, 'reload schema';
