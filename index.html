@@ -791,6 +791,7 @@ async function searchPeople(){
     const searchable=[
       person.display_name,
       person.username,
+      person.bio,
       person.status,
       ...(Array.isArray(person.interests)?person.interests:[person.interests||""])
     ].filter(Boolean).join(" ").toLocaleLowerCase();
