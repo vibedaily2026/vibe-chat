@@ -2058,7 +2058,102 @@ const achiThemeTracks=[
 ];
 // The two approved lyric texts are intentionally kept as shared language-level sets,
 // rather than duplicated per audio arrangement. Populate only with the user's verbatim approved lyrics.
-const achiThemeLyrics={th:"",en:""};
+const achiThemeLyrics={th:"",en:`[Intro]
+Achi...
+Achi...
+ACHI!
+(BOING!)
+A-CHI! A-CHI! A-CHI!
+HEY! HEY! HEYYYY!
+
+[Verse 1]
+Who's that? ACHI!
+What's that? ACHI!
+Knock knock knock!
+It's ACHI!
+
+Jump up high!
+Touch the sky!
+Who's the boss?
+ACHI! That's right!
+
+Achi Achi Achi Achi!
+Oops! What was that?!
+ACHI!!!
+
+[Pre-Chorus]
+A-CHI! A-CHI! A-CHI! A-CHI!
+ACHI! ACHI! ACHI! HEY!
+Left! Right! Up! Down!
+ACHI is all around!
+
+[Chorus]
+ACHI! ACHI! ACHI! HEY!
+ACHI! ACHI! EVERY DAY!
+ACHI! ACHI! WHAT'S THAT?!
+ACHI! ACHI! HA HA HA!
+
+A-CHI! A-CHI! A-CHI!
+ACHI! ACHI! ACHI!
+Hey! Hey! Hey!
+ACHI NEVER GOES AWAY!
+
+[Funny Break]
+achi... achi... achi...
+
+ACHI! ACHI!
+
+AAAA-CHIIIIIIII!!!
+
+(BOING! BOING! BOING!)
+Hehehehehe!
+
+[Verse 2]
+Wanna chat? ACHI!
+Wanna play? ACHI!
+Send a sticker!
+ACHI! HEY!
+
+Make a friend!
+Start a laugh!
+One more time!
+ACHI ATTACK!
+
+Where's ACHI?
+Right here!
+Who's ACHI?
+Don't you dare!
+
+[Pre-Chorus]
+A-CHI! A-CHI! A-CHI! A-CHI!
+ACHI! ACHI! ACHI! HEY!
+Round and round!
+Make that sound!
+ACHI! ACHI! Shake the ground!
+
+[Final Chorus]
+ACHI! ACHI! ACHI! ACHI!
+HEY! HEY! HEY! HEY!
+ACHI! ACHI! ACHI! ACHI!
+WHAT?! WHAT?! WHAT?!
+
+A-CHI! A-CHI! A-CHI!
+A-CHI! A-CHI! A-CHI!
+ACHI! ACHI! ACHI!
+EVERYBODY SHOUT IT!
+
+ACHIIIIIIII!!!
+
+[Outro]
+achi...
+achi...
+achi...
+
+(Pause)
+
+...ACHI!
+
+(BOING!!!`};
 let achiSelectedTrack=null;
 let achiThemeStarted=false;
 function achiTrackUrl(file){return "https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/"+encodeURIComponent(file).replace(/%2F/g,"/")}
@@ -2066,7 +2161,7 @@ function updateAchiMusicUI(){
   const member=!!currentUser;
   const select=el("achiMusicTrack"),label=el("achiMusicTrackLabel"),lyrics=el("achiLyricsToggle");
   if(select){select.classList.toggle("hidden",!member);label?.classList.toggle("hidden",!member);select.value=achiSelectedTrack?.file||""}
-  lyrics?.classList.toggle("hidden",!member);
+  lyrics?.classList.toggle("hidden",!member||!achiSelectedTrack||!achiThemeLyrics[achiSelectedTrack.lang]);
   if(!member){el("achiLyricsPanel")?.classList.add("hidden")}
   const status=el("achiMusicStatus");
   if(status)status.textContent=member
@@ -2080,6 +2175,7 @@ function setAchiThemeTrack(track,shouldPlay=true){
   const audio=el("achiThemeAudio");if(!audio||!track)return;
   achiSelectedTrack=track;audio.src=achiTrackUrl(track.file);audio.loop=true;audio.load();
   if(el("achiMusicTrack"))el("achiMusicTrack").value=track.file;
+  updateAchiMusicUI();
   if(shouldPlay)playAchiThemeMusic();
 }
 function playAchiThemeMusic(){
@@ -2105,9 +2201,8 @@ function toggleAchiLyrics(){
   if(!isOpen){panel.classList.add("hidden");return}
   const lang=achiSelectedTrack.lang,lyrics=achiThemeLyrics[lang];
   el("achiLyricsTitle").textContent=lang==="th"?"เนื้อเพลงภาษาไทย":"English Lyrics";
-  el("achiLyricsText").textContent=lyrics||(lang==="th"
-    ?"เนื้อเพลงไทยฉบับที่ผู้ใช้อนุมัติจะใส่ไว้ที่นี่"
-    :"The user's approved English lyrics will appear here.");
+  if(!lyrics)return;
+  el("achiLyricsText").textContent=lyrics;
   panel.classList.remove("hidden");
 }
 function initAchiThemeMusic(){
