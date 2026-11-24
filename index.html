@@ -1835,7 +1835,7 @@ function addMessage(message){
   const stickerId=typeof message.message==="string"&&message.message.startsWith("ACHI_STICKER:")?message.message.slice("ACHI_STICKER:".length):null;
   if(stickerId&&achiStickerItems.some(x=>x[0]===stickerId)){renderAchiSticker(content,stickerId)}else{const body=document.createElement("p");body.textContent=message.message||"";content.append(body)}
   const time=document.createElement("small");time.className="chat-message-time";time.textContent=message.created_at?new Date(message.created_at).toLocaleTimeString(currentLanguage==="th"?"th-TH":"en-US",{hour:"2-digit",minute:"2-digit"}):"";
-  content.append(title,body,time);const tools=buildMessageTools(message,"community");const reactions=document.createElement("div");renderMessageReactions(reactions,message.id,"community",communityReactionCache[message.id]||[]);content.append(tools,reactions);content.addEventListener("click",()=>tools.classList.toggle("visible"));item.append(img,content);box.append(item)
+  content.append(title,time);const tools=buildMessageTools(message,"community");const reactions=document.createElement("div");renderMessageReactions(reactions,message.id,"community",communityReactionCache[message.id]||[]);content.append(tools,reactions);content.addEventListener("click",()=>tools.classList.toggle("visible"));item.append(img,content);box.append(item)
 }
 
 function scrollMessages(){el("messages").scrollTop=el("messages").scrollHeight}
