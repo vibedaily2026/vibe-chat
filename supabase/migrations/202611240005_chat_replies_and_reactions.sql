@@ -134,6 +134,128 @@ create policy direct_reactions_delete_own
 on public.direct_message_reactions for delete to authenticated
 using (user_id=(select auth.uid()));
 
+
+-- A reply must point to a message in the same room/conversation and visible to the sender.
+drop policy if exists "ACHI members can send community room messages" on public.messages;
+create policy "ACHI members can send community room messages"
+on public.messages for insert to authenticated
+with check (
+  user_id=auth.uid()::text
+  and exists (
+    select 1 from public.community_room_members crm
+    where crm.room_id=messages.room_id and crm.user_id=auth.uid()
+  )
+  and (
+    reply_to_id is null
+    or exists (
+      select 1 from public.messages parent
+      join public.community_room_members crm on crm.room_id=parent.room_id
+      where parent.id=messages.reply_to_id
+        and parent.room_id=messages.room_id
+        and crm.user_id=auth.uid()
+        and parent.created_at>=crm.joined_at
+    )
+  )
+);
+
+drop policy if exists direct_messages_insert_sender on public.direct_messages;
+create policy direct_messages_insert_sender on public.direct_messages
+for insert to authenticated
+with check (
+  sender_id=(select auth.uid())
+  and exists (
+    select 1 from public.conversation_participants cp
+    join public.conversations c on c.id=cp.conversation_id
+    where cp.conversation_id=direct_messages.conversation_id
+      and cp.user_id=(select auth.uid())
+      and (c.user_a=(select auth.uid()) or c.user_b=(select auth.uid()))
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+  and (
+    reply_to_id is null
+    or exists (
+      select 1 from public.direct_messages parent
+      where parent.id=direct_messages.reply_to_id
+        and parent.conversation_id=direct_messages.conversation_id
+    )
+  )
+);
+
+-- Ensure reaction updates/deletes remain limited to messages visible to the member.
+drop policy if exists community_reactions_update_own on public.community_message_reactions;
+create policy community_reactions_update_own
+on public.community_message_reactions for update to authenticated
+using (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid()) and m.created_at>=crm.joined_at
+  )
+)
+with check (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid()) and m.created_at>=crm.joined_at
+  )
+);
+drop policy if exists community_reactions_delete_own on public.community_message_reactions;
+create policy community_reactions_delete_own
+on public.community_message_reactions for delete to authenticated
+using (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.messages m
+    join public.community_room_members crm on crm.room_id=m.room_id
+    where m.id=community_message_reactions.message_id
+      and crm.user_id=(select auth.uid()) and m.created_at>=crm.joined_at
+  )
+);
+
+drop policy if exists direct_reactions_update_own on public.direct_message_reactions;
+create policy direct_reactions_update_own
+on public.direct_message_reactions for update to authenticated
+using (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.direct_messages dm
+    join public.conversation_participants cp on cp.conversation_id=dm.conversation_id
+    join public.conversations c on c.id=dm.conversation_id
+    where dm.id=direct_message_reactions.message_id
+      and cp.user_id=(select auth.uid())
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+)
+with check (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.direct_messages dm
+    join public.conversation_participants cp on cp.conversation_id=dm.conversation_id
+    join public.conversations c on c.id=dm.conversation_id
+    where dm.id=direct_message_reactions.message_id
+      and cp.user_id=(select auth.uid())
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+);
+drop policy if exists direct_reactions_delete_own on public.direct_message_reactions;
+create policy direct_reactions_delete_own
+on public.direct_message_reactions for delete to authenticated
+using (
+  user_id=(select auth.uid())
+  and exists (
+    select 1 from public.direct_messages dm
+    join public.conversation_participants cp on cp.conversation_id=dm.conversation_id
+    join public.conversations c on c.id=dm.conversation_id
+    where dm.id=direct_message_reactions.message_id
+      and cp.user_id=(select auth.uid())
+      and not public.users_are_blocked(c.user_a,c.user_b)
+  )
+);
+
 grant select,insert,update,delete on public.community_message_reactions to authenticated;
 grant select,insert,update,delete on public.direct_message_reactions to authenticated;
 
