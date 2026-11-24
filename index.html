@@ -1081,30 +1081,30 @@ async function unsendDirectMessage(messageId,messageType,mediaPath){
 const directChatEmojis=["😀","😃","😄","😁","😆","😅","😂","🤣","🥹","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤩","🥳","🤗","🤔","🫡","😭","🥺","😴","😤","😡","🤯","🤭","🫣","👍","👎","👏","🙌","🙏","💪","🤝","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💞","💖","💗","💓","💯","🔥","✨","⭐","🎉","🎊","🌈","☀️","🌙","☕","🍰","🍕","🎮","🎵","🐱","🐶"];
 
 const achiStickerItems=[
-  ["hello","สวัสดี","Hello","", "achi-buddy-01.png"],
+  ["hello","สวัสดี","Hello","", "achi-buddy-03.png"],
   ["love","ส่งความรัก","Love You","", "achi-buddy-02.png"],
-  ["laugh","หัวเราะ","Haha","", "achi-buddy-03.png"],
-  ["wink","ชูสองนิ้ว","Peace","", "achi-buddy-04.png"],
-  ["cool","มั่นใจ","Confident","", "achi-buddy-05.png"],
-  ["cry","งอน","Angry","", "achi-buddy-06.png"],
+  ["laugh","หัวเราะ","Haha","", "achi-buddy-04.png"],
+  ["wink","ชูสองนิ้ว","Peace","", "achi-buddy-10.png"],
+  ["cool","มั่นใจ","Confident","", "achi-buddy-06.png"],
+  ["cry","งอน","Angry","", "achi-buddy-23.png"],
   ["angry","ดีใจ","Yay","", "achi-buddy-07.png"],
-  ["shy","ง่วง","Sleepy","", "achi-buddy-08.png"],
-  ["wow","สงสัย","Hmm?","", "achi-buddy-09.png"],
-  ["think","เท่","Cool","", "achi-buddy-10.png"],
-  ["sleep","หัวเราะ","Laugh","", "achi-buddy-11.png"],
-  ["party","แอบมอง","Peek","", "achi-buddy-12.png"],
-  ["sorry","ส่งใจ","Heart","", "achi-buddy-13.png"],
-  ["thanks","กระโดดดีใจ","Jump","", "achi-buddy-14.png"],
-  ["yes","เก่งมาก","Good Job","", "achi-buddy-15.png"],
-  ["no","ทักทาย","Hi","", "achi-buddy-16.png"],
-  ["hug","รักนะ","Love","", "achi-buddy-17.png"],
+  ["shy","ง่วง","Sleepy","", "achi-buddy-13.png"],
+  ["wow","สงสัย","Hmm?","", "achi-buddy-22.png"],
+  ["think","เท่","Cool","", "achi-buddy-05.png"],
+  ["sleep","หัวเราะ","Laugh","", "achi-buddy-09.png"],
+  ["party","แอบมอง","Peek","", "achi-buddy-08.png"],
+  ["sorry","ส่งใจ","Heart","", "achi-buddy-23.png"],
+  ["thanks","กระโดดดีใจ","Jump","", "achi-buddy-16.png"],
+  ["yes","เก่งมาก","Good Job","", "achi-buddy-01.png"],
+  ["no","ทักทาย","Hi","", "achi-buddy-07.png"],
+  ["hug","รักนะ","Love","", "achi-buddy-18.png"],
   ["miss","เท่","Cool","", "achi-buddy-18.png"],
-  ["goodjob","หัวเราะ","Laugh","", "achi-buddy-19.png"],
-  ["tease","ขี้เล่น","Hehe","", "achi-buddy-20.png"],
-  ["welcome","ตาเป็นประกาย","Starry Eyes","", "achi-buddy-21.png"],
-  ["huh","งอน","Sulky","", "achi-buddy-22.png"],
-  ["heart","เย้","Yay","", "achi-buddy-23.png"],
-  ["bye","เก่งมาก","Good Job","", "achi-buddy-24.png"],
+  ["goodjob","หัวเราะ","Laugh","", "achi-buddy-01.png"],
+  ["tease","ขี้เล่น","Hehe","", "achi-buddy-21.png"],
+  ["welcome","ตาเป็นประกาย","Starry Eyes","", "achi-buddy-17.png"],
+  ["huh","งอน","Sulky","", "achi-buddy-13.png"],
+  ["heart","เย้","Yay","", "achi-buddy-14.png"],
+  ["bye","เก่งมาก","Good Job","", "achi-buddy-17.png"],
   ["buddy25","ส่งความรัก","Love You","", "achi-buddy-25.png"],
   ["buddy26","สวัสดี","Hello","", "achi-buddy-26.png"],
   ["buddy27","หัวเราะ","Haha","", "achi-buddy-27.png"],
@@ -1116,36 +1116,6 @@ const achiStickerItems=[
   ["buddy33","ทักทาย","Hi","", "achi-buddy-33.png"]
 ];
 function achiStickerImage(id){const aliases={sleepy:"sleep"};const key=aliases[id]||id;const item=achiStickerItems.find(x=>x[0]===key);return item?"/"+item[4]:"/achi-buddy-03.png"}
-function achiStickerSvg(id){
-  const item=achiStickerItems.find(x=>x[0]===id);if(!item)return "";
-  const face={
-    hello:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M49 61q7 9 14 0" fill="none" stroke="#202943" stroke-width="3" stroke-linecap="round"/>',
-    love:'<path d="M43 49q-7-9-13 0t13 16q20-12 8-18q-5-3-8 2" fill="#ff78b5"/><path d="M64 49q-7-9-13 0t13 16q20-12 8-18q-5-3-8 2" fill="#ff78b5"/>',
-    laugh:'<path d="M36 47q7-9 14 0M62 47q7-9 14 0" fill="none" stroke="#202943" stroke-width="4" stroke-linecap="round"/><path d="M43 59q13 19 26 0z" fill="#f45b91"/>',
-    wink:'<circle cx="43" cy="48" r="5" fill="#202943"/><path d="M62 49q8-9 16 0" fill="none" stroke="#202943" stroke-width="4" stroke-linecap="round"/><path d="M50 61q7 8 14 0" fill="none" stroke="#202943" stroke-width="3" stroke-linecap="round"/>',
-    cool:'<rect x="31" y="41" width="25" height="14" rx="6" fill="#202943"/><rect x="57" y="41" width="25" height="14" rx="6" fill="#202943"/><path d="M55 47h4" stroke="#202943" stroke-width="3"/><path d="M51 64q7 4 14 0" fill="none" stroke="#202943" stroke-width="3"/>',
-    cry:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 67q7-9 14 0" fill="none" stroke="#202943" stroke-width="3"/><path d="M34 54q-8 9 0 15" stroke="#72baff" stroke-width="4" fill="none"/>',
-    angry:'<path d="M35 42l16 6M78 42l-16 6" stroke="#202943" stroke-width="4" stroke-linecap="round"/><circle cx="43" cy="52" r="4" fill="#202943"/><circle cx="69" cy="52" r="4" fill="#202943"/><path d="M51 67q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    shy:'<path d="M37 49q6-7 12 0M63 49q6-7 12 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M51 61q7 6 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    wow:'<circle cx="43" cy="48" r="7" fill="#202943"/><circle cx="69" cy="48" r="7" fill="#202943"/><ellipse cx="56" cy="65" rx="6" ry="8" fill="#f45b91"/>',
-    think:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M51 64q7-5 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    sleep:'<path d="M36 49q7 6 14 0M62 49q7 6 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M51 64q7 4 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    party:'<path d="M36 48q7-9 14 0M62 48q7-9 14 0" stroke="#202943" stroke-width="4" fill="none"/><path d="M43 59q13 17 26 0z" fill="#f45b91"/>',
-    sorry:'<circle cx="43" cy="49" r="5" fill="#202943"/><circle cx="69" cy="49" r="5" fill="#202943"/><path d="M51 66q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    thanks:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    yes:'<path d="M36 49q7-8 14 0M62 49q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    no:'<path d="M36 49q7-8 14 0M62 49q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/><path d="M50 66q7-8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    hug:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    miss:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    goodjob:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    tease:'<circle cx="43" cy="48" r="5" fill="#202943"/><path d="M62 49q8-9 16 0" stroke="#202943" stroke-width="4" fill="none"/><path d="M50 60q13 17 20 0" fill="#f45b91"/>',
-    welcome:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    huh:'<circle cx="43" cy="48" r="7" fill="#202943"/><circle cx="69" cy="48" r="7" fill="#202943"/><ellipse cx="56" cy="65" rx="5" ry="7" fill="#f45b91"/>',
-    heart:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>',
-    bye:'<circle cx="43" cy="48" r="5" fill="#202943"/><circle cx="69" cy="48" r="5" fill="#202943"/><path d="M50 61q7 8 14 0" stroke="#202943" stroke-width="3" fill="none"/>'
-  }[id];
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A99EFF"/><stop offset="1" stop-color="#6F63E9"/></linearGradient></defs><ellipse cx="56" cy="103" rx="35" ry="5" fill="#202943" opacity=".10"/><path d="M27 73q-13-5-15-18M85 73q13-5 15-18" fill="none" stroke="#6F63E9" stroke-width="12" stroke-linecap="round"/><path d="M56 9C34 9 19 26 18 53c-1 28 14 43 38 43s39-15 38-43C93 26 78 9 56 9z" fill="url(#g)"/><ellipse cx="39" cy="100" rx="10" ry="5" fill="#6F63E9"/><ellipse cx="73" cy="100" rx="10" ry="5" fill="#6F63E9"/><ellipse cx="39" cy="46" rx="11" ry="13" fill="#fff"/><ellipse cx="73" cy="46" rx="11" ry="13" fill="#fff"/><circle cx="41" cy="47" r="5.5" fill="#202943"/><circle cx="75" cy="47" r="5.5" fill="#202943"/><circle cx="43" cy="44" r="2" fill="#fff"/><circle cx="77" cy="44" r="2" fill="#fff"/><ellipse cx="27" cy="65" rx="8" ry="5" fill="#F6A8C9" opacity=".85"/><ellipse cx="85" cy="65" rx="8" ry="5" fill="#F6A8C9" opacity=".85"/>'+face+'</svg>';
-}
 function renderAchiSticker(parent,id){
   const item=achiStickerItems.find(x=>x[0]===id);if(!item)return false;
   const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI "+(currentLanguage==="th"?item[1]:item[2]);sticker.src=achiStickerImage(id);parent.append(sticker);return true;
