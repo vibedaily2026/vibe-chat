@@ -326,7 +326,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <h2 data-i18n="discoverHeading">ค้นหาเพื่อนใหม่</h2>
     <p class="muted" data-i18n="discoverIntro">ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน</p>
     <div class="row">
-      <input id="peopleSearch" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาจากชื่อหรือ Username..."
+      <input id="peopleSearch" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาจากชื่อ Username สถานะ หรือความสนใจ..."
         onkeydown="if(event.key==='Enter')searchPeople()">
       <button onclick="searchPeople()" data-i18n="search">ค้นหา</button>
     </div>
@@ -785,27 +785,28 @@ async function searchPeople(){
   el("peopleStatus").textContent=tx("กำลังค้นหาสมาชิก...","Searching members...");
   el("peopleList").innerHTML="";
 
-  let query=db.from("profiles")
-    .select("id,display_name,avatar_url,bio,interests,age,gender,status")
+  const {data,error}=await db.from("profiles")
+    .select("id,username,display_name,avatar_url,bio,interests,age,gender,status,created_at")
     .neq("id",currentUser.id)
-    .limit(50);
-
-  if(term){
-    const safeTerm=term.replace(/[,%()]/g," ").trim();
-    if(!safeTerm){
-      el("peopleStatus").textContent=tx("กรุณาพิมพ์ชื่อที่แสดง","Please enter a display name");
-      return;
-    }
-    query=query.or("display_name.ilike.%"+safeTerm+"%,username.ilike.%"+safeTerm+"%");
-  }
-
-  const {data,error}=await query.order("created_at",{ascending:false});
+    .order("created_at",{ascending:false})
+    .limit(1000);
   if(error){
     el("peopleStatus").textContent=tx("ค้นหาสมาชิกไม่สำเร็จ: ","Could not search members: ")+error.message;
     return;
   }
 
-  peopleResults=(data||[]).filter(person=>!genderFilter||person.gender===genderFilter).slice(0,12);
+  const keyword=term.toLocaleLowerCase().trim();
+  peopleResults=(data||[]).filter(person=>{
+    if(genderFilter&&person.gender!==genderFilter)return false;
+    if(!keyword)return true;
+    const searchable=[
+      person.display_name,
+      person.username,
+      person.status,
+      ...(Array.isArray(person.interests)?person.interests:[person.interests||""])
+    ].filter(Boolean).join(" ").toLocaleLowerCase();
+    return searchable.includes(keyword);
+  }).slice(0,12);
   if(!peopleResults.length){
     el("peopleStatus").textContent=tx("ยังไม่พบสมาชิก ลองค้นหาด้วยคำอื่น","No members found. Try another search.");
     return;
