@@ -85,6 +85,11 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .nearby-card-visual:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#15152dcc);pointer-events:none}
 .nearby-online-dot{position:absolute;top:9px;right:9px;width:13px;height:13px;border:2px solid #fff;border-radius:50%;background:#9aa3b2;z-index:2}
 .nearby-online-dot.is-online{background:#22c55e}
+.nearby-online-dot.is-recent{background:#facc15}
+#peopleList .discover-person-dot.is-recent{background:#facc15}
+.nearby-online-label.online,.person-online.online{color:#22c55e}
+.nearby-online-label.recent,.person-online.recent{color:#facc15}
+.nearby-online-label.offline,.person-online.offline{color:#a1a1aa}
 .nearby-card-caption{position:absolute;z-index:2;left:11px;right:11px;bottom:9px;color:#fff;text-shadow:0 1px 4px #0008}
 .nearby-card-name{font-size:15px;font-weight:800;overflow-wrap:anywhere}
 .nearby-card-distance{font-size:12px;margin-top:3px;color:#f1f2ff}
@@ -809,12 +814,13 @@ async function searchPeople(){
     const visual=document.createElement("div");visual.className="discover-person-visual";visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"discover");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"discover")}};
     const img=document.createElement("img");img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
-    const dot=document.createElement("span");dot.className="discover-person-dot"+(nearbyOnlineIds.has(person.id)?" is-online":"");
+    const presence=nearbyPresenceStatus(person.id);
+    const dot=document.createElement("span");dot.className="discover-person-dot"+(presence==="online"?" is-online":presence==="recent"?" is-recent":"");
     const caption=document.createElement("div");caption.className="discover-person-caption";
     const name=document.createElement("div");name.className="person-name";name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const nearbyItem=nearbyCachedMembers.find(item=>item.person.id===person.id);
-    const distance=document.createElement("div");distance.className="person-distance";distance.textContent=nearbyItem?tx("ห่างประมาณ ","About ")+nearbyItem.distance_km+tx(" กม."," km"):tx("ระยะทางไม่พร้อมใช้งาน","Distance unavailable");
-    const online=document.createElement("div");online.className="person-online";online.textContent=nearbyOnlineIds.has(person.id)?tx("● ออนไลน์","● Online"):tx("○ ออฟไลน์","○ Offline");
+    const distance=document.createElement("div");distance.className="person-distance";distance.textContent=nearbyItem?nearbyDistanceLabel(nearbyItem.distance_km):tx("ไม่ทราบระยะทาง","Distance unavailable");
+    const online=document.createElement("div");online.className="person-online "+presence;online.textContent=nearbyPresenceLabel(presence);
     caption.append(name,distance,online);visual.append(img,dot,caption);card.appendChild(visual);
     el("peopleList").appendChild(card);
   });
@@ -1537,7 +1543,23 @@ async function disableNearby(){
 let nearbyDisplayLimit=(()=>{try{const n=Number.parseInt(localStorage.getItem("achiNearbyDisplayLimit"),10)||12;return [8,12,16,20].includes(n)?n:12}catch(_){return 12}})();
 let nearbyPresenceChannel=null;
 let nearbyOnlineIds=new Set();
+let nearbyLastSeenAt=new Map();
 let nearbyCachedMembers=[];
+
+function nearbyPresenceStatus(id){
+  if(nearbyOnlineIds.has(id))return "online";
+  const leftAt=nearbyLastSeenAt.get(id);
+  return leftAt&&Date.now()-leftAt<5*60*1000?"recent":"offline";
+}
+function nearbyPresenceLabel(status){
+  if(status==="online")return tx("ออนไลน์","Online");
+  if(status==="recent")return tx("เพิ่งออฟไลน์","Recently offline");
+  return tx("ออฟไลน์","Offline");
+}
+function nearbyDistanceLabel(value){
+  const distance=Number(value);
+  return Number.isFinite(distance)?distance.toFixed(2)+tx(" กม."," km"):tx("ไม่ทราบระยะทาง","Distance unavailable");
+}
 
 function setNearbyLimit(value){
   const requested=Number.parseInt(value,10)||12;
@@ -1553,7 +1575,11 @@ async function ensureNearbyPresence(){
   nearbyPresenceChannel=db.channel("achi-online-presence",{config:{presence:{key:currentUser.id}}});
   const refresh=()=>{
     const state=nearbyPresenceChannel.presenceState();
-    nearbyOnlineIds=new Set(Object.keys(state||{}).filter(id=>(state[id]||[]).length>0));
+    const nextOnline=new Set(Object.keys(state||{}).filter(id=>(state[id]||[]).length>0));
+    const now=Date.now();
+    nearbyOnlineIds.forEach(id=>{if(!nextOnline.has(id))nearbyLastSeenAt.set(id,now)});
+    nextOnline.forEach(id=>nearbyLastSeenAt.delete(id));
+    nearbyOnlineIds=nextOnline;
     renderNearbyFriends();
   };
   nearbyPresenceChannel
@@ -1580,13 +1606,14 @@ function renderNearbyFriends(){
     const visual=document.createElement("div");visual.className="nearby-card-visual";
     const img=document.createElement("img");img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
-    const dot=document.createElement("span");dot.className="nearby-online-dot"+(nearbyOnlineIds.has(person.id)?" is-online":"");
-    dot.title=nearbyOnlineIds.has(person.id)?tx("ออนไลน์","Online"):tx("ออฟไลน์","Offline");
+    const presence=nearbyPresenceStatus(person.id);
+    const dot=document.createElement("span");dot.className="nearby-online-dot"+(presence==="online"?" is-online":presence==="recent"?" is-recent":"");
+    dot.title=nearbyPresenceLabel(presence);
     visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"nearby");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"nearby")}};
     const caption=document.createElement("div");caption.className="nearby-card-caption";
     const name=document.createElement("div");name.className="nearby-card-name";name.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
-    const distance=document.createElement("div");distance.className="nearby-card-distance";distance.textContent=tx("ห่างประมาณ ","About ")+item.distance_km+tx(" กม."," km");
-    const online=document.createElement("div");online.className="nearby-online-label";online.textContent=nearbyOnlineIds.has(person.id)?tx("● ออนไลน์","● Online"):tx("○ ออฟไลน์","○ Offline");
+    const distance=document.createElement("div");distance.className="nearby-card-distance";distance.textContent=nearbyDistanceLabel(item.distance_km);
+    const online=document.createElement("div");online.className="nearby-online-label "+presence;online.textContent=nearbyPresenceLabel(presence);
     caption.append(name,distance,online);visual.append(img,dot,caption);
     const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||tx("ยังไม่ได้เขียนแนะนำตัว","No bio yet");
     card.append(visual,bio);list.appendChild(card);
