@@ -723,7 +723,7 @@ function showPage(page){
   if(page==="supportAdminInbox")loadSupportAdminInbox();
   if(page==="supportAdminChat")loadSupportAdminChat();
   if(page==="discover")searchPeople();
-  if(page==="nearby"){loadNearbyStatus();loadNearbyFriends();}
+  if(page==="nearby")loadNearbyPage();
   if(page==="settings")loadSettings();
 }
 
@@ -771,7 +771,7 @@ async function searchPeople(){
     const img=document.createElement("img");
     img.className="person-avatar";
     img.src=safeImage(person.avatar_url,person.display_name);
-    img.alt="รูปโปรไฟล์";
+    img.alt=tx("รูปโปรไฟล์","Profile photo");
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
 
     const names=document.createElement("div");
@@ -1432,22 +1432,27 @@ function openSupportAdminChat(id){activeSupportConversationId=id;showPage("suppo
 async function loadSupportAdminChat(){if(currentProfile?.role!=="admin"){showPage("chat");return}if(!activeSupportConversationId)return;const {data,error}=await db.from("support_conversations").select("member_id,subject,status").eq("id",activeSupportConversationId).maybeSingle();if(error||!data){el("supportAdminChatStatus").textContent=tx("ไม่สามารถเปิดบทสนทนาได้","Could not open conversation");return}const {data:profile}=await db.from("profiles").select("display_name").eq("id",data.member_id).maybeSingle();el("supportAdminChatTitle").textContent=profile?.display_name||tx("สมาชิก ACHI","ACHI member");el("supportAdminChatSubject").textContent=supportCategoryLabel(data.subject)+(data.status==="closed"?" · "+tx("ปิดแล้ว","Closed"):"");await renderSupportMessages("supportAdminMessages",activeSupportConversationId,true);await markSupportRead(activeSupportConversationId,true)}
 function subscribeSupportMessages(){if(supportRealtimeChannel)db.removeChannel(supportRealtimeChannel);supportRealtimeChannel=db.channel("achi-support-"+currentUser.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"support_messages"},async payload=>{if(payload.new?.sender_id!==currentUser?.id)playAchiNotification();const id=payload.new?.conversation_id;if(id&&id===activeSupportConversationId){const adminChat=!el("supportAdminChatPage").classList.contains("hidden"),memberChat=!el("supportChatPage").classList.contains("hidden");if(adminChat||memberChat){await renderSupportMessages(adminChat?"supportAdminMessages":"supportMemberMessages",id,adminChat);await markSupportRead(id,adminChat)}}if(currentProfile?.role==="admin"&&!el("supportAdminInboxPage").classList.contains("hidden"))loadSupportAdminInbox()}).subscribe()}
 
+async function loadNearbyPage(){
+  await loadNearbyStatus();
+  await loadNearbyFriends();
+}
+
 async function loadNearbyStatus(){
   if(!currentUser)return;
   const {data,error}=await db.rpc("my_location_enabled");
-  if(error){el("nearbyStatus").textContent="ตรวจสอบสถานะไม่สำเร็จ: "+error.message;return}
+  if(error){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+error.message;return}
   const enabled=!!data;
   el("nearbyEnableButton").classList.toggle("hidden",enabled);
   el("nearbyDisableButton").classList.toggle("hidden",!enabled);
-  el("nearbyStatus").textContent=enabled?"กำลังเปิดแชร์ตำแหน่งอยู่":"ขณะนี้ยังไม่ได้แชร์ตำแหน่ง";
+  el("nearbyStatus").textContent=enabled?tx("กำลังเปิดแชร์ตำแหน่งอยู่","Location sharing is on"):tx("ขณะนี้ยังไม่ได้แชร์ตำแหน่ง","Location sharing is off");
 }
 
 function getCurrentPosition(){
   return new Promise((resolve,reject)=>{
-    if(!navigator.geolocation)return reject(new Error("เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง"));
+    if(!navigator.geolocation)return reject(new Error(tx("เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง","This browser does not support location services")));
     navigator.geolocation.getCurrentPosition(
       position=>resolve(position),
-      error=>reject(new Error(error.code===1?"คุณยังไม่ได้อนุญาตให้เว็บไซต์ใช้ตำแหน่ง":error.code===2?"ไม่สามารถระบุตำแหน่งได้ กรุณาลองอีกครั้ง":"หมดเวลารอพิกัด กรุณาลองอีกครั้ง")),
+      error=>reject(new Error(error.code===1?tx("คุณยังไม่ได้อนุญาตให้เว็บไซต์ใช้ตำแหน่ง","You haven't allowed this site to access your location"):error.code===2?tx("ไม่สามารถระบุตำแหน่งได้ กรุณาลองอีกครั้ง","Unable to determine your location. Please try again"):tx("หมดเวลารอพิกัด กรุณาลองอีกครั้ง","Location request timed out. Please try again"))),
       {enableHighAccuracy:false,timeout:15000,maximumAge:60000}
     );
   });
@@ -1456,16 +1461,16 @@ function getCurrentPosition(){
 async function enableNearby(){
   if(!currentUser)return;
   el("nearbyEnableButton").disabled=true;
-  el("nearbyStatus").textContent="กำลังขออนุญาตตำแหน่งจากเบราว์เซอร์...";
+  el("nearbyStatus").textContent=tx("กำลังขออนุญาตตำแหน่งจากเบราว์เซอร์...","Requesting location permission from your browser...");
   try{
     const position=await getCurrentPosition();
     const {error}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
     if(error)throw error;
     await loadNearbyStatus();
-    el("nearbyStatus").textContent="เปิดแชร์ตำแหน่งแล้ว ระบบจะแสดงเฉพาะระยะทางโดยประมาณ";
+    el("nearbyStatus").textContent=tx("เปิดแชร์ตำแหน่งแล้ว ระบบจะแสดงเฉพาะระยะทางโดยประมาณ","Location sharing is on. Only approximate distances will be shown.");
     await loadNearbyFriends();
   }catch(error){
-    el("nearbyStatus").textContent="เปิดแชร์ตำแหน่งไม่สำเร็จ: "+(error.message||"เกิดข้อผิดพลาด");
+    el("nearbyStatus").textContent=tx("เปิดแชร์ตำแหน่งไม่สำเร็จ: ","Could not enable location sharing: ")+(error.message||tx("เกิดข้อผิดพลาด","An error occurred"));
   }finally{el("nearbyEnableButton").disabled=false}
 }
 
@@ -1474,10 +1479,10 @@ async function disableNearby(){
   el("nearbyDisableButton").disabled=true;
   const {error}=await db.rpc("set_my_location",{p_lat:null,p_lon:null,p_enabled:false});
   el("nearbyDisableButton").disabled=false;
-  if(error){el("nearbyStatus").textContent="ปิดแชร์ตำแหน่งไม่สำเร็จ: "+error.message;return}
+  if(error){el("nearbyStatus").textContent=tx("ปิดแชร์ตำแหน่งไม่สำเร็จ: ","Could not turn off location sharing: ")+error.message;return}
   el("nearbyList").innerHTML="";
   await loadNearbyStatus();
-  el("nearbyStatus").textContent="ปิดแชร์ตำแหน่งแล้ว และลบพิกัดที่จัดเก็บไว้แล้ว";
+  el("nearbyStatus").textContent=tx("ปิดแชร์ตำแหน่งแล้ว และลบพิกัดที่จัดเก็บไว้แล้ว","Location sharing is off and your stored coordinates have been deleted.");
 }
 
 async function loadNearbyFriends(){
@@ -1485,19 +1490,19 @@ async function loadNearbyFriends(){
   el("nearbyList").innerHTML="";
   el("nearbyStatus").textContent=tx("กำลังค้นหาเพื่อนใกล้เคียง...","Searching for nearby friends...");
   const {data:enabled,error:statusError}=await db.rpc("my_location_enabled");
-  if(statusError){el("nearbyStatus").textContent="ตรวจสอบสถานะไม่สำเร็จ: "+statusError.message;return}
+  if(statusError){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+statusError.message;return}
   if(!enabled){el("nearbyStatus").textContent=tx("กรุณากด “เปิดแชร์ตำแหน่ง” ก่อนค้นหาเพื่อนใกล้เคียง","Please enable location sharing to find nearby friends");return}
   try{
     const position=await getCurrentPosition();
     const {error:updateError}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
     if(updateError)throw updateError;
-  }catch(error){el("nearbyStatus").textContent="อัปเดตตำแหน่งไม่สำเร็จ: "+error.message;return}
+  }catch(error){el("nearbyStatus").textContent=tx("อัปเดตตำแหน่งไม่สำเร็จ: ","Could not update location: ")+error.message;return}
   const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:50});
-  if(error){el("nearbyStatus").textContent="ค้นหาเพื่อนไม่สำเร็จ: "+error.message;return}
+  if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
   if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่แชร์ตำแหน่งภายใน 50 กม. เมื่อมีสมาชิกใกล้เคียงเปิดแชร์ ระบบจะแสดงที่นี่","No members sharing their location within 50 km yet. They will appear here when they opt in.");return}
   const ids=data.map(x=>x.user_id);
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,username,display_name,avatar_url,bio,interests,age,gender").in("id",ids);
-  if(profileError){el("nearbyStatus").textContent="โหลดโปรไฟล์สมาชิกไม่สำเร็จ: "+profileError.message;return}
+  if(profileError){el("nearbyStatus").textContent=tx("โหลดโปรไฟล์สมาชิกไม่สำเร็จ: ","Could not load member profiles: ")+profileError.message;return}
   const byId={};
   (profiles||[]).forEach(p=>byId[p.id]=p);
   const found=data.filter(x=>byId[x.user_id]);
@@ -1523,18 +1528,18 @@ async function loadNearbyFriends(){
 }
 
 async function blockNearbyUser(userId,name){
-  if(!confirm("ต้องการบล็อก "+name+" ใช่ไหม? สมาชิกที่บล็อกกันจะไม่ปรากฏในผลค้นหาเพื่อนใกล้ฉัน"))return;
+  if(!confirm(tx("ต้องการบล็อก ","Block ")+name+tx(" ใช่ไหม? สมาชิกที่บล็อกกันจะไม่ปรากฏในผลค้นหาเพื่อนใกล้ฉัน","? Members who block each other won't appear in Nearby Friends.")))return;
   const {error}=await db.from("user_blocks").insert({blocker_id:currentUser.id,blocked_id:userId});
-  if(error){el("nearbyStatus").textContent=error.code==="23505"?"คุณบล็อกสมาชิกนี้อยู่แล้ว":"บล็อกไม่สำเร็จ: "+error.message;return}
+  if(error){el("nearbyStatus").textContent=error.code==="23505"?tx("คุณบล็อกสมาชิกนี้อยู่แล้ว","You have already blocked this member"):tx("บล็อกไม่สำเร็จ: ","Could not block member: ")+error.message;return}
   el("nearbyStatus").textContent=tx("บล็อกสมาชิกแล้ว","Member blocked");await loadNearbyFriends();
 }
 
 async function reportNearbyUser(userId,name){
-  const reason=prompt("ระบุเหตุผลในการรายงาน "+name+" (เช่น คุกคาม, สแปม, แอบอ้าง)");
+  const reason=prompt(tx("ระบุเหตุผลในการรายงาน ","Why are you reporting ")+name+tx(" (เช่น คุกคาม, สแปม, แอบอ้าง)"," (e.g. harassment, spam, impersonation)"));
   if(!reason||!reason.trim())return;
-  const details=prompt("รายละเอียดเพิ่มเติม (ไม่บังคับ)")||"";
+  const details=prompt(tx("รายละเอียดเพิ่มเติม (ไม่บังคับ)","Additional details (optional)"))||"";
   const {error}=await db.from("user_reports").insert({reporter_id:currentUser.id,reported_id:userId,reason:reason.trim().slice(0,100),details:details.trim().slice(0,1000)});
-  if(error){el("nearbyStatus").textContent="ส่งรายงานไม่สำเร็จ: "+error.message;return}
+  if(error){el("nearbyStatus").textContent=tx("ส่งรายงานไม่สำเร็จ: ","Could not submit report: ")+error.message;return}
   alert(tx("ส่งรายงานเรียบร้อยแล้ว ขอบคุณที่ช่วยให้ ACHI ปลอดภัยขึ้น","Report submitted. Thank you for helping keep ACHI safe."));
 }
 
