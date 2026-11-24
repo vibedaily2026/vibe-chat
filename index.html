@@ -264,7 +264,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <button id="achiLyricsToggle" type="button" class="secondary hidden" onclick="toggleAchiLyrics()">♫ <span data-i18n="musicLyrics">ดูเนื้อเพลง</span></button>
     </div>
     <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลง ACHI ให้คุณฟัง</div>
-    <p id="achiMusicLoginHint" class="achi-music-login-hint">เข้าสู่ระบบเพื่อเลือกฟังครบ 7 เวอร์ชัน</p>
+    <p id="achiMusicLoginHint" class="achi-music-login-hint">ฟังอีก 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false">เข้าสู่ระบบ</a></p>
   </div>
   <div id="achiLyricsPanel" class="achi-lyrics hidden" aria-live="polite">
     <h3 id="achiLyricsTitle">เนื้อเพลง ACHI</h3>
@@ -2299,7 +2299,7 @@ function updateAchiMusicUI(){
     ?(currentLanguage==="en"?"Choose from all 7 versions.":"เลือกฟังได้ครบ 7 เวอร์ชัน")
     :(currentLanguage==="en"?"A random track is ready.":"สุ่มเพลงให้คุณแล้ว");
   const loginHint=el("achiMusicLoginHint");
-  if(loginHint){loginHint.classList.toggle("hidden",member);loginHint.innerHTML=currentLanguage==="en"?'Hear the other 7 versions? <a href="#" onclick="openAuth(\'login\');return false">Log in</a>':'ฟังอีก 7 เวอร์ชัน? <a href="#" onclick="openAuth(\'login\');return false">เข้าสู่ระบบ</a>';}
+  if(loginHint){loginHint.classList.toggle("hidden",member);loginHint.innerHTML=currentLanguage==="en"?'Hear the other 7 versions? <a href="#" onclick="openAuth(\'login\');return false">Log in</a>':'ฟังอีก 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false">เข้าสู่ระบบ</a>';}
   const play=el("achiMusicPlay");if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
   const stop=el("achiMusicStop");if(stop){stop.textContent="■";stop.setAttribute("aria-label",currentLanguage==="en"?"Stop music":"หยุดเพลง");stop.title=currentLanguage==="en"?"Stop music":"หยุดเพลง"}
   const lyricButton=el("achiLyricsToggle");if(lyricButton)lyricButton.textContent=currentLanguage==="en"?"♫ Show lyrics":"♫ ดูเนื้อเพลง";
