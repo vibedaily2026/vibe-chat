@@ -283,7 +283,20 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 }
 #landing .hero>div:first-child{grid-column:1;grid-row:1 / span 2;min-width:0}
 #landing .hero-art{grid-column:2;grid-row:1;min-width:0;min-height:0;justify-content:center}
-#landing #achiMusicPlayer{grid-column:2;grid-row:2;width:100%;max-width:510px;margin:0;align-self:start}
+#landing #achiMusicPlayer{
+  grid-column:1 / -1;grid-row:2;
+  width:100%;max-width:100%;min-width:0;
+  box-sizing:border-box;margin:10px 0 0;
+  justify-self:stretch;align-self:stretch;padding:0;
+}
+#landing #achiMusicPlayer .achi-music-panel{
+  width:100%;max-width:100%;box-sizing:border-box;
+  justify-content:center;align-items:center;text-align:center;
+}
+#landing #achiMusicPlayer .achi-music-title{width:100%;text-align:center}
+#landing #achiMusicPlayer .achi-music-controls{justify-content:center;flex:1 1 100%;min-width:0}
+#landing #achiMusicPlayer .achi-music-status,
+#landing #achiMusicPlayer .achi-music-login-hint{text-align:center;white-space:normal;overflow-wrap:anywhere}
 #landing .hero-mascot-cloud{
   box-sizing:border-box;display:grid;position:relative;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -319,7 +332,10 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   #landing .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;text-align:center;row-gap:14px;padding:30px 18px}
   #landing .hero>div:first-child{grid-column:1;grid-row:1}
   #landing .hero-art{grid-column:1;grid-row:2;min-height:0}
-  #landing #achiMusicPlayer{grid-column:1;grid-row:3;max-width:510px;margin-inline:auto}
+  #landing #achiMusicPlayer{
+    grid-column:1;grid-row:3;width:100%;max-width:100%;
+    margin:0;justify-self:stretch;
+  }
   #landing .hero-mascot-cloud{width:min(100%,360px);height:250px;gap:8px;padding:2px}
   #landing .hero-mascot-cloud img{width:100%;height:100%;max-width:112px;max-height:118px}
   .achi-member-music{padding:0 10px}
