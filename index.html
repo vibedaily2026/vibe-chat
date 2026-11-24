@@ -402,7 +402,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <label data-i18n="avatarUrlLabel">หรือลิงก์รูปโปรไฟล์ (ไม่บังคับ)</label>
     <input id="avatarUrl" type="url" placeholder="https://example.com/photo.jpg">
     <label for="profileAge" data-i18n="ageLabel">อายุ</label>
-    <input id="profileAge" type="number" min="1" max="120" step="1" inputmode="numeric" placeholder="เช่น 25">
+    <input id="profileAge" type="number" min="18" max="120" step="1" inputmode="numeric" placeholder="เช่น 25">
     <label for="profileGender" data-i18n="genderLabel">เพศ</label>
     <select id="profileGender">
       <option value="" data-i18n="genderChoose">เลือกเพศ</option>
@@ -710,7 +710,7 @@ async function saveProfile(){
   const interests=el("interests").value.split(",").map(x=>x.trim()).filter(Boolean).slice(0,20);
   if(!/^[a-z0-9_]{3,24}$/.test(username))return profileMessage("Username ต้องมี 3–24 ตัว ใช้ได้เฉพาะ a-z, 0-9 และ _");
   if(!displayName)return profileMessage("กรุณากรอกชื่อที่แสดง");
-  if(ageValue&&(!Number.isInteger(age)||age<1||age>120))return profileMessage(tx("กรุณาระบุอายุเป็นจำนวนเต็มระหว่าง 1–120 ปี","Please enter a whole-number age between 1 and 120"));
+  if(ageValue&&(!Number.isInteger(age)||age>120||(age<18&&age!==currentProfile?.age)))return profileMessage(tx("กรุณาระบุอายุอย่างน้อย 18 ปีบริบูรณ์","Please enter an age of at least 18"));
   if(avatarUrl&&!/^https?:\/\//i.test(avatarUrl))return profileMessage("ลิงก์รูปโปรไฟล์ต้องขึ้นต้นด้วย http:// หรือ https://");
   const saveButton=document.querySelector('#profilePage button[onclick="saveProfile()"]');
   if(saveButton)saveButton.disabled=true;
