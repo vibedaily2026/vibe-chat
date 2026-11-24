@@ -254,21 +254,22 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 
 .install-button{padding:9px 12px;font-size:12px;white-space:nowrap;box-shadow:none}@media(max-width:520px){.header-actions{gap:6px}.install-button{padding:8px 9px;font-size:11px}}
 
-/* Refined hero composition: one balanced six-mascot cluster, no scattered extras */
+/* Refined hero composition: balanced cluster with safe breathing room around every mascot */
 @media(min-width:801px){
  #landing .hero{grid-template-columns:1.02fr .98fr;gap:12px}
  #landing .hero-art{transform:translateX(-18px);min-width:0}
- #landing .hero-mascot-cloud{width:min(100%,440px);height:360px;margin-inline:auto}
+ #landing .hero-mascot-cloud{box-sizing:border-box;width:min(100%,440px);height:390px;margin-inline:auto;padding:14px;overflow:visible}
  #landing .hero-mascot-cloud img{width:clamp(88px,9vw,112px)}
- #landing .hero-mascot-cloud img:nth-child(1){left:35%;top:27%;width:clamp(142px,14vw,166px);z-index:2;transform:rotate(-4deg)}
- #landing .hero-mascot-cloud img:nth-child(2){left:7%;top:7%;width:clamp(94px,9vw,112px);transform:rotate(-10deg);animation-delay:-1s}
- #landing .hero-mascot-cloud img:nth-child(3){right:7%;top:7%;width:clamp(94px,9vw,112px);transform:rotate(10deg);animation-delay:-2s}
- #landing .hero-mascot-cloud img:nth-child(4){left:5%;bottom:7%;width:clamp(84px,8vw,102px);transform:rotate(8deg);animation-delay:-.7s}
- #landing .hero-mascot-cloud img:nth-child(5){right:5%;bottom:7%;width:clamp(88px,8.5vw,106px);transform:rotate(-8deg);animation-delay:-1.8s}
- #landing .hero-mascot-cloud img:nth-child(6){left:40%;bottom:0;width:clamp(76px,7.5vw,92px);transform:rotate(4deg);animation-delay:-2.6s}
+ #landing .hero-mascot-cloud img:nth-child(1){left:35%;top:28%;width:clamp(142px,14vw,166px);z-index:2;transform:rotate(-4deg)}
+ #landing .hero-mascot-cloud img:nth-child(2){left:7%;top:9%;width:clamp(94px,9vw,112px);transform:rotate(-10deg);animation-delay:-1s}
+ #landing .hero-mascot-cloud img:nth-child(3){right:7%;top:9%;width:clamp(94px,9vw,112px);transform:rotate(10deg);animation-delay:-2s}
+ #landing .hero-mascot-cloud img:nth-child(4){left:6%;bottom:9%;width:clamp(84px,8vw,102px);transform:rotate(8deg);animation-delay:-.7s}
+ #landing .hero-mascot-cloud img:nth-child(5){right:6%;bottom:9%;width:clamp(88px,8.5vw,106px);transform:rotate(-8deg);animation-delay:-1.8s}
+ #landing .hero-mascot-cloud img:nth-child(6){left:40%;bottom:5%;width:clamp(76px,7.5vw,92px);transform:rotate(4deg);animation-delay:-2.6s}
 }
 @media(max-width:800px){
  #landing .hero-art{transform:none}
+ #landing .hero-mascot-cloud{overflow:visible}
 }
 
 </style>
