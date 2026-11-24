@@ -120,10 +120,16 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 @media(max-width:600px){#nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#nearbyList .nearby-person-card{padding:4px;border-radius:10px}}
 
 /* ACHI theme music player */
-.achi-conversation-row{border-radius:12px;transition:background .15s ease}
+.achi-conversation-row{position:relative;border-radius:12px;transition:background .15s ease;min-width:0;overflow:visible}
 .achi-conversation-row:hover{background:rgba(120,140,170,.12)}
-.achi-hide-conversation{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 48px;width:48px;height:36px;min-width:48px;padding:0 10px!important;border:1px solid #f0b8b8!important;border-radius:9px!important;background:#fff0f0!important;color:#c62828!important;font-size:13px!important;font-weight:800!important;line-height:1.2!important;visibility:visible!important;opacity:1!important;position:relative;z-index:2}
-.achi-hide-conversation:hover{background:#ffe1e1!important;border-color:#df8d8d!important}
+.achi-conversation-row .conversation-unread-badge{flex:0 0 auto;min-width:22px;margin-left:auto}
+.achi-chat-menu-wrap{position:relative;flex:0 0 34px;display:flex;justify-content:flex-end}
+.achi-chat-menu-trigger{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 34px;width:34px;height:36px;min-width:34px;padding:0!important;border:1px solid #e5e9f2!important;border-radius:9px!important;background:#fff!important;color:#59657b!important;font-size:22px!important;font-weight:800!important;line-height:1!important;cursor:pointer}
+.achi-chat-menu-trigger:hover{background:#f2f4fa!important}
+.achi-chat-menu{position:absolute;right:0;top:40px;z-index:30;min-width:190px;padding:6px;background:#fff;border:1px solid #e3e7f0;border-radius:12px;box-shadow:0 8px 24px #20294326}
+.achi-chat-menu[hidden]{display:none!important}
+.achi-chat-menu-action{display:flex!important;align-items:center;width:100%;padding:10px 12px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#c62828!important;text-align:left!important;font-size:13px!important;font-weight:700!important;cursor:pointer}
+.achi-chat-menu-action:hover{background:#fff0f0!important}
 .achi-music-player{max-width:1180px;margin:14px auto;padding:0 22px}
 .achi-music-panel{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;border:1px solid #e8e7f8;border-radius:18px;background:#ffffffed;box-shadow:0 8px 24px #2029430b}
 .achi-music-title{font-weight:800;color:#293b61;min-width:150px}
@@ -1125,16 +1131,22 @@ async function loadConversations(){
     const row=document.createElement("div");
     row.className="secondary achi-conversation-row";
     row.dataset.conversationId=conv.id;
-    row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left;padding:8px 12px;cursor:pointer";
+    row.style.cssText="display:flex;align-items:center;gap:10px;width:100%;margin:8px 0;text-align:left;padding:8px 12px;cursor:pointer";
     row.setAttribute("role","button");row.tabIndex=0;
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
-    const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left";label.textContent=peer.display_name||"ACHI member";
+    const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis";label.textContent=peer.display_name||"ACHI member";
     const unread=document.createElement("span");unread.className="unread-badge conversation-unread-badge hidden";unread.textContent="0";unread.setAttribute("aria-label","Unread messages from this member");
-    const remove=document.createElement("button");remove.type="button";remove.className="secondary achi-hide-conversation";remove.textContent=tx("ลบ","Delete");remove.title=tx("ลบรายชื่อนี้ออกจากรายการแชทของฉัน","Remove this chat from my list");remove.setAttribute("aria-label",remove.title);
-    remove.onclick=(event)=>{event.stopPropagation();hideConversationFromInbox(conv.id,peer.display_name||"ACHI member")};
-    row.append(img,label,unread,remove);
-    row.onclick=()=>openDirectChat(peerId,conv.id);
-    row.onkeydown=(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openDirectChat(peerId,conv.id)}};
+    const menuWrap=document.createElement("div");menuWrap.className="achi-chat-menu-wrap";
+    const menuTrigger=document.createElement("button");menuTrigger.type="button";menuTrigger.className="secondary achi-chat-menu-trigger";menuTrigger.textContent="⋮";menuTrigger.title=tx("ตัวเลือกแชท","Chat options");menuTrigger.setAttribute("aria-label",menuTrigger.title);menuTrigger.setAttribute("aria-expanded","false");
+    const menu=document.createElement("div");menu.className="achi-chat-menu";menu.hidden=true;
+    const remove=document.createElement("button");remove.type="button";remove.className="achi-chat-menu-action";remove.textContent=tx("ลบออกจากรายการแชท","Remove from chat list");
+    remove.onclick=(event)=>{event.stopPropagation();menu.hidden=true;menuTrigger.setAttribute("aria-expanded","false");hideConversationFromInbox(conv.id,peer.display_name||"ACHI member")};
+    menu.append(remove);
+    menuTrigger.onclick=(event)=>{event.stopPropagation();const opening=menu.hidden;document.querySelectorAll(".achi-chat-menu").forEach(other=>other.hidden=true);document.querySelectorAll(".achi-chat-menu-trigger").forEach(other=>other.setAttribute("aria-expanded","false"));menu.hidden=!opening;menuTrigger.setAttribute("aria-expanded",String(opening))};
+    menuWrap.append(menuTrigger,menu);
+    row.append(img,label,unread,menuWrap);
+    row.onclick=()=>{menu.hidden=true;openDirectChat(peerId,conv.id)};
+    row.onkeydown=(event)=>{if(event.target===row&&(event.key==="Enter"||event.key===" ")){event.preventDefault();openDirectChat(peerId,conv.id)}};
     el("conversationList").append(row);
   }
   await updatePrivateUnreadBadge();
