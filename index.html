@@ -257,9 +257,14 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 /* Keep the original two-column hero; gently move only the mascot group inward */
 @media(min-width:801px){
  #landing .hero-art{transform:translateX(-38px)}
+ #landing .hero-mascot-cloud{width:min(100%,440px)}
+ #landing .hero-mascot-cloud img:nth-child(7){left:-2%;top:37%;width:clamp(70px,8vw,96px);z-index:1;transform:rotate(-12deg);animation-delay:-.4s}
+ #landing .hero-mascot-cloud img:nth-child(8){left:5%;bottom:-1%;width:clamp(66px,7vw,88px);z-index:1;transform:rotate(9deg);animation-delay:-1.4s}
+ #landing .hero-mascot-cloud img:nth-child(9){left:13%;top:67%;width:clamp(62px,7vw,82px);z-index:1;transform:rotate(-7deg);animation-delay:-2.2s}
 }
 @media(max-width:800px){
  #landing .hero-art{transform:none}
+ #landing .hero-mascot-cloud img:nth-child(n+7){display:none}
 }
 
 </style>
@@ -268,7 +273,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 
 <header><div class="logo"><img class="brand-mark" id="landingBrandMascot" alt="ACHI Buddy mascot"><span>ACHI</span></div><div class="header-actions"><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></header>
 
-<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR WORLD. YOUR PEOPLE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มีสไตล์เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><div class="hero-mascot-cloud" id="landingHeroMascot" aria-label="ACHI Buddy in different moods"><img data-landing-pose="hello" alt="ACHI Buddy waving"><img data-landing-pose="love" alt="ACHI Buddy showing love"><img data-landing-pose="party" alt="ACHI Buddy celebrating"><img data-landing-pose="think" alt="ACHI Buddy thinking"><img data-landing-pose="tease" alt="ACHI Buddy playful"><img data-landing-pose="sleepy" alt="ACHI Buddy sleepy"></div></div><section id="achiMusicPlayer" class="achi-music-player" aria-label="ACHI theme music">
+<section id="landing"><div class="hero"><div><div class="eyebrow" data-i18n="eyebrow">✦ YOUR WORLD. YOUR PEOPLE.</div><h1 data-i18n="heroTitle">โลกของเพื่อนใหม่<br><span>เริ่มต้นที่นี่</span></h1><p data-i18n="heroText">พื้นที่ที่ทำให้การพบเพื่อนใหม่เป็นเรื่องง่าย พูดคุย แบ่งปันสิ่งที่ชอบ และค้นพบผู้คนที่มีสไตล์เดียวกับคุณ</p><div class="hero-actions"><button onclick="openAuth('signup')" data-i18n="join">สมัครสมาชิกฟรี</button><button class="secondary" onclick="openAuth('login')" data-i18n="login">เข้าสู่ระบบ</button></div></div><div class="hero-art"><div class="hero-mascot-cloud" id="landingHeroMascot" aria-label="ACHI Buddy in different moods"><img data-landing-pose="hello" alt="ACHI Buddy waving"><img data-landing-pose="love" alt="ACHI Buddy showing love"><img data-landing-pose="party" alt="ACHI Buddy celebrating"><img data-landing-pose="think" alt="ACHI Buddy thinking"><img data-landing-pose="tease" alt="ACHI Buddy playful"><img data-landing-pose="sleepy" alt="ACHI Buddy sleepy"><img data-landing-pose="buddy14" alt="ACHI Buddy with heart"><img data-landing-pose="buddy16" alt="ACHI Buddy cheerful"><img data-landing-pose="buddy22" alt="ACHI Buddy surprised"></div></div><section id="achiMusicPlayer" class="achi-music-player" aria-label="ACHI theme music">
   <div class="achi-music-panel">
     <div class="achi-music-title">🎵 HEY! ACHI! ACHI! ACHI!</div>
     
