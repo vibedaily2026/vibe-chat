@@ -120,6 +120,10 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 @media(max-width:600px){#nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}#nearbyList .nearby-person-card{padding:4px;border-radius:10px}}
 
 /* ACHI theme music player */
+.achi-conversation-row{border-radius:12px;transition:background .15s ease}
+.achi-conversation-row:hover{background:rgba(120,140,170,.12)}
+.achi-hide-conversation{flex:0 0 34px;width:34px;height:34px;min-width:34px;padding:0;border-radius:50%;font-size:22px;line-height:1;color:#d64545}
+.achi-hide-conversation:hover{background:rgba(220,65,65,.12)}
 .achi-music-player{max-width:1180px;margin:14px auto;padding:0 22px}
 .achi-music-panel{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;border:1px solid #e8e7f8;border-radius:18px;background:#ffffffed;box-shadow:0 8px 24px #2029430b}
 .achi-music-title{font-weight:800;color:#293b61;min-width:150px}
@@ -1042,7 +1046,10 @@ async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
   const {data:conversations,error}=await db.from("conversations").select("id").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).limit(100);
   if(error){console.warn("Unread conversations:",error.message);return}
-  const ids=(conversations||[]).map(c=>c.id);
+  const {data:hiddenRows,error:hiddenError}=await db.from("conversation_hidden_by_user").select("conversation_id").eq("user_id",currentUser.id);
+  if(hiddenError){console.warn("Hidden conversations:",hiddenError.message);return}
+  const hiddenIds=new Set((hiddenRows||[]).map(x=>x.conversation_id));
+  const ids=(conversations||[]).map(c=>c.id).filter(id=>!hiddenIds.has(id));
   const unreadByConversation={};
   if(ids.length){
     const {data:participants,error:participantError}=await db.from("conversation_participants").select("conversation_id,last_read_at").eq("user_id",currentUser.id).in("conversation_id",ids);
@@ -1078,26 +1085,46 @@ async function loadConversations(){
   el("conversationList").innerHTML="";
   const {data,error}=await db.from("conversations").select("id,user_a,user_b,updated_at").order("updated_at",{ascending:false}).limit(100);
   if(error){el("inboxStatus").textContent=tx("โหลดรายการแชตไม่สำเร็จ: ","Could not load conversations: ")+error.message;return}
+  const {data:hiddenRows,error:hiddenError}=await db.from("conversation_hidden_by_user").select("conversation_id").eq("user_id",currentUser.id);
+  if(hiddenError){el("inboxStatus").textContent=tx("โหลดรายการที่ซ่อนไม่สำเร็จ: ","Could not load hidden chats: ")+hiddenError.message;return}
+  const hiddenIds=new Set((hiddenRows||[]).map(x=>x.conversation_id));
+  const visibleConversations=(data||[]).filter(c=>!hiddenIds.has(c.id));
   await updatePrivateUnreadBadge();
-  if(!data||!data.length){el("inboxStatus").textContent=tx("ยังไม่มีข้อความส่วนตัว เริ่มต้นได้จากหน้า “ค้นหาเพื่อน”","No private chats yet. Start one from Discover.");return}
-  const peerIds=[...new Set(data.map(c=>c.user_a===currentUser.id?c.user_b:c.user_a))];
+  if(!visibleConversations.length){el("inboxStatus").textContent=tx("ยังไม่มีข้อความส่วนตัว เริ่มต้นได้จากหน้า “ค้นหาเพื่อน”","No private chats yet. Start one from Discover.");return}
+  const peerIds=[...new Set(visibleConversations.map(c=>c.user_a===currentUser.id?c.user_b:c.user_a))];
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",peerIds);
   if(profileError){el("inboxStatus").textContent=profileError.message;return}
   const byId={};(profiles||[]).forEach(p=>byId[p.id]=p);
   el("inboxStatus").textContent="";
-  for(const conv of data){
+  for(const conv of visibleConversations){
     const peerId=conv.user_a===currentUser.id?conv.user_b:conv.user_a;
     const peer=byId[peerId]||{id:peerId,display_name:tx("สมาชิก ACHI","ACHI member")};
     directPeerCache[peerId]=peer;
-    const row=document.createElement("button");
-    row.className="secondary";
+    const row=document.createElement("div");
+    row.className="secondary achi-conversation-row";
     row.dataset.conversationId=conv.id;
-    row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left";
+    row.style.cssText="display:flex;align-items:center;gap:12px;width:100%;margin:8px 0;text-align:left;padding:8px 12px;cursor:pointer";
+    row.setAttribute("role","button");row.tabIndex=0;
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
     const label=document.createElement("span");label.style.cssText="flex:1;min-width:0;text-align:left";label.textContent=peer.display_name||"ACHI member";
     const unread=document.createElement("span");unread.className="unread-badge conversation-unread-badge hidden";unread.textContent="0";unread.setAttribute("aria-label","Unread messages from this member");
-    row.append(img,label,unread);row.onclick=()=>openDirectChat(peerId,conv.id);el("conversationList").append(row);
+    const remove=document.createElement("button");remove.type="button";remove.className="secondary achi-hide-conversation";remove.textContent="×";remove.title=tx("ลบรายชื่อนี้ออกจากรายการแชทของฉัน","Remove this chat from my list");remove.setAttribute("aria-label",remove.title);
+    remove.onclick=(event)=>{event.stopPropagation();hideConversationFromInbox(conv.id,peer.display_name||"ACHI member")};
+    row.append(img,label,unread,remove);
+    row.onclick=()=>openDirectChat(peerId,conv.id);
+    row.onkeydown=(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openDirectChat(peerId,conv.id)}};
+    el("conversationList").append(row);
   }
+  await updatePrivateUnreadBadge();
+}
+
+async function hideConversationFromInbox(conversationId,peerName){
+  if(!currentUser||!conversationId)return;
+  const confirmed=confirm(tx("ลบ “"+peerName+"” ออกจากรายการแชทของคุณ? ประวัติและข้อความของอีกฝ่ายจะไม่ถูกลบ และนี่ไม่ใช่การบล็อก","Remove “"+peerName+"” from your chat list? Their chat history and messages will remain unchanged. This does not block them."));
+  if(!confirmed)return;
+  const {error}=await db.from("conversation_hidden_by_user").insert({conversation_id:conversationId,user_id:currentUser.id});
+  if(error&&error.code!=="23505"){el("inboxStatus").textContent=tx("ลบรายชื่อไม่สำเร็จ: ","Could not remove chat: ")+error.message;return}
+  await loadConversations();
   await updatePrivateUnreadBadge();
 }
 
@@ -1110,6 +1137,7 @@ async function openDirectChat(peerId,existingId){
     if(error){el("directStatus").textContent=tx("เปิดแชตไม่สำเร็จ: ","Could not open chat: ")+error.message;return}
     conversationId=data;
   }
+  await db.from("conversation_hidden_by_user").delete().eq("conversation_id",conversationId).eq("user_id",currentUser.id);
   if(activeConversationId&&activeConversationId!==conversationId){
     await endDirectCall(true);
     if(callChannel){await db.removeChannel(callChannel);callChannel=null;callChannelConversationId=null}
