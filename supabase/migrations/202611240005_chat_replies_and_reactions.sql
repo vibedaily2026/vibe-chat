@@ -135,7 +135,27 @@ on public.direct_message_reactions for delete to authenticated
 using (user_id=(select auth.uid()));
 
 
--- A reply must point to a message in the same room/conversation and visible to the sender.
+-- Validate community reply targets in a SECURITY DEFINER helper to avoid recursive RLS on messages.
+create or replace function public.achi_can_reply_to_community_message(p_reply_id uuid,p_room_id uuid,p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path=''
+as $$
+  select exists (
+    select 1
+    from public.messages parent
+    join public.community_room_members crm on crm.room_id=parent.room_id
+    where parent.id=p_reply_id
+      and parent.room_id=p_room_id
+      and crm.user_id=p_user_id
+      and parent.created_at>=crm.joined_at
+  );
+$$;
+revoke all on function public.achi_can_reply_to_community_message(uuid,uuid,uuid) from public,anon;
+grant execute on function public.achi_can_reply_to_community_message(uuid,uuid,uuid) to authenticated;
+
 drop policy if exists "ACHI members can send community room messages" on public.messages;
 create policy "ACHI members can send community room messages"
 on public.messages for insert to authenticated
@@ -147,14 +167,7 @@ with check (
   )
   and (
     reply_to_id is null
-    or exists (
-      select 1 from public.messages parent
-      join public.community_room_members crm on crm.room_id=parent.room_id
-      where parent.id=messages.reply_to_id
-        and parent.room_id=messages.room_id
-        and crm.user_id=auth.uid()
-        and parent.created_at>=crm.joined_at
-    )
+    or public.achi_can_reply_to_community_message(reply_to_id,room_id,auth.uid())
   )
 );
 
