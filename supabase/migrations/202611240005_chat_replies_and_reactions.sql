@@ -145,7 +145,7 @@ stable
 security definer
 set search_path=''
 as $$
-  select exists (
+  select p_user_id=(select auth.uid()) and exists (
     select 1
     from public.messages parent
     join public.community_room_members crm on crm.room_id=parent.room_id
