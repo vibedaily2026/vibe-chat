@@ -436,7 +436,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary" onclick="showPage('inbox')"><span data-i18n="topNotifications">🔔 แจ้งเตือน / แชท</span> <span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary" onclick="showPage('nearby')" data-i18n="topNearby">เพื่อนใกล้ฉัน</button><button type="button" class="secondary" onclick="focusPeopleFilters()" data-i18n="topFilters">ตัวกรอง</button><button type="button" class="secondary" onclick="pickRandomMember()" data-i18n="topRandom">สุ่มสมาชิก</button><button type="button" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button><label class="top-limit-label" for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดง</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option></select></div>
+  <div class="achi-topbar"><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary" onclick="showPage('inbox')"><span data-i18n="topNotifications">🔔 แจ้งเตือน / แชท</span> <span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary" onclick="showPage('nearby')" data-i18n="topNearby">เพื่อนใกล้ฉัน</button><button type="button" class="secondary" onclick="focusPeopleFilters()" data-i18n="topFilters">ตัวกรอง</button><button type="button" class="secondary" onclick="pickRandomMember()" data-i18n="topRandom">สุ่มสมาชิก</button><button type="button" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button><label class="top-limit-label" for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดง</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -1881,7 +1881,7 @@ async function disableNearby(){
   el("nearbyStatus").textContent=tx("ปิดแชร์ตำแหน่งแล้ว และลบพิกัดที่จัดเก็บไว้แล้ว","Location sharing is off and your stored coordinates have been deleted.");
 }
 
-let nearbyDisplayLimit=(()=>{try{const n=Number.parseInt(localStorage.getItem("achiNearbyDisplayLimit"),10)||12;return [8,12,16,20].includes(n)?n:12}catch(_){return 12}})();
+let nearbyDisplayLimit=(()=>{try{const saved=localStorage.getItem("achiNearbyDisplayLimit");if(saved==="all")return Infinity;const n=Number.parseInt(saved,10)||12;return [8,12,16,20].includes(n)?n:12}catch(_){return 12}})();
 let nearbyPresenceChannel=null;
 let nearbyOnlineIds=new Set();
 let nearbyLastSeenAt=new Map();
@@ -1912,10 +1912,10 @@ setInterval(()=>{
 
 function setNearbyLimit(value){
   const requested=Number.parseInt(value,10)||12;
-  const parsed=[8,12,16,20].includes(requested)?requested:12;
+  const parsed=value==="all"?Infinity:([8,12,16,20].includes(requested)?requested:12);
   nearbyDisplayLimit=parsed;
-  const topSelect=el("topNearbyLimitSelect");if(topSelect)topSelect.value=String(parsed);
-  try{localStorage.setItem("achiNearbyDisplayLimit",String(parsed))}catch(_){}
+  const topSelect=el("topNearbyLimitSelect");if(topSelect)topSelect.value=parsed===Infinity?"all":String(parsed);
+  try{localStorage.setItem("achiNearbyDisplayLimit",parsed===Infinity?"all":String(parsed))}catch(_){}
   renderNearbyFriends();
 }
 
@@ -1977,7 +1977,7 @@ async function loadNearbyFriends(){
   if(!nearbyDisplayLimit){
     try{const saved=Number.parseInt(localStorage.getItem("achiNearbyDisplayLimit"),10)||12;nearbyDisplayLimit=[8,12,16,20].includes(saved)?saved:12}catch(_){nearbyDisplayLimit=12}
   }
-  const topLimitSelect=el("topNearbyLimitSelect");if(topLimitSelect)topLimitSelect.value=String(nearbyDisplayLimit);
+  const topLimitSelect=el("topNearbyLimitSelect");if(topLimitSelect)topLimitSelect.value=nearbyDisplayLimit===Infinity?"all":String(nearbyDisplayLimit);
   await ensureNearbyPresence();
   const {data:enabled,error:statusError}=await db.rpc("my_location_enabled");
   if(statusError){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+statusError.message;return}
