@@ -1411,6 +1411,7 @@ function subscribeDirectMessages(){
       }
       loadConversations();
     })
+    .on("postgres_changes",{event:"*",schema:"public",table:"direct_message_reactions"},payload=>{const changed=payload.new||payload.old;if(changed?.message_id&&directMessageCache[changed.message_id]&&!el("directChatPage").classList.contains("hidden"))loadDirectMessages()})
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"conversation_participants",filter:"user_id=eq."+currentUser.id},()=>updatePrivateUnreadBadge())
     .subscribe();
 }
@@ -1749,7 +1750,9 @@ function subscribeMessages(){
         }
         addMessage(payload.new);
         scrollMessages();
-      }).subscribe();
+      })
+    .on("postgres_changes",{event:"*",schema:"public",table:"community_message_reactions"},payload=>{const changed=payload.new||payload.old;if(changed?.message_id&&communityMessageCache[changed.message_id]&&!el("communityRoomPage").classList.contains("hidden"))loadMessages(activeCommunityRoomId)})
+    .subscribe();
 }
 
 async function deleteMyAccount(){
