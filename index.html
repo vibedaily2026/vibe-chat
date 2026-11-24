@@ -182,7 +182,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 .direct-sticker-picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;padding:12px;margin:8px 0;border:1px solid #e5e3fb;border-radius:15px;background:#fff;max-height:330px;overflow:auto}
 .direct-sticker-option{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;padding:7px 4px!important;background:#f8f7ff!important;color:#49427e!important;border:1px solid #eeecff!important;box-shadow:none!important;border-radius:12px!important}
 .direct-sticker-option img{width:100%;max-width:76px;aspect-ratio:1;object-fit:contain}
-.direct-sticker-option span{font-size:11px;line-height:1.2;text-align:center}
+
 .direct-sticker-image{display:block;width:min(190px,48vw);height:auto;max-height:210px;object-fit:contain}.achi-topbar-brand{display:inline-flex;align-items:center;gap:6px}.achi-topbar-brand img{width:30px;height:30px;object-fit:contain}.brand-mark{width:42px;height:42px;object-fit:contain}.achi-feature-mascot{width:54px;height:54px;display:flex;align-items:center;justify-content:center}.achi-feature-mascot img{width:100%;height:100%;object-fit:contain}
 @media(max-width:420px){.direct-sticker-picker{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
@@ -1081,48 +1081,48 @@ async function unsendDirectMessage(messageId,messageType,mediaPath){
 const directChatEmojis=["😀","😃","😄","😁","😆","😅","😂","🤣","🥹","😊","😇","🙂","🙃","😉","😍","🥰","😘","😋","😎","🤩","🥳","🤗","🤔","🫡","😭","🥺","😴","😤","😡","🤯","🤭","🫣","👍","👎","👏","🙌","🙏","💪","🤝","❤️","🧡","💛","💚","💙","💜","🖤","🤍","💕","💞","💖","💗","💓","💯","🔥","✨","⭐","🎉","🎊","🌈","☀️","🌙","☕","🍰","🍕","🎮","🎵","🐱","🐶"];
 
 const achiStickerItems=[
-  ["hello","สวัสดี","Hello","", "achi-buddy-03.png"],
-  ["love","ส่งความรัก","Love You","", "achi-buddy-02.png"],
-  ["laugh","หัวเราะ","Haha","", "achi-buddy-04.png"],
-  ["wink","ชูสองนิ้ว","Peace","", "achi-buddy-10.png"],
-  ["cool","มั่นใจ","Confident","", "achi-buddy-06.png"],
-  ["cry","งอน","Angry","", "achi-buddy-23.png"],
-  ["angry","ดีใจ","Yay","", "achi-buddy-07.png"],
-  ["shy","ง่วง","Sleepy","", "achi-buddy-13.png"],
-  ["wow","สงสัย","Hmm?","", "achi-buddy-22.png"],
-  ["think","เท่","Cool","", "achi-buddy-05.png"],
-  ["sleep","หัวเราะ","Laugh","", "achi-buddy-09.png"],
-  ["party","แอบมอง","Peek","", "achi-buddy-08.png"],
-  ["sorry","ส่งใจ","Heart","", "achi-buddy-23.png"],
-  ["thanks","กระโดดดีใจ","Jump","", "achi-buddy-16.png"],
-  ["yes","เก่งมาก","Good Job","", "achi-buddy-01.png"],
-  ["no","ทักทาย","Hi","", "achi-buddy-07.png"],
-  ["hug","รักนะ","Love","", "achi-buddy-18.png"],
-  ["miss","เท่","Cool","", "achi-buddy-18.png"],
-  ["goodjob","หัวเราะ","Laugh","", "achi-buddy-01.png"],
-  ["tease","ขี้เล่น","Hehe","", "achi-buddy-21.png"],
-  ["welcome","ตาเป็นประกาย","Starry Eyes","", "achi-buddy-17.png"],
-  ["huh","งอน","Sulky","", "achi-buddy-13.png"],
-  ["heart","เย้","Yay","", "achi-buddy-14.png"],
-  ["bye","เก่งมาก","Good Job","", "achi-buddy-17.png"],
-  ["buddy25","ส่งความรัก","Love You","", "achi-buddy-25.png"],
-  ["buddy26","สวัสดี","Hello","", "achi-buddy-26.png"],
-  ["buddy27","หัวเราะ","Haha","", "achi-buddy-27.png"],
-  ["buddy28","สงสัย","Curious","", "achi-buddy-28.png"],
-  ["buddy29","เท่","Cool","", "achi-buddy-29.png"],
-  ["buddy30","งอน","Angry","", "achi-buddy-30.png"],
-  ["buddy31","ดีใจ","Yay","", "achi-buddy-31.png"],
-  ["buddy32","ง่วง","Sleepy","", "achi-buddy-32.png"],
-  ["buddy33","ทักทาย","Hi","", "achi-buddy-33.png"]
+  ["hello","achi-buddy-03.png"],
+  ["love","achi-buddy-02.png"],
+  ["laugh","achi-buddy-04.png"],
+  ["wink","achi-buddy-10.png"],
+  ["cool","achi-buddy-06.png"],
+  ["cry","achi-buddy-23.png"],
+  ["angry","achi-buddy-07.png"],
+  ["shy","achi-buddy-13.png"],
+  ["wow","achi-buddy-22.png"],
+  ["think","achi-buddy-05.png"],
+  ["sleep","achi-buddy-09.png"],
+  ["party","achi-buddy-08.png"],
+  ["sorry","achi-buddy-23.png"],
+  ["thanks","achi-buddy-16.png"],
+  ["yes","achi-buddy-01.png"],
+  ["no","achi-buddy-07.png"],
+  ["hug","achi-buddy-18.png"],
+  ["miss","achi-buddy-18.png"],
+  ["goodjob","achi-buddy-01.png"],
+  ["tease","achi-buddy-21.png"],
+  ["welcome","achi-buddy-17.png"],
+  ["huh","achi-buddy-13.png"],
+  ["heart","achi-buddy-14.png"],
+  ["bye","achi-buddy-17.png"],
+  ["buddy25","achi-buddy-25.png"],
+  ["buddy26","achi-buddy-26.png"],
+  ["buddy27","achi-buddy-27.png"],
+  ["buddy28","achi-buddy-28.png"],
+  ["buddy29","achi-buddy-29.png"],
+  ["buddy30","achi-buddy-30.png"],
+  ["buddy31","achi-buddy-31.png"],
+  ["buddy32","achi-buddy-32.png"],
+  ["buddy33","achi-buddy-33.png"]
 ];
-function achiStickerImage(id){const aliases={sleepy:"sleep"};const key=aliases[id]||id;const item=achiStickerItems.find(x=>x[0]===key);return item?"/"+item[4]:"/achi-buddy-03.png"}
+function achiStickerImage(id){const aliases={sleepy:"sleep"};const key=aliases[id]||id;const item=achiStickerItems.find(x=>x[0]===key);return item?"/"+item[1]:"/achi-buddy-03.png"}
 function renderAchiSticker(parent,id){
   const item=achiStickerItems.find(x=>x[0]===id);if(!item)return false;
-  const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI "+(currentLanguage==="th"?item[1]:item[2]);sticker.src=achiStickerImage(id);parent.append(sticker);return true;
+  const sticker=document.createElement("img");sticker.className="direct-sticker-image";sticker.alt="ACHI Buddy sticker";sticker.src=achiStickerImage(id);parent.append(sticker);return true;
 }
 function toggleAchiStickerPicker(pickerId,onPick){
   const picker=el(pickerId);if(!picker)return;
-  if(!picker.dataset.ready){achiStickerItems.forEach(item=>{const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";const img=document.createElement("img");img.alt=item[1];img.src=achiStickerImage(item[0]);const label=document.createElement("span");label.textContent=currentLanguage==="th"?item[1]:item[2];button.append(img,label);button.onclick=()=>onPick(item[0]);picker.append(button)});picker.dataset.ready="true"}
+  if(!picker.dataset.ready){achiStickerItems.forEach(item=>{const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";const img=document.createElement("img");img.alt="ACHI Buddy sticker";img.src=achiStickerImage(item[0]);button.append(img);button.setAttribute("aria-label","ACHI Buddy sticker");button.onclick=()=>onPick(item[0]);picker.append(button)});picker.dataset.ready="true"}
   picker.classList.toggle("hidden");
 }
 async function sendCommunitySticker(id){
@@ -1158,9 +1158,8 @@ function toggleDirectStickerPicker(){
   if(!picker.dataset.ready){
     achiStickerItems.forEach(item=>{
       const button=document.createElement("button");button.type="button";button.className="direct-sticker-option";
-      const img=document.createElement("img");img.alt=item[1];img.src=achiStickerImage(item[0]);
-      const label=document.createElement("span");label.textContent=currentLanguage==="th"?item[1]:item[2];
-      button.append(img,label);button.title=item[2];button.onclick=()=>sendDirectSticker(item[0]);picker.append(button);
+      const img=document.createElement("img");img.alt="ACHI Buddy sticker";img.src=achiStickerImage(item[0]);
+      button.append(img);button.setAttribute("aria-label","ACHI Buddy sticker");button.onclick=()=>sendDirectSticker(item[0]);picker.append(button);
     });picker.dataset.ready="true";
   }
   picker.classList.toggle("hidden");
