@@ -39,6 +39,8 @@ create index if not exists direct_message_reactions_message_idx
 
 alter table public.community_message_reactions enable row level security;
 alter table public.direct_message_reactions enable row level security;
+alter table public.community_message_reactions replica identity full;
+alter table public.direct_message_reactions replica identity full;
 
 drop policy if exists community_reactions_read_visible_messages on public.community_message_reactions;
 create policy community_reactions_read_visible_messages
