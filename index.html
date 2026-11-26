@@ -1322,7 +1322,7 @@ async function searchPeople(){
     if(nearbyItem&&Number.isFinite(Number(nearbyItem.distance_km))){
       const distance=document.createElement("div");distance.className="discover-person-distance";distance.textContent=nearbyDistanceLabel(nearbyItem.distance_km);visual.appendChild(distance);
     }
-    caption.append(username);visual.append(img,caption);card.appendChild(visual);el("peopleList").appendChild(card);
+    caption.append(username);visual.append(img,presenceDot,caption);card.appendChild(visual);el("peopleList").appendChild(card);
   });
 }
 let currentPersonSourcePage="discover";
@@ -2383,6 +2383,11 @@ function renderNearbyFriends(){
     const visual=document.createElement("div");visual.className="nearby-card-visual";
     const img=document.createElement("img");img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
+    const presenceDot=document.createElement("span");
+    const presenceStatus=nearbyPresenceStatus(person.id);
+    presenceDot.className="nearby-online-dot"+(presenceStatus==="online"?" is-online":presenceStatus==="recent"?" is-recent":"");
+    presenceDot.setAttribute("aria-label",nearbyPresenceLabel(presenceStatus));
+    presenceDot.title=nearbyPresenceLabel(presenceStatus);
     visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"nearby");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"nearby")}};
     const caption=document.createElement("div");caption.className="nearby-card-caption";
     const username=document.createElement("div");username.className="nearby-card-name";username.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
