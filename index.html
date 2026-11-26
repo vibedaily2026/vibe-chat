@@ -2881,6 +2881,11 @@ async function logout(){
   if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null}
   if(achiNotificationsChannel){await db.removeChannel(achiNotificationsChannel);achiNotificationsChannel=null}
   if(supportRealtimeChannel){await db.removeChannel(supportRealtimeChannel);supportRealtimeChannel=null}
+  // Release the previous account's realtime presence before the next login.
+  if(nearbyPresenceChannel){await db.removeChannel(nearbyPresenceChannel);nearbyPresenceChannel=null}
+  nearbyOnlineIds=new Set();
+  nearbyLastSeenAt=new Map();
+  nearbyCachedMembers=[];
   await db.auth.signOut();
   currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
   const musicPlayer=el("achiMusicPlayer");
