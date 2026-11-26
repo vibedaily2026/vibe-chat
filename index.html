@@ -2399,6 +2399,8 @@ async function loadNearbyFriends(){
   }
   const topLimitSelect=el("topNearbyLimitSelect");if(topLimitSelect)topLimitSelect.value=nearbyDisplayLimit===Infinity?"all":String(nearbyDisplayLimit);
   await ensureNearbyPresence();
+  // Wait for the consented startup GPS refresh so this search does not race stale coordinates.
+  if(nearbyLocationRefreshPromise)await nearbyLocationRefreshPromise;
   const {data:enabled,error:statusError}=await db.rpc("my_location_enabled");
   if(statusError){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+statusError.message;return}
   if(!enabled){el("nearbyStatus").textContent=tx("กรุณากด “เปิดแชร์ตำแหน่ง” ก่อนค้นหาเพื่อนใกล้เคียง","Please enable location sharing to find nearby friends");return}
