@@ -1055,7 +1055,18 @@ async function unblockMember(blockId,name){
 }
 function focusPeopleFilters(){showPage("discover");setTimeout(()=>el("peopleGenderFilter")?.focus(),80)}
 async function pickRandomMember(){let pool=nearbyCachedMembers.map(x=>x.person);if(!pool.length)pool=peopleResults;if(!pool.length){await searchPeople();pool=peopleResults}if(!pool.length){showPage("discover");return}const p=pool[Math.floor(Math.random()*pool.length)];showPerson(p.id,p,nearbyCachedMembers.some(x=>x.person.id===p.id)?"nearby":"discover")}
+function toggleAchiMenu(force){
+  const nav=el("achiSideNav");
+  const button=el("achiMenuToggle");
+  if(!nav||!button)return;
+  const open=typeof force==="boolean"?force:!nav.classList.contains("is-open");
+  nav.classList.toggle("is-open",open);
+  button.setAttribute("aria-expanded",String(open));
+  button.setAttribute("aria-label",open?"Close navigation menu":"Open navigation menu");
+  button.textContent=open?"✕":"☰";
+}
 function showPage(page){
+  toggleAchiMenu(false);
   ["chat","communityRoom","inbox","directChat","supportChat","supportAdminInbox","supportAdminChat","discover","nearby","profile","personDetail","settings"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
