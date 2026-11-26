@@ -2948,13 +2948,13 @@ function setAchiThemeTrack(track,shouldPlay=true){
 function playAchiThemeMusic(){
   const audio=el("achiThemeAudio");if(!audio)return;
   if(!achiSelectedTrack){const track=achiThemeTracks[Math.floor(Math.random()*achiThemeTracks.length)];setAchiThemeTrack(track,false)}
-  audio.play().then(()=>{achiThemeStarted=true;el("achiMusicStatus").textContent=currentLanguage==="en"?"Now playing: "+achiSelectedTrack.label:"กำลังเล่น: "+achiSelectedTrack.label})
-    .catch(()=>{el("achiMusicStatus").textContent=currentLanguage==="en"?"Tap ▶ to play":"กด ▶ เพื่อฟังเพลง"})
+  audio.play().then(()=>{achiThemeStarted=true;if(el("achiMusicStatus"))el("achiMusicStatus").textContent=currentLanguage==="en"?"Now playing: "+achiSelectedTrack.label:"กำลังเล่น: "+achiSelectedTrack.label})
+    .catch(()=>{if(el("achiMusicStatus"))el("achiMusicStatus").textContent=currentLanguage==="en"?"Tap ▶ to play":"กด ▶ เพื่อฟังเพลง"})
 }
 function stopAchiThemeMusic(){
   const audio=el("achiThemeAudio");if(!audio)return;
   audio.pause();audio.currentTime=0;
-  el("achiMusicStatus").textContent=currentLanguage==="en"?"Music stopped":"หยุดเพลงแล้ว";
+  if(el("achiMusicStatus"))el("achiMusicStatus").textContent=currentLanguage==="en"?"Music stopped":"หยุดเพลงแล้ว";
 }
 function selectAchiThemeTrack(file){
   if(!currentUser)return;
