@@ -1310,7 +1310,7 @@ async function searchPeople(){
     const visual=document.createElement("div");visual.className="discover-person-visual";visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"discover");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"discover")}};
     const img=document.createElement("img");img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
     const caption=document.createElement("div");caption.className="discover-person-caption";
-    const username=document.createElement("div");username.className="person-name";username.textContent="@"+(person.username||"member");
+    const username=document.createElement("div");username.className="person-name";username.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const nearbyItem=nearbyCachedMembers.find(item=>item.person.id===person.id);
     if(nearbyItem&&Number.isFinite(Number(nearbyItem.distance_km))){
       const distance=document.createElement("div");distance.className="discover-person-distance";distance.textContent=nearbyDistanceLabel(nearbyItem.distance_km);visual.appendChild(distance);
@@ -2378,7 +2378,7 @@ function renderNearbyFriends(){
     img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
     visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"nearby");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"nearby")}};
     const caption=document.createElement("div");caption.className="nearby-card-caption";
-    const username=document.createElement("div");username.className="nearby-card-name";username.textContent="@"+(person.username||"member");
+    const username=document.createElement("div");username.className="nearby-card-name";username.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const distanceValue=Number(item.distance_km);
     if(Number.isFinite(distanceValue)){
       const distance=document.createElement("div");distance.className="nearby-card-distance";distance.textContent=nearbyDistanceLabel(distanceValue);visual.appendChild(distance);
