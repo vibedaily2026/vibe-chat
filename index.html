@@ -314,10 +314,18 @@ body:has(#app:not(.hidden)) #app{margin-top:0!important}
 @media(max-width:520px){#app .achi-topbar-mascot{flex-basis:34px;width:34px;height:34px;margin-right:1px}}
 
 /* Icon-only friend search filters and compact sidebar sound toggle */
-.achi-filter-icon-label{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0 6px 0 0;border:1px solid #e1e7f0;border-radius:10px;background:#f7f9fd;color:#526b91;font-size:23px;line-height:1;vertical-align:middle;cursor:pointer}
-.achi-online-filter-dot{color:#22a65a;font-size:21px;line-height:1}
-.achi-filter-icon-label+select{display:inline-block;width:calc(50% - 30px);min-width:110px;vertical-align:middle}
-.achi-sound-icon-button{display:flex!important;align-items:center;justify-content:center;width:38px;height:38px;padding:0!important;margin:5px auto;border-radius:10px;font-size:20px;line-height:1}
+.achi-discover-filters{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;width:100%;margin:8px 0 12px}
+.achi-filter-group{display:flex;flex:1 1 0;min-width:0;align-items:center;gap:5px}
+.achi-filter-icon-label{display:inline-flex;flex:0 0 34px;align-items:center;justify-content:center;width:34px;height:36px;margin:0;border:0;border-radius:8px;background:transparent;color:#526b91;font-size:22px;line-height:1;cursor:pointer}
+.achi-filter-group select{flex:1 1 0;width:1%;min-width:0!important;margin:0;padding:8px 5px;font-size:12px}
+.achi-presence-filter-icon{position:relative;display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1}
+.achi-presence-filter-icon i{position:absolute;width:6px;height:6px;border:1px solid #fff;border-radius:50%;bottom:-1px}
+.achi-presence-dot-online{background:#22a65a;right:-3px}
+.achi-presence-dot-offline{background:#9299a8;right:-9px}
+.achi-side-utility-row{display:flex;align-items:center;justify-content:center;gap:18px;width:100%;padding:3px 0}
+.achi-side-nav .achi-side-utility-row button.achi-utility-icon-button{display:inline-flex!important;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;min-width:42px;padding:0!important;margin:0;border:0!important;border-radius:8px;background:transparent!important;box-shadow:none!important;color:#4d5870;font-size:20px;line-height:1}
+.achi-side-nav .achi-side-utility-row button.achi-utility-icon-button:hover,.achi-side-nav .achi-side-utility-row button.achi-utility-icon-button.active{background:transparent!important;color:#554bcb;transform:none;box-shadow:none!important}
+@media(max-width:800px){.achi-discover-filters{gap:6px}.achi-filter-group{gap:3px}.achi-filter-group select{font-size:11px;padding:8px 3px}.achi-side-utility-row{gap:12px}}
 #achiMusicPlay,#achiMusicStop{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:16px!important;line-height:1}
 </style>
 
@@ -639,15 +647,13 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <div class="achi-music-controls">
       <button id="achiMusicPlay" type="button" onclick="playAchiThemeMusic()" aria-label="เล่นเพลง" title="เล่นเพลง">▶</button>
       <button id="achiMusicStop" type="button" class="secondary" onclick="stopAchiThemeMusic()" aria-label="หยุดเพลง" title="หยุดเพลง">■</button>
-      <label id="achiMusicTrackLabel" class="hidden" for="achiMusicTrack">เพลง</label>
+       
       <select id="achiMusicTrack" class="hidden" aria-label="Choose ACHI theme song" onchange="selectAchiThemeTrack(this.value)">
         <option value="ACHI TH01.mp3">ไทย 01</option><option value="ACHI TH02.mp3">ไทย 02</option><option value="ACHI TH03.mp3">ไทย 03</option><option value="ACHI TH04.mp3">ไทย 04</option>
         <option value="ACHI EN01.mp3">English 01</option><option value="ACHI EN02.mp3">English 02</option><option value="ACHI EN03.mp3">English 03</option>
       </select>
       
     </div>
-    <div id="achiMusicStatus" class="achi-music-status" role="status" aria-live="polite">สุ่มเพลงให้คุณแล้ว</div>
-    <p id="achiMusicLoginHint" class="achi-music-login-hint">ฟังทั้ง 7 เวอร์ชั่น <a href="#" onclick="openAuth(\'login\');return false"><strong>[เข้าสู่ระบบ]</strong></a></p>
   </div>
   
   <audio id="achiThemeAudio" preload="auto"></audio>
@@ -703,7 +709,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="settingsTab" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button>
     <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
-  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><button type="button" onclick="showPage('chat')" data-page="chat"><span class="achi-nav-badge-host">👥<span id="communitySideUnreadBadge" class="unread-badge hidden" aria-label="Community unread notifications">0</span></span><small data-i18n="chatTab">ชุมชน</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="musicMenuLabel">เพลง ACHI</div><div id="achiMusicDrawerSlot"></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><button type="button" onclick="showPage('settings')" data-page="settings"><span>⚙</span><small data-i18n="settingsTab">ตั้งค่า</small></button><button id="sideNotificationSoundToggle" type="button" onclick="toggleNotificationSound()" data-page="sound" class="achi-sound-icon-button" aria-label="เสียงแจ้งเตือน" title="เสียงแจ้งเตือน"><span aria-hidden="true">🔔</span></button><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navAccount">บัญชีและแอป</div><div class="achi-menu-account"><div class="achi-menu-account-brand">ACHI Buddy</div><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></nav>
+  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><button type="button" onclick="showPage('chat')" data-page="chat"><span class="achi-nav-badge-host">👥<span id="communitySideUnreadBadge" class="unread-badge hidden" aria-label="Community unread notifications">0</span></span><small data-i18n="chatTab">ชุมชน</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div id="achiMusicDrawerSlot"></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><div class="achi-side-utility-row"><button type="button" onclick="showPage('settings')" data-page="settings" class="achi-utility-icon-button" aria-label="ตั้งค่า" title="ตั้งค่า"><span aria-hidden="true">⚙</span></button><button id="sideNotificationSoundToggle" type="button" onclick="toggleNotificationSound()" data-page="sound" class="achi-utility-icon-button" aria-label="เสียงแจ้งเตือน" title="เสียงแจ้งเตือน"><span aria-hidden="true">🔔</span></button></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navAccount">บัญชีและแอป</div><div class="achi-menu-account"><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></nav>
 
   <section id="inboxPage" class="card hidden">
     <h2 data-i18n="privateChatHeading">ข้อความส่วนตัว</h2>
@@ -798,20 +804,22 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
         onkeydown="if(event.key==='Enter')searchPeople()">
       <button onclick="searchPeople()" data-i18n="search">ค้นหา</button>
     </div>
-    <label class="achi-filter-icon-label" for="peopleGenderFilter" aria-label="ค้นหาตามเพศ" title="ค้นหาตามเพศ">⚥</label>
-    <select id="peopleGenderFilter" onchange="searchPeople()">
-      <option value="" data-i18n="genderAll">ทุกเพศ</option>
-      <option value="ชาย" data-i18n="genderMale">ชาย</option>
-      <option value="หญิง" data-i18n="genderFemale">หญิง</option>
-      <option value="ชาย LGBTQ+" data-i18n="genderMaleLgbtq">ชาย LGBTQ+</option>
-      <option value="หญิง LGBTQ+" data-i18n="genderFemaleLgbtq">หญิง LGBTQ+</option>
-    </select>
-    <label class="achi-filter-icon-label" for="peoplePresenceFilter" aria-label="สถานะออนไลน์" title="สถานะออนไลน์"><span class="achi-online-filter-dot" aria-hidden="true">●</span></label>
-    <select id="peoplePresenceFilter" onchange="searchPeople()">
-      <option value="all" data-i18n="presenceAll">ออนไลน์และออฟไลน์</option>
-      <option value="online" data-i18n="presenceOnline">ออนไลน์</option>
-      <option value="offline" data-i18n="presenceOffline">ออฟไลน์</option>
-    </select>
+    <div class="achi-discover-filters">
+      <div class="achi-filter-group"><label class="achi-filter-icon-label" for="peopleGenderFilter" aria-label="ค้นหาตามเพศ" title="ค้นหาตามเพศ">⚥</label>
+      <select id="peopleGenderFilter" onchange="searchPeople()">
+        <option value="" data-i18n="genderAll">ทุกเพศ</option>
+        <option value="ชาย" data-i18n="genderMale">ชาย</option>
+        <option value="หญิง" data-i18n="genderFemale">หญิง</option>
+        <option value="ชาย LGBTQ+" data-i18n="genderMaleLgbtq">ชาย LGBTQ+</option>
+        <option value="หญิง LGBTQ+" data-i18n="genderFemaleLgbtq">หญิง LGBTQ+</option>
+      </select></div>
+      <div class="achi-filter-group"><label class="achi-filter-icon-label" for="peoplePresenceFilter" aria-label="สถานะออนไลน์" title="สถานะออนไลน์"><span class="achi-presence-filter-icon" aria-hidden="true">👤<i class="achi-presence-dot-online"></i><i class="achi-presence-dot-offline"></i></span></label>
+      <select id="peoplePresenceFilter" onchange="searchPeople()">
+        <option value="all" data-i18n="presenceAll">ออนไลน์และออฟไลน์</option>
+        <option value="online" data-i18n="presenceOnline">ออนไลน์</option>
+        <option value="offline" data-i18n="presenceOffline">ออฟไลน์</option>
+      </select></div>
+    </div>
     <p id="peopleStatus" class="muted">กำลังโหลดสมาชิก...</p>
     <div id="peopleList" class="people-grid"></div>
   </section>
@@ -2863,17 +2871,6 @@ function updateAchiMusicUI(){
   const member=!!currentUser;
   const select=el("achiMusicTrack"),label=el("achiMusicTrackLabel");
   if(select){select.classList.toggle("hidden",!member);label?.classList.toggle("hidden",!member);select.value=achiSelectedTrack?.file||""}
-  const status=el("achiMusicStatus");
-  if(status)status.textContent=member
-    ?(currentLanguage==="en"?"Choose any of the 7 versions below.":"เลือกฟังเพลงได้ครบทั้ง 7 เวอร์ชัน")
-    :(currentLanguage==="en"?"A random track is ready.":"สุ่มเพลงให้คุณแล้ว");
-  const loginHint=el("achiMusicLoginHint");
-  if(loginHint){
-    loginHint.classList.toggle("hidden",member);
-    loginHint.innerHTML=currentLanguage==="en"
-      ?'<span>Listen to all 7 versions</span> <a href="#" onclick="openAuth(\'login\');return false"><strong>[Log in]</strong></a>'
-      :'<span>ฟังทั้ง 7 เวอร์ชั่น</span> <a href="#" onclick="openAuth(\'login\');return false"><strong>[เข้าสู่ระบบ]</strong></a>'
-  }
   const play=el("achiMusicPlay");
   if(play){play.textContent="▶";play.setAttribute("aria-label",currentLanguage==="en"?"Play music":"เล่นเพลง");play.title=currentLanguage==="en"?"Play music":"เล่นเพลง"}
   const stop=el("achiMusicStop");
