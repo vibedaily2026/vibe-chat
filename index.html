@@ -48,7 +48,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #peopleList .discover-person-visual img{width:100%;height:100%;object-fit:cover;display:block}
 #peopleList .discover-person-visual:after{content:"";position:absolute;inset:38% 0 0;background:linear-gradient(transparent,#15152ddd);pointer-events:none}
 #peopleList .discover-person-caption{position:absolute;z-index:2;left:6px;right:6px;bottom:6px;color:white;text-align:center;text-shadow:0 1px 4px #0009}
-#peopleList .discover-person-caption .person-name{color:white;text-align:center;font-size:11px;line-height:1.2;min-height:0;font-weight:800;overflow-wrap:anywhere}
+#peopleList .discover-person-caption .person-name{color:white;text-align:center;font-size:11px;line-height:1.2;min-height:0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #peopleList .discover-person-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:#17172a99;color:#fff;font-size:9px;line-height:1.2;white-space:nowrap;text-align:center}
 #peopleList .discover-person-top{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0}
 #peopleList .discover-person-avatar{width:100%;height:auto;aspect-ratio:1/1;border-radius:11px;object-fit:cover}
@@ -101,7 +101,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .nearby-online-label.recent,.person-online.recent{color:#facc15}
 .nearby-online-label.offline,.person-online.offline{color:#a1a1aa}
 .nearby-card-caption{position:absolute;z-index:2;left:6px;right:6px;bottom:7px;color:#fff;text-align:center;text-shadow:0 1px 4px #0008}
-.nearby-card-name{font-size:12px;line-height:1.2;font-weight:800;overflow-wrap:anywhere}
+.nearby-card-name{font-size:12px;line-height:1.2;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nearby-card-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:#17172a99;color:#fff;font-size:10px;line-height:1.2;white-space:nowrap;text-align:center}
 
 /* Nearby cards: make the photo overlay layout explicit */
@@ -2190,9 +2190,13 @@ async function loadNearbyStatus(){
   const {data,error}=await db.rpc("my_location_enabled");
   if(error){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+error.message;return}
   const enabled=!!data;
-  el("nearbyEnableButton").classList.toggle("hidden",enabled);
+  const needsRetry=enabled&&!!nearbyLocationRefreshError;
+  el("nearbyEnableButton").classList.toggle("hidden",enabled&&!needsRetry);
   el("nearbyDisableButton").classList.toggle("hidden",!enabled);
-  el("nearbyStatus").textContent=enabled?tx("กำลังเปิดแชร์ตำแหน่งอยู่","Location sharing is on"):tx("ขณะนี้ยังไม่ได้แชร์ตำแหน่ง","Location sharing is off");
+  el("nearbyEnableButton").textContent=needsRetry?tx("อัปเดตตำแหน่ง","Update location"):tx("เปิดแชร์ตำแหน่ง","Enable location sharing");
+  el("nearbyStatus").textContent=needsRetry
+    ?tx("เปิดแชร์ตำแหน่งอยู่ แต่ไม่สามารถอัปเดตพิกัดได้: ","Location sharing is on, but the location could not be refreshed: ")+nearbyLocationRefreshError
+    :(enabled?tx("กำลังเปิดแชร์ตำแหน่งอยู่","Location sharing is on"):tx("ขณะนี้ยังไม่ได้แชร์ตำแหน่ง","Location sharing is off"));
 }
 
 function getCurrentPosition(){
@@ -2238,9 +2242,12 @@ async function refreshMyNearbyLocation(force=false){
     });
     if(updateError)throw updateError;
     nearbyLocationLastRefreshAt=Date.now();
+    nearbyLocationRefreshError=null;
     return true;
   })().catch(error=>{
+    nearbyLocationRefreshError=error?.message||tx("ไม่สามารถอัปเดตตำแหน่งได้","Could not refresh location");
     console.warn("ACHI nearby location refresh failed:",error?.message||error);
+    if(!el("nearbyPage")?.classList.contains("hidden"))void loadNearbyStatus();
     return false;
   }).finally(()=>{nearbyLocationRefreshPromise=null});
   return nearbyLocationRefreshPromise;
@@ -2267,6 +2274,7 @@ async function enableNearby(){
     const {error}=await db.rpc("set_my_location",{p_lat:position.coords.latitude,p_lon:position.coords.longitude,p_enabled:true});
     if(error)throw error;
     nearbyLocationLastRefreshAt=Date.now();
+    nearbyLocationRefreshError=null;
     await loadNearbyStatus();
     el("nearbyStatus").textContent=tx("เปิดแชร์ตำแหน่งแล้ว ระบบจะแสดงเฉพาะระยะทางโดยประมาณ","Location sharing is on. Only approximate distances will be shown.");
     await loadNearbyFriends();
@@ -2280,6 +2288,7 @@ async function disableNearby(){
   el("nearbyDisableButton").disabled=true;
   const {error}=await db.rpc("set_my_location",{p_lat:null,p_lon:null,p_enabled:false});
   nearbyLocationLastRefreshAt=0;
+  nearbyLocationRefreshError=null;
   el("nearbyDisableButton").disabled=false;
   if(error){el("nearbyStatus").textContent=tx("ปิดแชร์ตำแหน่งไม่สำเร็จ: ","Could not turn off location sharing: ")+error.message;return}
   el("nearbyList").innerHTML="";
@@ -2296,6 +2305,7 @@ let nearbyLocationRefreshTimer=null;
 let nearbyLocationRefreshPromise=null;
 let nearbyLocationRefreshListenersReady=false;
 let nearbyLocationLastRefreshAt=0;
+let nearbyLocationRefreshError=null;
 
 function nearbyPresenceStatus(id){
   if(nearbyOnlineIds.has(id))return "online";
@@ -2308,6 +2318,7 @@ function nearbyPresenceLabel(status){
   return tx("ออฟไลน์","Offline");
 }
 function nearbyDistanceLabel(value){
+  if(value===null||value===undefined||value==="")return "";
   const distance=Number(value);
   return Number.isFinite(distance)?distance.toFixed(2)+tx(" กม."," km"):"";
 }
