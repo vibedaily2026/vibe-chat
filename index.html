@@ -1074,12 +1074,25 @@ function toggleAuth(){
 async function login(){
   const email=el("email").value.trim();
   const password=el("password").value;
-  if(!email||!password)return showAuthMessage("กรุณากรอกอีเมลและรหัสผ่าน");
-  el("authButton").disabled=true;
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  el("authButton").disabled=false;
-  if(error)return showAuthMessage("เข้าสู่ระบบไม่สำเร็จ: "+error.message);
-  await startApp(data.user);
+  if(!email||!password)return showAuthMessage(tx("กรุณากรอกอีเมลและรหัสผ่าน","Please enter your email and password"));
+  const button=el("authButton");
+  button.disabled=true;
+  button.textContent=tx("กำลังเข้าสู่ระบบ...","Signing in...");
+  el("authMessage").classList.add("hidden");
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error)throw error;
+    if(!data?.user)throw new Error(tx("ระบบยืนยันตัวตนไม่ส่งข้อมูลบัญชีกลับมา","Authentication did not return an account"));
+    await startApp(data.user);
+  }catch(error){
+    console.error("ACHI login/startup failed:",error);
+    el("app").classList.add("hidden");
+    el("authBox").classList.remove("hidden");
+    showAuthMessage(tx("เข้าสู่ระบบหรือเปิดหน้าแอปไม่สำเร็จ: ","Could not sign in or start ACHI: ")+(error?.message||tx("เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ","An unexpected error occurred")));
+  }finally{
+    button.disabled=false;
+    button.textContent=isSignup?tx("สมัครสมาชิก","Create account"):tx("เข้าสู่ระบบ","Log in");
+  }
 }
 
 function isAdultDateOfBirth(value){
