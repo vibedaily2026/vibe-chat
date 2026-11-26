@@ -682,7 +682,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button class="secondary" onclick="showPage('inbox')" data-i18n="backToInbox">← กลับข้อความส่วนตัว</button>
     <div class="person-top" style="margin-top:16px">
       <img id="directPeerAvatar" class="person-avatar direct-peer-profile-link" alt="Profile" role="button" tabindex="0" title="เปิดโปรไฟล์คู่สนทนา" onclick="openActivePeerProfile()" onkeydown="handlePeerProfileKeydown(event)">
-      <div style="flex:1;min-width:0"><div id="directPeerName" class="person-name direct-peer-profile-link" role="button" tabindex="0" title="เปิดโปรไฟล์คู่สนทนา" onclick="openActivePeerProfile()" onkeydown="handlePeerProfileKeydown(event)"></div><div id="directChatStatus" class="person-username"></div></div>
+      <div style="flex:1;min-width:0"><div id="directPeerName" class="person-name direct-peer-profile-link" role="button" tabindex="0" title="เปิดโปรไฟล์คู่สนทนา" onclick="openActivePeerProfile()" onkeydown="handlePeerProfileKeydown(event)"></div><small id="directPeerLastMessageTime" style="display:block;margin-top:3px;color:#8b96a8;font-size:11px;line-height:1.3;font-weight:400"></small><div id="directChatStatus" class="person-username"></div></div>
       <div class="row" style="gap:6px;flex-wrap:wrap">
         <button class="secondary" type="button" onclick="startDirectCall('audio')" title="โทรเสียง" aria-label="โทรเสียง">📞</button>
         <button class="secondary" type="button" onclick="startDirectCall('video')" title="วิดีโอคอล" aria-label="วิดีโอคอล">📹</button>
@@ -1574,9 +1574,8 @@ function formatRelativeMessageTime(timestamp){
   return currentLanguage==="en"?value+" "+unitEn+(value===1?"":"s")+" ago":value+" "+unitTh+"ที่แล้ว";
 }
 function refreshConversationRelativeTimes(){
-  document.querySelectorAll(".conversation-last-message-time[data-last-message-at]").forEach(node=>{
-    node.textContent=formatRelativeMessageTime(node.dataset.lastMessageAt);
-  });
+  const node=el("directPeerLastMessageTime");
+  if(node?.dataset.lastMessageAt)node.textContent=formatRelativeMessageTime(node.dataset.lastMessageAt);
 }
 if(!window.achiConversationTimeTicker){
   window.achiConversationTimeTicker=setInterval(refreshConversationRelativeTimes,1000);
@@ -1597,12 +1596,6 @@ async function loadConversations(){
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,display_name,username,avatar_url").in("id",peerIds);
   if(profileError){el("inboxStatus").textContent=profileError.message;return}
   const byId={};(profiles||[]).forEach(p=>byId[p.id]=p);
-  const latestByConversation={};
-  const {data:latestMessages,error:latestError}=await db.from("direct_messages").select("conversation_id,created_at").in("conversation_id",visibleConversations.map(c=>c.id)).order("created_at",{ascending:false}).limit(1000);
-  if(latestError)console.warn("Could not load latest private-message timestamps:",latestError.message);
-  (latestMessages||[]).forEach(message=>{
-    if(!latestByConversation[message.conversation_id])latestByConversation[message.conversation_id]=message.created_at;
-  });
   el("inboxStatus").textContent="";
   for(const conv of visibleConversations){
     const peerId=conv.user_a===currentUser.id?conv.user_b:conv.user_a;
@@ -1616,11 +1609,7 @@ async function loadConversations(){
     const img=document.createElement("img");img.className="person-avatar";img.src=safeImage(peer.avatar_url,peer.display_name);img.alt="";
     const labelWrap=document.createElement("span");labelWrap.style.cssText="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:left;overflow:hidden";
     const label=document.createElement("span");label.style.cssText="width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap";label.textContent=peer.display_name||"ACHI member";
-    const lastMessageTime=document.createElement("small");lastMessageTime.className="conversation-last-message-time";lastMessageTime.style.cssText="display:block;width:100%;margin-top:3px;color:#8b96a8;font-size:11px;line-height:1.3;font-weight:400";
-    const lastMessageAt=latestByConversation[conv.id];
-    if(lastMessageAt){lastMessageTime.dataset.lastMessageAt=lastMessageAt;lastMessageTime.textContent=formatRelativeMessageTime(lastMessageAt)}
-    else lastMessageTime.textContent=tx("ยังไม่มีข้อความ","No messages yet");
-    labelWrap.append(label,lastMessageTime);
+    labelWrap.append(label);
     const unread=document.createElement("span");unread.className="unread-badge conversation-unread-badge hidden";unread.textContent="0";unread.setAttribute("aria-label","Unread messages from this member");
     const menuWrap=document.createElement("div");menuWrap.className="achi-chat-menu-wrap";
     const menuTrigger=document.createElement("button");menuTrigger.type="button";menuTrigger.className="secondary achi-chat-menu-trigger";menuTrigger.textContent="⋮";menuTrigger.title=tx("ตัวเลือกแชท","Chat options");menuTrigger.setAttribute("aria-label",menuTrigger.title);menuTrigger.setAttribute("aria-expanded","false");
@@ -1684,6 +1673,7 @@ async function openDirectChat(peerId,existingId){
   }
   el("directPeerName").textContent=peer.display_name||tx("สมาชิก ACHI","ACHI member");
   el("directPeerAvatar").src=safeImage(peer.avatar_url,peer.display_name);
+  const peerTime=el("directPeerLastMessageTime");if(peerTime){peerTime.textContent=tx("กำลังโหลดเวลา...","Loading time...");delete peerTime.dataset.lastMessageAt}
   el("directChatStatus").textContent="";
   el("directStatus").textContent="";
   showPage("directChat");await loadDirectMessages();await markConversationRead(conversationId);
@@ -1709,6 +1699,12 @@ async function loadDirectMessages(){
   if(!activeConversationId)return;
   const {data,error}=await db.from("direct_messages").select("id,sender_id,message_type,body,media_path,latitude,longitude,created_at,reply_to_id").eq("conversation_id",activeConversationId).order("created_at",{ascending:true}).limit(200);
   if(error){el("directStatus").textContent=tx("โหลดข้อความไม่สำเร็จ: ","Could not load messages: ")+error.message;return}
+  const peerTime=el("directPeerLastMessageTime");
+  if(peerTime){
+    const latest=(data||[]).length?(data||[])[(data||[]).length-1].created_at:null;
+    if(latest){peerTime.dataset.lastMessageAt=latest;peerTime.textContent=formatRelativeMessageTime(latest)}
+    else{delete peerTime.dataset.lastMessageAt;peerTime.textContent=tx("ยังไม่มีข้อความ","No messages yet")}
+  }
   const box=el("directMessages");box.innerHTML="";directMessageCache={};(data||[]).forEach(m=>directMessageCache[m.id]=m);
   const directIds=(data||[]).map(m=>m.id);const directReactions={};if(directIds.length){const {data:rows,error:reactionError}=await db.from("direct_message_reactions").select("message_id,user_id,emoji").in("message_id",directIds);if(!reactionError)(rows||[]).forEach(r=>(directReactions[r.message_id]||(directReactions[r.message_id]=[])).push(r))}
   let peerLastReadAt=null;
