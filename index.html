@@ -253,6 +253,25 @@ label{font-size:14px;font-weight:bold;color:#52657f}
  #app .achi-side-nav{z-index:120}
 }
 
+
+/* ACHI member-first home: community is a compact destination, not the landing canvas */
+@media(min-width:801px){
+ #discoverPage{width:100%;max-width:none;margin:0;padding:8px 4px 30px;background:transparent;border:0;box-shadow:none}
+ #discoverPage>h2,#discoverPage>p.muted:first-of-type{display:none}
+ #peopleList.people-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:10px}
+ #peopleList .discover-person{padding:0;border:0;background:transparent;box-shadow:none}
+ #peopleList .discover-person-visual{aspect-ratio:4/5;border-radius:13px}
+}
+@media(min-width:801px) and (max-width:1150px){#peopleList.people-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:800px){
+ #discoverPage{margin:0;padding:8px 2px 30px;background:transparent;border:0;box-shadow:none}
+ #discoverPage>h2,#discoverPage>p.muted:first-of-type{display:none}
+ #peopleList.people-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+ #peopleList .discover-person{padding:0;border:0;background:transparent;box-shadow:none}
+ #peopleList .discover-person-visual{aspect-ratio:4/5;border-radius:9px}
+}
+@media(max-width:380px){#peopleList.people-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -567,7 +586,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon" onclick="showPage('inbox')" aria-label="Notifications and chats"><span aria-hidden="true">🔔</span><span data-i18n="topNotifications">แจ้งเตือน / แชท</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
+  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon" onclick="showPage('inbox')" aria-label="Notifications and chats"><span aria-hidden="true">🔔</span><span data-i18n="topNotifications">แจ้งเตือน / แชท</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('chat')" aria-label="ชุมชน" title="ชุมชน"><span aria-hidden="true">♧</span><span data-i18n="chatTab">ชุมชน</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -577,7 +596,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="settingsTab" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button>
     <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
-  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('chat')" data-page="chat"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">เพื่อนใกล้ฉัน</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navQuickTools">เครื่องมือ</div><button type="button" onclick="focusPeopleFilters()"><span>☷</span><small data-i18n="topFilters">ตัวกรองสมาชิก</small></button><button type="button" onclick="pickRandomMember()"><span>✧</span><small data-i18n="topRandom">สุ่มสมาชิก</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><button type="button" onclick="showPage('settings')" data-page="settings"><span>⚙</span><small data-i18n="settingsTab">ตั้งค่า</small></button><button type="button" onclick="toggleNotificationSound()" data-page="sound"><span>🔔</span><small>เสียงแจ้งเตือน</small></button></nav>
+  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('chat')" data-page="chat"><span>♧</span><small data-i18n="chatTab">ชุมชน</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">เพื่อนใกล้ฉัน</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navQuickTools">เครื่องมือ</div><button type="button" onclick="focusPeopleFilters()"><span>☷</span><small data-i18n="topFilters">ตัวกรองสมาชิก</small></button><button type="button" onclick="pickRandomMember()"><span>✧</span><small data-i18n="topRandom">สุ่มสมาชิก</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><button type="button" onclick="showPage('settings')" data-page="settings"><span>⚙</span><small data-i18n="settingsTab">ตั้งค่า</small></button><button type="button" onclick="toggleNotificationSound()" data-page="sound"><span>🔔</span><small>เสียงแจ้งเตือน</small></button></nav>
 
   <section id="inboxPage" class="card hidden">
     <h2 data-i18n="privateChatHeading">ข้อความส่วนตัว</h2>
@@ -631,7 +650,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <div id="directStickerPicker" class="direct-sticker-picker hidden" aria-label="ACHI stickers"></div>
     <p id="directStatus" class="muted"></p>
   </section>
-  <section id="chatPage" class="card">
+  <section id="chatPage" class="card hidden">
     <h2 data-i18n="chatHeading">ชุมชน ACHI</h2>
     <p class="muted" data-i18n="chatIntro">เลือกห้องที่สนใจเพื่อเริ่มพูดคุย</p>
     <div class="support-entry"><div class="support-entry-icon" aria-hidden="true">🎧</div><div class="support-entry-copy"><strong data-i18n="supportTitle">ติดต่อ ACHI</strong><p data-i18n="supportIntro">มีคำถามหรือพบปัญหา? คุยกับทีมงาน ACHI แบบส่วนตัวได้ที่นี่</p></div><div class="support-entry-actions"><button type="button" onclick="openSupportChat()" data-i18n="supportContactButton">ติดต่อทีมงาน</button><button id="supportAdminShortcut" type="button" class="secondary hidden" onclick="showPage('supportAdminInbox')" data-i18n="supportAdminInbox">กล่องข้อความแอดมิน</button></div></div><p id="communityRoomsStatus" class="muted"></p>
@@ -663,7 +682,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   <section id="supportAdminInboxPage" class="card hidden"><button class="secondary" type="button" onclick="showPage('chat')" data-i18n="supportBack">← กลับชุมชน</button><h2 data-i18n="supportAdminHeading">กล่องข้อความติดต่อ ACHI</h2><p class="muted" data-i18n="supportAdminIntro">รายการข้อความส่วนตัวจากสมาชิก</p><p id="supportAdminInboxStatus" class="support-status"></p><div id="supportAdminTickets"></div></section>
   <section id="supportAdminChatPage" class="card hidden"><button class="secondary" type="button" onclick="showPage('supportAdminInbox')" data-i18n="supportAdminBack">← กลับกล่องข้อความ</button><h2 id="supportAdminChatTitle">ติดต่อ ACHI</h2><p id="supportAdminChatSubject" class="muted"></p><div id="supportAdminMessages" class="support-chat-box"></div><div id="supportAdminImagePreview" class="support-preview hidden"><img id="supportAdminImagePreviewImg" alt="Image preview"><button type="button" class="secondary" onclick="clearSupportImage()" data-i18n="supportRemoveImage">ยกเลิกรูป</button></div><div class="row" style="align-items:center"><button type="button" class="secondary" onclick="el('supportImageInput').click()" title="Attach image">📷</button><button type="button" class="secondary" onclick="toggleAchiStickerPicker('supportAdminStickerPicker',id=>sendSupportSticker(true,id))" aria-label="ACHI stickers">💜 ACHI</button><input id="supportAdminInput" maxlength="2000" placeholder="พิมพ์ข้อความตอบกลับ..." data-i18n-placeholder="supportReplyPlaceholder" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSupportMessage(true)}"><button type="button" onclick="sendSupportMessage(true)" data-i18n="send">ส่ง</button></div><div id="supportAdminStickerPicker" class="direct-sticker-picker hidden" aria-label="ACHI stickers"></div><p id="supportAdminChatStatus" class="support-status"></p></section>
   <input id="supportImageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden" onchange="previewSupportImage(event)">
-  <section id="discoverPage" class="card hidden">
+  <section id="discoverPage" class="card">
     <h2 data-i18n="discoverHeading">ค้นหาเพื่อนใหม่</h2>
     <p class="muted" data-i18n="discoverIntro">ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน</p>
     <div class="row">
@@ -988,7 +1007,8 @@ async function startApp(user){
   await loadOrCreateProfile();
   el("supportAdminShortcut").classList.toggle("hidden",currentProfile?.role!=="admin");
   await loadCommunityRooms();
-  document.querySelector('.achi-bottom-nav [data-page="chat"]')?.classList.add("active");
+  showPage("discover");
+  document.querySelector('.achi-bottom-nav [data-page="discover"]')?.classList.add("active");
   setLanguage(currentLanguage);
   subscribeMessages();
   await loadConversations();
@@ -1191,7 +1211,7 @@ async function searchPeople(){
       ...(Array.isArray(person.interests)?person.interests:[person.interests||""])
     ].filter(Boolean).join(" ").toLocaleLowerCase();
     return searchable.includes(keyword);
-  }).slice(0,12);
+  });
   if(!peopleResults.length){
     el("peopleStatus").textContent=tx("ยังไม่พบสมาชิก ลองค้นหาด้วยคำอื่น","No members found. Try another search.");
     return;
