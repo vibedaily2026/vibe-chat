@@ -2530,7 +2530,7 @@ async function loadNearbyFriends(){
   // Location is acquired and saved only when the member explicitly enables sharing.
   // Searching must use the already-consented server-side location; asking the browser
   // for GPS again here can fail on another device and incorrectly block discovery.
-  const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:50});
+  const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:20038});
   if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
   if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่แชร์ตำแหน่งและอัปเดตภายใน 30 นาที สมาชิกที่เปิดแชร์ตำแหน่งและออนไลน์อยู่จะปรากฏที่นี่เมื่อระบบอัปเดตพิกัดสำเร็จ","No members with a location refreshed within the last 30 minutes were found. Members who share location will appear here after their location refreshes successfully.");return}
   const ids=data.map(x=>x.user_id);
