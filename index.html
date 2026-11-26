@@ -49,7 +49,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #peopleList .discover-person-visual:after{content:"";position:absolute;inset:38% 0 0;background:linear-gradient(transparent,#15152ddd);pointer-events:none}
 #peopleList .discover-person-caption{position:absolute;z-index:2;left:6px;right:6px;bottom:6px;color:white;text-align:center;text-shadow:0 1px 4px #0009}
 #peopleList .discover-person-caption .person-name{color:white;text-align:center;font-size:11px;line-height:1.2;min-height:0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#peopleList .discover-person-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:#17172a99;color:#fff;font-size:9px;line-height:1.2;white-space:nowrap;text-align:center}
+#peopleList .discover-person-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:transparent;color:#fff;font-size:9px;line-height:1.2;white-space:nowrap;text-align:center}
 #peopleList .discover-person-top{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin:0}
 #peopleList .discover-person-avatar{width:100%;height:auto;aspect-ratio:1/1;border-radius:11px;object-fit:cover}
 
@@ -2506,7 +2506,7 @@ function renderNearbyFriends(){
     if(Number.isFinite(distanceValue)){
       const distance=document.createElement("div");distance.className="nearby-card-distance";distance.textContent=nearbyDistanceLabel(distanceValue);visual.appendChild(distance);
     }
-    caption.append(username);visual.append(img,caption);
+    caption.append(username);visual.append(img,presenceDot,caption);
     const bio=document.createElement("p");bio.className="person-bio";bio.textContent=person.bio||tx("ยังไม่ได้เขียนแนะนำตัว","No bio yet");
     card.append(visual,bio);list.appendChild(card);
   });
