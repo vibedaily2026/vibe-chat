@@ -102,7 +102,7 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .nearby-online-label.offline,.person-online.offline{color:#a1a1aa}
 .nearby-card-caption{position:absolute;z-index:2;left:6px;right:6px;bottom:7px;color:#fff;text-align:center;text-shadow:0 1px 4px #0008}
 .nearby-card-name{font-size:12px;line-height:1.2;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nearby-card-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:#17172a99;color:#fff;font-size:10px;line-height:1.2;white-space:nowrap;text-align:center}
+.nearby-card-distance{position:absolute;z-index:2;top:7px;left:50%;transform:translateX(-50%);max-width:calc(100% - 14px);padding:3px 8px;border-radius:999px;background:transparent;color:#fff;font-size:10px;line-height:1.2;white-space:nowrap;text-align:center}
 
 /* Nearby cards: make the photo overlay layout explicit */
 #nearbyList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -2501,7 +2501,7 @@ function renderNearbyFriends(){
     presenceDot.title=nearbyPresenceLabel(presenceStatus);
     visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"nearby");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"nearby")}};
     const caption=document.createElement("div");caption.className="nearby-card-caption";
-    const username=document.createElement("div");username.className="nearby-card-name";username.textContent=person.username?"@"+person.username:tx("สมาชิก ACHI","ACHI member");
+    const username=document.createElement("div");username.className="nearby-card-name";username.textContent=person.display_name||tx("สมาชิก ACHI","ACHI member");
     const distanceValue=item.distance_km===null||item.distance_km===undefined||item.distance_km===""?NaN:Number(item.distance_km);
     if(Number.isFinite(distanceValue)){
       const distance=document.createElement("div");distance.className="nearby-card-distance";distance.textContent=nearbyDistanceLabel(distanceValue);visual.appendChild(distance);
