@@ -228,6 +228,31 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 }
 @media(max-width:380px){.achi-topbar{gap:6px}.achi-topbar .achi-topbar-icon{width:36px;height:38px}.achi-menu-toggle{width:38px;height:38px}}
 
+
+/* Navigation layout correction: desktop sidebar + reliable mobile drawer */
+@media(min-width:801px){
+ #app{width:calc(100% - 276px);max-width:1240px;margin:25px 24px 30px 252px;padding-bottom:90px}
+ #app .achi-topbar{top:12px}
+ #app .tabs{display:none!important}
+ #app .achi-side-nav,#app .achi-bottom-nav.achi-side-nav{position:fixed;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px;top:82px;left:16px;right:auto;bottom:16px;width:214px;height:auto;max-height:calc(100vh - 98px);overflow-y:auto;transform:none;padding:14px 12px;background:#fff;border:1px solid #e9e8f7;border-radius:18px;box-shadow:0 6px 22px #2029430b;z-index:40}
+ #app .achi-side-nav .achi-side-brand{flex:none}
+ #app .achi-side-nav button{flex:none;width:100%;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;min-height:42px;padding:9px 11px}
+ #app .achi-side-nav button span{min-width:23px;text-align:center}
+ #app .achi-side-nav button small{font-size:13px}
+ #app .achi-side-close,#app .achi-menu-backdrop{display:none!important}
+ #app .achi-menu-toggle{display:none!important}
+}
+@media(max-width:800px){
+ #app{width:auto;max-width:none;margin:0 8px 24px;padding-bottom:90px}
+ #app .achi-menu-toggle{display:inline-flex!important;position:relative;z-index:121;pointer-events:auto;touch-action:manipulation}
+ #app .achi-topbar{z-index:110;overflow:visible}
+ #app .achi-side-nav,#app .achi-bottom-nav.achi-side-nav{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px}
+ #app .achi-side-nav:not(.is-open){visibility:hidden;pointer-events:none}
+ #app .achi-side-nav.is-open{visibility:visible;pointer-events:auto}
+ #app .achi-menu-backdrop{z-index:115}
+ #app .achi-side-nav{z-index:120}
+}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -542,7 +567,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleAchiMenu()">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon" onclick="showPage('inbox')" aria-label="Notifications and chats"><span aria-hidden="true">🔔</span><span data-i18n="topNotifications">แจ้งเตือน / แชท</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
+  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon" onclick="showPage('inbox')" aria-label="Notifications and chats"><span aria-hidden="true">🔔</span><span data-i18n="topNotifications">แจ้งเตือน / แชท</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -2703,6 +2728,7 @@ async function init(){
   if(session?.user)await startApp(session.user);
   else initAchiThemeMusic();
 }
+el("achiMenuToggle")?.addEventListener("click",()=>toggleAchiMenu());
 el("authButton").onclick=login;
 setLanguage(currentLanguage);
 applyAchiMascotBranding();
