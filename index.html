@@ -2296,6 +2296,8 @@ function subscribeSupportMessages(){if(supportRealtimeChannel)db.removeChannel(s
 
 async function loadNearbyPage(){
   await loadNearbyStatus();
+  const {data:sharing,error}=await db.rpc("my_location_enabled");
+  if(!error&&sharing)await refreshMyNearbyLocation(true);
   await loadNearbyFriends();
 }
 
@@ -2305,9 +2307,9 @@ async function loadNearbyStatus(){
   if(error){el("nearbyStatus").textContent=tx("ตรวจสอบสถานะไม่สำเร็จ: ","Could not check status: ")+error.message;return}
   const enabled=!!data;
   const needsRetry=enabled&&!!nearbyLocationRefreshError;
-  el("nearbyEnableButton").classList.toggle("hidden",enabled&&!needsRetry);
+  el("nearbyEnableButton").classList.toggle("hidden",!enabled);
   el("nearbyDisableButton").classList.toggle("hidden",!enabled);
-  el("nearbyEnableButton").textContent=needsRetry?tx("อัปเดตตำแหน่ง","Update location"):tx("เปิดแชร์ตำแหน่ง","Enable location sharing");
+  el("nearbyEnableButton").textContent=enabled?tx("อัปเดตตำแหน่ง","Refresh location"):tx("เปิดแชร์ตำแหน่ง","Enable location sharing");
   el("nearbyStatus").textContent=needsRetry
     ?tx("เปิดแชร์ตำแหน่งอยู่ แต่ไม่สามารถอัปเดตพิกัดได้: ","Location sharing is on, but the location could not be refreshed: ")+nearbyLocationRefreshError
     :(enabled?tx("กำลังเปิดแชร์ตำแหน่งอยู่","Location sharing is on"):tx("ขณะนี้ยังไม่ได้แชร์ตำแหน่ง","Location sharing is off"));
@@ -2368,8 +2370,10 @@ async function refreshMyNearbyLocation(force=false){
 }
 
 function startNearbyLocationHeartbeat(){
+  // Refresh immediately for every signed-in session, even when a previous account
+  // left the shared five-minute timer running in this browser tab.
+  void refreshMyNearbyLocation(true);
   if(!nearbyLocationRefreshTimer){
-    void refreshMyNearbyLocation(true);
     nearbyLocationRefreshTimer=setInterval(()=>{if(document.visibilityState!=="hidden")void refreshMyNearbyLocation(true)},5*60*1000);
   }
   if(!nearbyLocationRefreshListenersReady){
@@ -2528,7 +2532,7 @@ async function loadNearbyFriends(){
   // for GPS again here can fail on another device and incorrectly block discovery.
   const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:50});
   if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
-  if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่เปิดแชร์ตำแหน่งในขณะนี้ เมื่อมีสมาชิกเปิดแชร์ ระบบจะแสดงที่นี่","No members sharing their location yet. They will appear here when they opt in.");return}
+  if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่แชร์ตำแหน่งและอัปเดตภายใน 30 นาที สมาชิกที่เปิดแชร์ตำแหน่งและออนไลน์อยู่จะปรากฏที่นี่เมื่อระบบอัปเดตพิกัดสำเร็จ","No members with a location refreshed within the last 30 minutes were found. Members who share location will appear here after their location refreshes successfully.");return}
   const ids=data.map(x=>x.user_id);
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,username,display_name,avatar_url,bio,interests,age,gender,status").in("id",ids);
   if(profileError){el("nearbyStatus").textContent=tx("โหลดโปรไฟล์สมาชิกไม่สำเร็จ: ","Could not load member profiles: ")+profileError.message;return}
