@@ -312,6 +312,13 @@ body:has(#app:not(.hidden)) #app{margin-top:0!important}
 #app .achi-topbar{top:0!important}
 #app .achi-topbar-mascot{display:block;flex:0 0 42px;width:42px;height:42px;object-fit:contain;margin-right:3px}
 @media(max-width:520px){#app .achi-topbar-mascot{flex-basis:34px;width:34px;height:34px;margin-right:1px}}
+
+/* Icon-only friend search filters and compact sidebar sound toggle */
+.achi-filter-icon-label{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0 6px 0 0;border:1px solid #e1e7f0;border-radius:10px;background:#f7f9fd;color:#526b91;font-size:23px;line-height:1;vertical-align:middle;cursor:pointer}
+.achi-online-filter-dot{color:#22a65a;font-size:21px;line-height:1}
+.achi-filter-icon-label+select{display:inline-block;width:calc(50% - 30px);min-width:110px;vertical-align:middle}
+.achi-sound-icon-button{display:flex!important;align-items:center;justify-content:center;width:38px;height:38px;padding:0!important;margin:5px auto;border-radius:10px;font-size:20px;line-height:1}
+#achiMusicPlay,#achiMusicStop{width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;padding:0!important;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font-size:16px!important;line-height:1}
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -630,8 +637,8 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <div class="achi-music-title">🎵 HEY! ACHI! ACHI! ACHI!</div>
     
     <div class="achi-music-controls">
-      <button id="achiMusicPlay" type="button" onclick="playAchiThemeMusic()">▶ <span data-i18n="musicPlay">เล่นเพลง</span></button>
-      <button id="achiMusicStop" type="button" class="secondary" onclick="stopAchiThemeMusic()">■ <span data-i18n="musicStop">หยุดเพลง</span></button>
+      <button id="achiMusicPlay" type="button" onclick="playAchiThemeMusic()" aria-label="เล่นเพลง" title="เล่นเพลง">▶</button>
+      <button id="achiMusicStop" type="button" class="secondary" onclick="stopAchiThemeMusic()" aria-label="หยุดเพลง" title="หยุดเพลง">■</button>
       <label id="achiMusicTrackLabel" class="hidden" for="achiMusicTrack">เพลง</label>
       <select id="achiMusicTrack" class="hidden" aria-label="Choose ACHI theme song" onchange="selectAchiThemeTrack(this.value)">
         <option value="ACHI TH01.mp3">ไทย 01</option><option value="ACHI TH02.mp3">ไทย 02</option><option value="ACHI TH03.mp3">ไทย 03</option><option value="ACHI TH04.mp3">ไทย 04</option>
@@ -686,7 +693,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><img class="achi-topbar-mascot" src="/achi-buddy-03.png" alt="ACHI Buddy mascot"><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('notifications')" aria-label="การแจ้งเตือน" title="การแจ้งเตือน"><span class="achi-top-icon-wrap"><span aria-hidden="true">🔔</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="จำนวนแจ้งเตือนที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="topNotifications">แจ้งเตือน</span></button><button id="communityTopButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('chat')" aria-label="ชุมชน" title="ชุมชน"><span class="achi-top-icon-wrap"><span aria-hidden="true">♧</span><span id="communityUnreadBadge" class="unread-badge hidden" aria-label="จำนวนแจ้งเตือนชุมชนที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="chatTab">ชุมชน</span></button><button id="privateMessagesTopButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('inbox')" aria-label="ข้อความส่วนตัว" title="ข้อความส่วนตัว"><span class="achi-top-icon-wrap"><span aria-hidden="true">💬</span><span id="privateTopUnreadBadge" class="unread-badge hidden" aria-label="จำนวนข้อความส่วนตัวที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="privateChatTab">ข้อความ</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" aria-label="เพื่อนใกล้ฉัน" title="เพื่อนใกล้ฉัน"><span aria-hidden="true">📍</span><span data-i18n="topNearby">เพื่อนใกล้ฉัน</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" aria-label="ค้นหาเพื่อน" title="ค้นหาเพื่อน"><span aria-hidden="true">🔍</span><span data-i18n="discoverTab">ค้นหาเพื่อน</span></button></div>
+  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><img class="achi-topbar-mascot" src="/achi-buddy-03.png" alt="ACHI Buddy mascot"><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('notifications')" aria-label="การแจ้งเตือน" title="การแจ้งเตือน"><span class="achi-top-icon-wrap"><span aria-hidden="true">📢</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="จำนวนแจ้งเตือนที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="topNotifications">แจ้งเตือน</span></button><button id="communityTopButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('chat')" aria-label="ชุมชน" title="ชุมชน"><span class="achi-top-icon-wrap"><span aria-hidden="true">👥</span><span id="communityUnreadBadge" class="unread-badge hidden" aria-label="จำนวนแจ้งเตือนชุมชนที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="chatTab">ชุมชน</span></button><button id="privateMessagesTopButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('inbox')" aria-label="ข้อความส่วนตัว" title="ข้อความส่วนตัว"><span class="achi-top-icon-wrap"><span aria-hidden="true">💬</span><span id="privateTopUnreadBadge" class="unread-badge hidden" aria-label="จำนวนข้อความส่วนตัวที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="privateChatTab">ข้อความ</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" aria-label="เพื่อนใกล้ฉัน" title="เพื่อนใกล้ฉัน"><span aria-hidden="true">📍</span><span data-i18n="topNearby">เพื่อนใกล้ฉัน</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" aria-label="ค้นหาเพื่อน" title="ค้นหาเพื่อน"><span aria-hidden="true">🔍</span><span data-i18n="discoverTab">ค้นหาเพื่อน</span></button></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -696,7 +703,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button id="settingsTab" class="secondary" onclick="showPage('settings')" data-i18n="settingsTab">ตั้งค่า</button>
     <button id="notificationSoundToggle" class="secondary" onclick="toggleNotificationSound()" type="button">🔇 เสียงปิด</button>
   </div>
-  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><button type="button" onclick="showPage('chat')" data-page="chat"><span class="achi-nav-badge-host">♧<span id="communitySideUnreadBadge" class="unread-badge hidden" aria-label="Community unread notifications">0</span></span><small data-i18n="chatTab">ชุมชน</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="musicMenuLabel">เพลง ACHI</div><div id="achiMusicDrawerSlot"></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><button type="button" onclick="showPage('settings')" data-page="settings"><span>⚙</span><small data-i18n="settingsTab">ตั้งค่า</small></button><button type="button" onclick="toggleNotificationSound()" data-page="sound"><span>🔔</span><small>เสียงแจ้งเตือน</small></button><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navAccount">บัญชีและแอป</div><div class="achi-menu-account"><div class="achi-menu-account-brand">ACHI Buddy</div><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></nav>
+  <div id="achiMenuBackdrop" class="achi-menu-backdrop" onclick="toggleAchiMenu(false)" aria-hidden="true"></div><nav class="achi-bottom-nav achi-side-nav" id="achiSideNav" aria-label="Main navigation"><div class="achi-side-brand">✦ ACHI <button type="button" class="achi-side-close" onclick="toggleAchiMenu(false)" aria-label="Close menu">✕</button></div><div class="achi-side-section-label" data-i18n="navMain">เมนูหลัก</div><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌂</span><small data-i18n="bottomHome">หน้าหลัก</small></button><button type="button" onclick="showPage('profile')" data-page="profile"><span>☺</span><small data-i18n="bottomProfile">โปรไฟล์</small></button><button type="button" onclick="showPage('chat')" data-page="chat"><span class="achi-nav-badge-host">👥<span id="communitySideUnreadBadge" class="unread-badge hidden" aria-label="Community unread notifications">0</span></span><small data-i18n="chatTab">ชุมชน</small></button><button type="button" onclick="showPage('inbox')" data-page="inbox"><span class="achi-nav-badge-host">💬<span id="bottomChatUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></span><small data-i18n="bottomChat">แชท</small></button><button type="button" onclick="showPage('discover')" data-page="discover"><span>⌕</span><small data-i18n="bottomSearch">ค้นหาเพื่อน</small></button><button type="button" onclick="showPage('nearby')" data-page="nearby"><span>◎</span><small data-i18n="bottomActivity">กิจกรรม</small></button><div class="achi-side-limit"><label for="topNearbyLimitSelect" data-i18n="nearbyLimitLabel">แสดงสมาชิก</label><select id="topNearbyLimitSelect" class="top-limit-select" onchange="setNearbyLimit(this.value)" aria-label="Number of nearby members"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="musicMenuLabel">เพลง ACHI</div><div id="achiMusicDrawerSlot"></div><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navPreferences">การตั้งค่า</div><button type="button" onclick="showPage('settings')" data-page="settings"><span>⚙</span><small data-i18n="settingsTab">ตั้งค่า</small></button><button id="sideNotificationSoundToggle" type="button" onclick="toggleNotificationSound()" data-page="sound" class="achi-sound-icon-button" aria-label="เสียงแจ้งเตือน" title="เสียงแจ้งเตือน"><span aria-hidden="true">🔔</span></button><div class="achi-side-divider"></div><div class="achi-side-section-label" data-i18n="navAccount">บัญชีและแอป</div><div class="achi-menu-account"><div class="achi-menu-account-brand">ACHI Buddy</div><div class="lang-switch"><button id="langTh" class="selected" onclick="setLanguage('th')">ไทย</button><button id="langEn" onclick="setLanguage('en')">EN</button></div><button id="installAppButton" class="secondary install-button" type="button" onclick="installACHI()" data-i18n="installApp">ติดตั้ง ACHI</button><div id="userArea" class="hidden"><span id="userEmail" class="muted"></span><button class="secondary" onclick="logout()" data-i18n="logout">ออกจากระบบ</button></div></div></nav>
 
   <section id="inboxPage" class="card hidden">
     <h2 data-i18n="privateChatHeading">ข้อความส่วนตัว</h2>
@@ -791,7 +798,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
         onkeydown="if(event.key==='Enter')searchPeople()">
       <button onclick="searchPeople()" data-i18n="search">ค้นหา</button>
     </div>
-    <label for="peopleGenderFilter" data-i18n="genderFilterLabel">ค้นหาตามเพศ</label>
+    <label class="achi-filter-icon-label" for="peopleGenderFilter" aria-label="ค้นหาตามเพศ" title="ค้นหาตามเพศ">⚥</label>
     <select id="peopleGenderFilter" onchange="searchPeople()">
       <option value="" data-i18n="genderAll">ทุกเพศ</option>
       <option value="ชาย" data-i18n="genderMale">ชาย</option>
@@ -799,7 +806,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <option value="ชาย LGBTQ+" data-i18n="genderMaleLgbtq">ชาย LGBTQ+</option>
       <option value="หญิง LGBTQ+" data-i18n="genderFemaleLgbtq">หญิง LGBTQ+</option>
     </select>
-    <label for="peoplePresenceFilter" data-i18n="presenceFilterLabel">สถานะออนไลน์</label>
+    <label class="achi-filter-icon-label" for="peoplePresenceFilter" aria-label="สถานะออนไลน์" title="สถานะออนไลน์"><span class="achi-online-filter-dot" aria-hidden="true">●</span></label>
     <select id="peoplePresenceFilter" onchange="searchPeople()">
       <option value="all" data-i18n="presenceAll">ออนไลน์และออฟไลน์</option>
       <option value="online" data-i18n="presenceOnline">ออนไลน์</option>
@@ -986,19 +993,24 @@ let pendingProfileImagePreviewUrl=null;
 function el(id){return document.getElementById(id)}
 
 function updateNotificationSoundButton(){
-  const button=el("notificationSoundToggle");
-  if(!button)return;
-  button.textContent=notificationSoundEnabled
-    ?tx("🔊 เสียงเปิด","🔊 Sound on")
-    :tx("🔇 เสียงปิด","🔇 Sound off");
-  button.classList.toggle("active",notificationSoundEnabled);
-  button.classList.toggle("secondary",!notificationSoundEnabled);
-  const settingsButton=el("settingsSoundToggle");
-  if(settingsButton){
-    settingsButton.textContent=notificationSoundEnabled?tx("🔊 เสียงเปิด","🔊 Sound on"):tx("🔇 เสียงปิด","🔇 Sound off");
-    settingsButton.classList.toggle("active",notificationSoundEnabled);
-    settingsButton.classList.toggle("secondary",!notificationSoundEnabled);
-  }
+  const icon=notificationSoundEnabled?"🔔":"🔕";
+  const label=notificationSoundEnabled?tx("เปิดเสียงแจ้งเตือน","Notification sound on"):tx("ปิดเสียงแจ้งเตือน","Notification sound off");
+  ["notificationSoundToggle","settingsSoundToggle","sideNotificationSoundToggle"].forEach(id=>{
+    const button=el(id);
+    if(!button)return;
+    if(id==="sideNotificationSoundToggle"){
+      const iconNode=button.querySelector("span");
+      if(iconNode)iconNode.textContent=icon;
+      button.setAttribute("aria-label",label);
+      button.title=label;
+    }else{
+      button.textContent=icon;
+      button.setAttribute("aria-label",label);
+      button.title=label;
+    }
+    button.classList.toggle("active",notificationSoundEnabled);
+    button.classList.toggle("secondary",!notificationSoundEnabled);
+  });
 }
   
 let notificationAudioUnlocked=false;
