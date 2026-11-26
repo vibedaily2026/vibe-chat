@@ -48,6 +48,19 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 #peopleList .virtual-person-bio{font-size:9px;line-height:1.3;color:#667085;padding:4px 2px 0;min-height:28px}
 /* Discover results: fixed four-column layout on desktop and mobile */
 #peopleList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.member-count-control{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin:10px 0 12px}
+.member-count-control label{font-size:12px;color:#66758d}
+#peopleList.members-count-8,#nearbyList.members-count-8{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#peopleList.members-count-12,#nearbyList.members-count-12{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#peopleList.members-count-16,#nearbyList.members-count-16{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+#peopleList.members-count-20,#nearbyList.members-count-20{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+#peopleList.members-count-all,#nearbyList.members-count-all{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))!important}
+#nearbyList .virtual-person-card{padding:4px;overflow:hidden}
+#nearbyList .virtual-person-card .discover-person-visual{position:relative;width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden}
+#nearbyList .virtual-person-card .discover-person-visual img{width:100%;height:100%;object-fit:cover}
+#nearbyList .virtual-person-card .discover-person-caption{position:absolute;z-index:2;left:6px;right:6px;bottom:6px;color:white;text-align:center}
+#nearbyList .virtual-person-card .discover-person-caption .person-name{color:white;font-size:11px}
+#nearbyList .virtual-person-card .virtual-person-bio{display:none}
 #peopleList .discover-person{padding:5px;display:flex;flex-direction:column;gap:0;overflow:hidden}
 #peopleList .discover-person-visual{position:relative;width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#efeeff}
 #peopleList .discover-person-visual img{width:100%;height:100%;object-fit:cover;display:block}
@@ -2576,8 +2589,12 @@ function renderNearbyFriends(){
   if(!list)return;
   list.innerHTML="";
   const members=nearbyCachedMembers.slice().sort((a,b)=>Number(a.distance_km)-Number(b.distance_km));
-  const visible=members.slice(0,nearbyDisplayLimit);
-  visible.forEach(item=>{
+  const demoMembers=getAchiVirtualMembers("",null).map(person=>({kind:"demo",person}));
+  const combined=[...members.map(item=>({kind:"real",item})),...demoMembers];
+  const visible=combined.slice(0,nearbyDisplayLimit);
+  visible.forEach(entry=>{
+    if(entry.kind==="demo"){list.appendChild(renderAchiVirtualMember(entry.person));return}
+    const item=entry.item;
     const person=item.person;
     const card=document.createElement("div");card.className="person nearby-person-card";
     const visual=document.createElement("div");visual.className="nearby-card-visual";
@@ -2622,7 +2639,7 @@ async function loadNearbyFriends(){
   // for GPS again here can fail on another device and incorrectly block discovery.
   const {data,error}=await db.rpc("find_nearby_friends",{p_radius_km:20038});
   if(error){el("nearbyStatus").textContent=tx("ค้นหาเพื่อนไม่สำเร็จ: ","Could not find nearby friends: ")+error.message;return}
-  if(!data||!data.length){el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกที่แชร์ตำแหน่งและอัปเดตภายใน 30 นาที สมาชิกที่เปิดแชร์ตำแหน่งและออนไลน์อยู่จะปรากฏที่นี่เมื่อระบบอัปเดตพิกัดสำเร็จ","No members with a location refreshed within the last 30 minutes were found. Members who share location will appear here after their location refreshes successfully.");return}
+  if(!data||!data.length){nearbyCachedMembers=[];el("nearbyStatus").textContent=tx("ยังไม่พบสมาชิกจริงที่แชร์ตำแหน่งและอัปเดตภายใน 30 นาที โปรไฟล์ DEMO ด้านล่างเป็นตัวอย่างเท่านั้น ไม่ใช่ผู้ที่อยู่ใกล้คุณ","No real members with a recently shared location were found. DEMO profiles below are examples only, not nearby people.");renderNearbyFriends();return}
   const ids=data.map(x=>x.user_id);
   const {data:profiles,error:profileError}=await db.from("profiles").select("id,username,display_name,avatar_url,bio,interests,age,gender,status").in("id",ids);
   if(profileError){el("nearbyStatus").textContent=tx("โหลดโปรไฟล์สมาชิกไม่สำเร็จ: ","Could not load member profiles: ")+profileError.message;return}
