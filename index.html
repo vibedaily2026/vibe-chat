@@ -41,6 +41,11 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 .notice{padding:12px;border-radius:10px;background:#edf5ff;color:#376caf;margin:12px 0;font-size:14px}
 .muted{color:#8290a3;font-size:13px}
 .people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:18px}
+/* Clearly distinguish non-interactive virtual demo profiles from real members. */
+#peopleList .virtual-person-card{position:relative;cursor:default}
+#peopleList .virtual-person-badge{position:absolute;z-index:4;top:6px;left:6px;padding:3px 6px;border-radius:6px;background:#fff1c7;color:#76500a;font-size:8px;font-weight:900;letter-spacing:.3px}
+#peopleList .virtual-person-detail{font-size:9px;line-height:1.2;color:#fff;margin-top:2px}
+#peopleList .virtual-person-bio{font-size:9px;line-height:1.3;color:#667085;padding:4px 2px 0;min-height:28px}
 /* Discover results: fixed four-column layout on desktop and mobile */
 #peopleList.people-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 #peopleList .discover-person{padding:5px;display:flex;flex-direction:column;gap:0;overflow:hidden}
@@ -1332,6 +1337,42 @@ function showPage(page){
   if(page==="settings")loadSettings();
 }
 
+
+const achiVirtualMembers=[
+  {id:"virtual-demo-01",nameTh:"มินตรา",nameEn:"Mina",gender:"หญิง",age:24,bioTh:"ชอบคาเฟ่ เพลง และการเดินทาง",bioEn:"Into cafés, music and little adventures"},
+  {id:"virtual-demo-02",nameTh:"ภาคิน",nameEn:"Kai",gender:"ชาย",age:27,bioTh:"ชอบเทคโนโลยีและถ่ายภาพ",bioEn:"Interested in technology and photography"},
+  {id:"virtual-demo-03",nameTh:"อริน",nameEn:"Arin",gender:"หญิง",age:22,bioTh:"ชอบอ่านหนังสือและแมว",bioEn:"Books, cats and quiet weekends"},
+  {id:"virtual-demo-04",nameTh:"นที",nameEn:"Nate",gender:"ชาย",age:29,bioTh:"ชอบกีฬาและอาหารอร่อย",bioEn:"Sports and discovering good food"},
+  {id:"virtual-demo-05",nameTh:"พิมพ์ชนก",nameEn:"Pim",gender:"หญิง",age:26,bioTh:"ชอบศิลปะและดนตรีสด",bioEn:"Art, live music and creative things"},
+  {id:"virtual-demo-06",nameTh:"ธันวา",nameEn:"Tawan",gender:"ชาย",age:25,bioTh:"ชอบธรรมชาติและทริปสั้น ๆ",bioEn:"Nature lover and weekend explorer"},
+  {id:"virtual-demo-07",nameTh:"ลลิน",nameEn:"Lalin",gender:"หญิง",age:28,bioTh:"ชอบทำอาหารและดูหนัง",bioEn:"Cooking experiments and movie nights"},
+  {id:"virtual-demo-08",nameTh:"กวิน",nameEn:"Gavin",gender:"ชาย",age:23,bioTh:"ชอบเกมและคุยเรื่องไอเดียใหม่ ๆ",bioEn:"Gaming and conversations about new ideas"}
+];
+function getAchiVirtualMembers(term,genderFilter){
+  const keyword=String(term||"").toLocaleLowerCase().trim();
+  return achiVirtualMembers.filter(person=>{
+    if(genderFilter&&person.gender!==genderFilter)return false;
+    if(!keyword)return true;
+    const searchable=[person.nameTh,person.nameEn,person.gender,person.age,person.bioTh,person.bioEn].join(" ").toLocaleLowerCase();
+    return searchable.includes(keyword);
+  });
+}
+function renderAchiVirtualMember(person){
+  const name=currentLanguage==="en"?person.nameEn:person.nameTh;
+  const bio=currentLanguage==="en"?person.bioEn:person.bioTh;
+  const card=document.createElement("div");card.className="person discover-person virtual-person-card";
+  const visual=document.createElement("div");visual.className="discover-person-visual";
+  const img=document.createElement("img");img.src=fallbackAvatar(name);img.alt=tx("ภาพประกอบโปรไฟล์ตัวอย่าง","Illustrative demo profile");
+  const badge=document.createElement("span");badge.className="virtual-person-badge";badge.textContent=tx("ตัวอย่าง","DEMO");
+  const caption=document.createElement("div");caption.className="discover-person-caption";
+  const username=document.createElement("div");username.className="person-name";username.textContent=name;
+  const detail=document.createElement("div");detail.className="virtual-person-detail";detail.textContent=person.age+" · "+person.gender;
+  const description=document.createElement("div");description.className="virtual-person-bio";description.textContent=bio;
+  visual.title=tx("โปรไฟล์ตัวอย่าง ไม่ใช่สมาชิกจริง","Demo profile, not a real member");
+  caption.append(username,detail);visual.append(img,badge,caption);card.append(visual,description);
+  return card;
+}
+
 async function searchPeople(){
   if(!currentUser)return;
   const term=el("peopleSearch").value.trim();
@@ -1355,8 +1396,10 @@ async function searchPeople(){
     if(presenceFilter==="offline")return !isOnline;
     return true;
   });
-  if(!peopleResults.length){el("peopleStatus").textContent=tx("ยังไม่พบสมาชิกตามตัวกรองที่เลือก ลองเปลี่ยนตัวกรองหรือคำค้นหา","No members match the selected filters. Try changing a filter or search term.");return}
-  el("peopleStatus").textContent=tx("พบสมาชิก ","Found ")+peopleResults.length+tx(" คน"," members");
+  const virtualResults=presenceFilter==="all"?getAchiVirtualMembers(term,genderFilter):[];
+  if(!peopleResults.length&&!virtualResults.length){el("peopleStatus").textContent=tx("ยังไม่พบสมาชิกตามตัวกรองที่เลือก ลองเปลี่ยนตัวกรองหรือคำค้นหา","No members match the selected filters. Try changing a filter or search term.");return}
+  el("peopleStatus").textContent=tx("สมาชิกจริง ","Real members ")+peopleResults.length+tx(" คน · โปรไฟล์ตัวอย่าง "," · demo profiles ")+virtualResults.length+tx(" คน","");
+  if(presenceFilter!=="all")el("peopleStatus").textContent+=tx(" · ซ่อนโปรไฟล์ตัวอย่างเมื่อกรองสถานะ"," · demo profiles are hidden while filtering presence");
   peopleResults.forEach(person=>{
     const card=document.createElement("div");card.className="person discover-person";
     const visual=document.createElement("div");visual.className="discover-person-visual";visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"discover");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"discover")}};
@@ -1374,6 +1417,7 @@ async function searchPeople(){
     }
     caption.append(username);visual.append(img,presenceDot,caption);card.appendChild(visual);el("peopleList").appendChild(card);
   });
+  virtualResults.forEach(person=>el("peopleList").appendChild(renderAchiVirtualMember(person)));
 }
 let currentPersonSourcePage="discover";
 async function showPerson(id,personOverride=null,sourcePage="discover"){
