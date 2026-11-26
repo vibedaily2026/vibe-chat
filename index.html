@@ -804,6 +804,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   <section id="discoverPage" class="card">
     <h2 data-i18n="discoverHeading">ค้นหาเพื่อนใหม่</h2>
     <p class="muted" data-i18n="discoverIntro">ทำความรู้จักสมาชิก ACHI ที่มีความสนใจคล้ายกัน</p>
+   <div class="member-count-control"><label for="discoverMemberLimit">แสดงสมาชิก / Members</label><select id="discoverMemberLimit" class="top-limit-select" onchange="setNearbyLimit(this.value)"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div>
     <div class="row">
       <input id="peopleSearch" data-i18n-placeholder="searchPlaceholder" placeholder="ค้นหาจากชื่อ Username สถานะ หรือความสนใจ..."
         onkeydown="if(event.key==='Enter')searchPeople()">
@@ -836,7 +837,8 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
       <button id="nearbyEnableButton" onclick="enableNearby()" data-i18n="enableLocation">เปิดแชร์ตำแหน่ง</button>
       <button id="nearbyDisableButton" class="secondary hidden" onclick="disableNearby()" data-i18n="disableLocation">ปิดแชร์ตำแหน่ง</button>
     </div>
-    <p id="nearbyStatus" class="muted">กำลังตรวจสอบสถานะ...</p>
+    <div class="member-count-control"><label for="nearbyMemberLimit">แสดงสมาชิก / Members</label><select id="nearbyMemberLimit" class="top-limit-select" onchange="setNearbyLimit(this.value)"><option value="8">8</option><option value="12">12</option><option value="16">16</option><option value="20">20</option><option value="all">ทั้งหมด / All</option></select></div>
+   <p id="nearbyStatus" class="muted">กำลังตรวจสอบสถานะ...</p>
     <div id="nearbyList" class="people-grid"></div>
   </section>
 
@@ -1359,7 +1361,9 @@ const achiVirtualMembers=[
   {id:"virtual-demo-05",nameTh:"พิมพ์ชนก",nameEn:"Pim",gender:"หญิง",age:26,bioTh:"ชอบศิลปะและดนตรีสด",bioEn:"Art, live music and creative things"},
   {id:"virtual-demo-06",nameTh:"ธันวา",nameEn:"Tawan",gender:"ชาย",age:25,bioTh:"ชอบธรรมชาติและทริปสั้น ๆ",bioEn:"Nature lover and weekend explorer"},
   {id:"virtual-demo-07",nameTh:"ลลิน",nameEn:"Lalin",gender:"หญิง",age:28,bioTh:"ชอบทำอาหารและดูหนัง",bioEn:"Cooking experiments and movie nights"},
-  {id:"virtual-demo-08",nameTh:"กวิน",nameEn:"Gavin",gender:"ชาย",age:23,bioTh:"ชอบเกมและคุยเรื่องไอเดียใหม่ ๆ",bioEn:"Gaming and conversations about new ideas"}
+  {id:"virtual-demo-08",nameTh:"กวิน",nameEn:"Gavin",gender:"ชาย",age:23,bioTh:"ชอบเกมและคุยเรื่องไอเดียใหม่ ๆ",bioEn:"Gaming and conversations about new ideas"},
+  {id:"virtual-demo-09",nameTh:"ณิชา",nameEn:"Nicha",gender:"หญิง",age:25,bioTh:"ชอบถ่ายรูปและค้นหาร้านอาหารใหม่ ๆ",bioEn:"Photography and finding new places to eat"},
+  {id:"virtual-demo-10",nameTh:"อคิน",nameEn:"Akin",gender:"ชาย",age:28,bioTh:"ชอบดนตรี เทคโนโลยี และการออกกำลังกาย",bioEn:"Music, technology and staying active"}
 ];
 function getAchiVirtualMembers(term,genderFilter){
   const keyword=String(term||"").toLocaleLowerCase().trim();
@@ -1410,10 +1414,12 @@ async function searchPeople(){
     return true;
   });
   const virtualResults=presenceFilter==="all"?getAchiVirtualMembers(term,genderFilter):[];
-  if(!peopleResults.length&&!virtualResults.length){el("peopleStatus").textContent=tx("ยังไม่พบสมาชิกตามตัวกรองที่เลือก ลองเปลี่ยนตัวกรองหรือคำค้นหา","No members match the selected filters. Try changing a filter or search term.");return}
-  el("peopleStatus").textContent=tx("สมาชิกจริง ","Real members ")+peopleResults.length+tx(" คน · โปรไฟล์ตัวอย่าง "," · demo profiles ")+virtualResults.length+tx(" คน","");
+  const allResults=[...peopleResults.map(person=>({kind:"real",person})),...virtualResults.map(person=>({kind:"demo",person}))];
+  const visibleResults=allResults.slice(0,nearbyDisplayLimit);
+  if(!visibleResults.length){el("peopleStatus").textContent=tx("ยังไม่พบสมาชิกตามตัวกรองที่เลือก ลองเปลี่ยนตัวกรองหรือคำค้นหา","No members match the selected filters. Try changing a filter or search term.");return}
+  el("peopleStatus").textContent=tx("สมาชิกจริง ","Real members ")+peopleResults.length+tx(" คน · โปรไฟล์ตัวอย่าง "," · demo profiles ")+virtualResults.length+tx(" คน · แสดง "," · showing ")+visibleResults.length+tx(" คน","");
   if(presenceFilter!=="all")el("peopleStatus").textContent+=tx(" · ซ่อนโปรไฟล์ตัวอย่างเมื่อกรองสถานะ"," · demo profiles are hidden while filtering presence");
-  peopleResults.forEach(person=>{
+  visibleResults.filter(item=>item.kind==="real").forEach(({person})=>{
     const card=document.createElement("div");card.className="person discover-person";
     const visual=document.createElement("div");visual.className="discover-person-visual";visual.tabIndex=0;visual.setAttribute("role","button");visual.onclick=()=>showPerson(person.id,person,"discover");visual.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showPerson(person.id,person,"discover")}};
     const img=document.createElement("img");img.src=safeImage(person.avatar_url,person.display_name);img.alt=tx("รูปโปรไฟล์","Profile photo");img.onerror=()=>{img.onerror=null;img.src=fallbackAvatar(person.display_name)};
@@ -1430,7 +1436,7 @@ async function searchPeople(){
     }
     caption.append(username);visual.append(img,presenceDot,caption);card.appendChild(visual);el("peopleList").appendChild(card);
   });
-  virtualResults.forEach(person=>el("peopleList").appendChild(renderAchiVirtualMember(person)));
+  visibleResults.filter(item=>item.kind==="demo").forEach(({person})=>el("peopleList").appendChild(renderAchiVirtualMember(person)));
 }
 let currentPersonSourcePage="discover";
 async function showPerson(id,personOverride=null,sourcePage="discover"){
@@ -2530,8 +2536,14 @@ function setNearbyLimit(value){
   const requested=Number.parseInt(value,10)||12;
   const parsed=value==="all"?Infinity:([8,12,16,20].includes(requested)?requested:12);
   nearbyDisplayLimit=parsed;
-  const topSelect=el("topNearbyLimitSelect");if(topSelect)topSelect.value=parsed===Infinity?"all":String(parsed);
-  try{localStorage.setItem("achiNearbyDisplayLimit",parsed===Infinity?"all":String(parsed))}catch(_){}
+  const selected=parsed===Infinity?"all":String(parsed);
+  ["topNearbyLimitSelect","discoverMemberLimit","nearbyMemberLimit"].forEach(id=>{const select=el(id);if(select)select.value=selected});
+  try{localStorage.setItem("achiNearbyDisplayLimit",selected)}catch(_){}
+  document.querySelectorAll("#peopleList,#nearbyList").forEach(list=>{
+    list.classList.remove("members-count-8","members-count-12","members-count-16","members-count-20","members-count-all");
+    list.classList.add("members-count-"+selected);
+  });
+  if(!el("discoverPage").classList.contains("hidden"))searchPeople();
   renderNearbyFriends();
 }
 
@@ -2595,9 +2607,10 @@ async function loadNearbyFriends(){
   el("nearbyList").innerHTML="";
   el("nearbyStatus").textContent=tx("กำลังค้นหาเพื่อนใกล้เคียง...","Searching for nearby friends...");
   if(!nearbyDisplayLimit){
-    try{const saved=Number.parseInt(localStorage.getItem("achiNearbyDisplayLimit"),10)||12;nearbyDisplayLimit=[8,12,16,20].includes(saved)?saved:12}catch(_){nearbyDisplayLimit=12}
+    try{const saved=localStorage.getItem("achiNearbyDisplayLimit")||"12";nearbyDisplayLimit=saved==="all"?Infinity:([8,12,16,20].includes(Number(saved))?Number(saved):12)}catch(_){nearbyDisplayLimit=12}
   }
-  const topLimitSelect=el("topNearbyLimitSelect");if(topLimitSelect)topLimitSelect.value=nearbyDisplayLimit===Infinity?"all":String(nearbyDisplayLimit);
+  const savedLimit=nearbyDisplayLimit===Infinity?"all":String(nearbyDisplayLimit);
+  ["topNearbyLimitSelect","discoverMemberLimit","nearbyMemberLimit"].forEach(id=>{const select=el(id);if(select)select.value=savedLimit});
   await ensureNearbyPresence();
   // Wait for the consented startup GPS refresh so this search does not race stale coordinates.
   if(nearbyLocationRefreshPromise)await nearbyLocationRefreshPromise;
