@@ -579,6 +579,13 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
   #app .achi-menu-toggle{flex-basis:34px;width:34px;height:34px}
   #app .achi-topbar-brand{font-size:16px}
 }
+
+/* Fix: mobile drawer must override the generic hidden bottom-navigation rule. */
+@media(max-width:800px){
+  #app nav#achiSideNav.achi-bottom-nav.achi-side-nav{display:flex!important;visibility:hidden;pointer-events:none;transform:translateX(-105%)}
+  #app nav#achiSideNav.achi-bottom-nav.achi-side-nav.is-open{display:flex!important;visibility:visible;pointer-events:auto;transform:translateX(0)}
+  #app #achiMenuBackdrop.achi-menu-backdrop{display:block!important}
+}
 </style>
 </head>
 <body>
