@@ -272,6 +272,43 @@ label{font-size:14px;font-weight:bold;color:#52657f}
 }
 @media(max-width:380px){#peopleList.people-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+/* ACHI notification center + compact header music controls */
+.achi-top-icon-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.achi-top-icon-wrap>.unread-badge{position:absolute;top:-10px;right:-13px;min-width:17px;height:17px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #fff;border-radius:999px;background:#e53945;color:#fff;font-size:10px;font-weight:900;line-height:1}
+.achi-top-icon-wrap>.unread-badge.hidden{display:none}
+.achi-notifications-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.achi-notifications-heading h2{margin-bottom:4px}
+.achi-notifications-list{display:flex;flex-direction:column;gap:8px}
+.achi-notification-row{position:relative;display:flex;align-items:flex-start;gap:12px;width:100%;padding:13px 14px;border:1px solid #e9eaf2;border-radius:14px;background:#fff;color:#303b53;text-align:left;cursor:pointer}
+.achi-notification-row.is-unread{background:#f7f8ff;border-color:#d9dcff}
+.achi-notification-kind{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#efefff;font-size:19px}
+.achi-notification-content{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.achi-notification-content strong{font-size:14px}
+.achi-notification-content small,.achi-notification-content time{color:#8992a6;font-size:11px}
+.achi-notification-preview{font-size:13px;color:#59657b;overflow-wrap:anywhere}
+.achi-notification-unread-dot{width:9px;height:9px;flex:0 0 9px;margin:7px 3px 0;border-radius:50%;background:#e53945}
+#app .achi-topbar{gap:7px}
+#app .achi-member-music{display:flex;flex:0 1 auto;width:auto;max-width:350px;min-width:0;margin:0 0 0 auto;padding:0}
+#app .achi-member-music .achi-music-panel{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;padding:4px 7px;border:1px solid #e9e8f7;border-radius:12px;background:#f9f9ff;box-shadow:none;min-width:0}
+#app .achi-member-music .achi-music-title{min-width:0;max-width:105px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+#app .achi-member-music .achi-music-controls{flex:0 0 auto;flex-wrap:nowrap;gap:4px}
+#app .achi-member-music .achi-music-controls button{min-width:30px;margin:0;padding:5px 7px;border-radius:9px;font-size:12px}
+#app .achi-member-music .achi-music-controls button span{display:none}
+#app .achi-member-music .achi-music-controls select{width:78px;min-width:0;max-width:78px;margin:0;padding:5px 4px;font-size:10px}
+#app .achi-member-music .achi-music-controls label,#app .achi-member-music .achi-music-status,#app .achi-member-music .achi-music-login-hint,#app .achi-member-music .achi-lyrics{display:none!important}
+@media(max-width:800px){
+ #app .achi-topbar{gap:5px}
+ #app .achi-topbar .achi-topbar-icon{width:38px;height:38px;padding:5px}
+ #app .achi-member-music{max-width:150px;margin-left:2px}
+ #app .achi-member-music .achi-music-panel{gap:3px;padding:3px}
+ #app .achi-member-music .achi-music-title{display:none}
+ #app .achi-member-music .achi-music-controls{gap:2px}
+ #app .achi-member-music .achi-music-controls button{min-width:27px;padding:5px}
+ #app .achi-member-music .achi-music-controls select{width:66px;max-width:66px}
+ .achi-notifications-heading button{font-size:12px;padding:8px 10px}
+}
+
 </style>
 
 <meta name="theme-color" content="#7467F0">
@@ -586,7 +623,7 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
 <audio id="achiNotificationSound" preload="auto" src="https://raw.githubusercontent.com/vibedaily2026/vibe-chat/main/achi-notification.mp3.mp3"></audio>
 
 <main id="app" class="hidden">
-  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon" onclick="showPage('inbox')" aria-label="Notifications and chats"><span aria-hidden="true">🔔</span><span data-i18n="topNotifications">แจ้งเตือน / แชท</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('chat')" aria-label="ชุมชน" title="ชุมชน"><span aria-hidden="true">♧</span><span data-i18n="chatTab">ชุมชน</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
+  <div class="achi-topbar"><button id="achiMenuToggle" class="secondary achi-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button><strong class="achi-topbar-brand"><img id="achiTopMascot" alt="">ACHI</strong><button id="topNotificationsButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('notifications')" aria-label="การแจ้งเตือน" title="การแจ้งเตือน"><span class="achi-top-icon-wrap"><span aria-hidden="true">🔔</span><span id="notificationUnreadBadge" class="unread-badge hidden" aria-label="จำนวนแจ้งเตือนที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="topNotifications">แจ้งเตือน</span></button><button id="privateMessagesTopButton" type="button" class="secondary achi-topbar-icon achi-notification-button" onclick="showPage('inbox')" aria-label="ข้อความส่วนตัว" title="ข้อความส่วนตัว"><span class="achi-top-icon-wrap"><span aria-hidden="true">💬</span><span id="privateTopUnreadBadge" class="unread-badge hidden" aria-label="จำนวนข้อความส่วนตัวที่ยังไม่ได้อ่าน">0</span></span><span data-i18n="privateChatTab">ข้อความ</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('chat')" aria-label="ชุมชน" title="ชุมชน"><span aria-hidden="true">♧</span><span data-i18n="chatTab">ชุมชน</span></button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('nearby')" data-i18n="topNearby">◎ เพื่อนใกล้ฉัน</button><button type="button" class="secondary achi-topbar-icon" onclick="showPage('discover')" data-i18n="discoverTab">⌕ ค้นหาเพื่อน</button></div>
   <div class="tabs">
     <button id="chatTab" class="active" onclick="showPage('chat')" data-i18n="chatTab">ชุมชน</button>
     <button id="privateChatTab" class="secondary" onclick="showPage('inbox')"><span data-i18n="privateChatTab">แชท</span> <span id="privateUnreadBadge" class="unread-badge hidden" aria-label="Unread messages">0</span></button>
@@ -769,6 +806,27 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
     <button onclick="saveProfile()" data-i18n="saveProfile">บันทึกโปรไฟล์</button>
     <p id="profileStatus" class="notice hidden"></p>
   </section>
+
+  <section id="notificationsPage" class="card hidden">
+    <div class="achi-notifications-heading">
+      <div><h2 data-i18n="notificationsHeading">การแจ้งเตือน</h2><p class="muted" data-i18n="notificationsIntro">ประกาศจาก ACHI ความคิดเห็นใต้โปรไฟล์ และข้อความในห้องชุมชน</p></div>
+      <button type="button" class="secondary" onclick="markAllAchiNotificationsRead()" data-i18n="markAllNotificationsRead">อ่านทั้งหมดแล้ว</button>
+    </div>
+    <div id="adminAnnouncementPanel" class="settings-group hidden">
+      <h3 data-i18n="adminAnnouncementHeading">ส่งประกาศถึงสมาชิก</h3>
+      <label for="adminAnnouncementType" data-i18n="announcementTypeLabel">ประเภทประกาศ</label>
+      <select id="adminAnnouncementType"><option value="admin">ประกาศจากแอดมิน</option><option value="system">ประกาศจากระบบ</option></select>
+      <label for="adminAnnouncementTitle" data-i18n="announcementTitleLabel">หัวข้อประกาศ</label>
+      <input id="adminAnnouncementTitle" maxlength="120" placeholder="หัวข้อประกาศ">
+      <label for="adminAnnouncementBody" data-i18n="announcementBodyLabel">รายละเอียด</label>
+      <textarea id="adminAnnouncementBody" maxlength="1000" rows="3" placeholder="เขียนรายละเอียดประกาศ"></textarea>
+      <button type="button" onclick="publishAchiAnnouncement()" data-i18n="publishAnnouncement">ส่งประกาศ</button>
+      <p id="adminAnnouncementStatus" class="muted" role="status"></p>
+    </div>
+    <p id="achiNotificationsStatus" class="muted" role="status"></p>
+    <div id="achiNotificationsList" class="achi-notifications-list"></div>
+  </section>
+
   <section id="settingsPage" class="card hidden">
     <h2 data-i18n="settingsHeading">ตั้งค่า</h2>
     <p class="muted" data-i18n="settingsIntro">จัดการภาษา การแจ้งเตือน ความเป็นส่วนตัว และบัญชีของคุณ</p>
@@ -999,7 +1057,7 @@ async function startApp(user){
   el("userArea").classList.remove("hidden");
   const musicPlayer=el("achiMusicPlayer");
   const appTopbar=document.querySelector("#app .achi-topbar");
-  if(musicPlayer&&appTopbar){appTopbar.after(musicPlayer);musicPlayer.classList.add("achi-member-music")}
+  if(musicPlayer&&appTopbar){appTopbar.append(musicPlayer);musicPlayer.classList.add("achi-member-music")}
   updateAchiMusicUI();
   el("userEmail").textContent=user.email||"";
   setLanguage(currentLanguage);
@@ -1012,6 +1070,8 @@ async function startApp(user){
   setLanguage(currentLanguage);
   subscribeMessages();
   await loadConversations();
+  await loadAchiNotifications();
+  subscribeAchiNotifications();
   subscribeDirectMessages();
   subscribeSupportMessages();
 }
@@ -1163,7 +1223,7 @@ function toggleAchiMenu(force){
 }
 function showPage(page){
   toggleAchiMenu(false);
-  ["chat","communityRoom","inbox","directChat","supportChat","supportAdminInbox","supportAdminChat","discover","nearby","profile","personDetail","settings"].forEach(name=>{
+  ["chat","communityRoom","inbox","directChat","supportChat","supportAdminInbox","supportAdminChat","discover","nearby","profile","personDetail","notifications","settings"].forEach(name=>{
     el(name+"Page").classList.toggle("hidden",name!==page);
   });
   const tabIds={chat:"chatTab",inbox:"privateChatTab",discover:"discoverTab",nearby:"nearbyTab",profile:"profileTab",settings:"settingsTab"};
@@ -1173,6 +1233,7 @@ function showPage(page){
   });
   document.querySelectorAll(".achi-bottom-nav [data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page||(b.dataset.page==="chat"&&page==="communityRoom")||(b.dataset.page==="inbox"&&page==="directChat")));
   if(page==="chat")loadCommunityRooms();
+  if(page==="notifications")loadAchiNotifications();
   if(page==="inbox")loadConversations();
   if(page==="supportChat")loadSupportChat();
   if(page==="supportAdminInbox")loadSupportAdminInbox();
@@ -1329,6 +1390,111 @@ let callConnectedAt=null;
 let callHistoryLogged=false;
 let isCallInitiator=false;
 
+async function updateAchiNotificationBadge(){
+  if(!currentUser)return;
+  const {count,error}=await db.from("achi_notifications").select("id",{count:"exact",head:true})
+    .eq("recipient_id",currentUser.id).is("read_at",null);
+  if(error){console.warn("Notification count:",error.message);return}
+  const badge=el("notificationUnreadBadge");
+  if(badge){badge.textContent=count>99?"99+":String(count||0);badge.classList.toggle("hidden",!count)}
+}
+let achiNotificationsChannel=null;
+async function loadAchiNotifications(){
+  if(!currentUser)return;
+  const status=el("achiNotificationsStatus"),list=el("achiNotificationsList");
+  if(!status||!list)return;
+  el("adminAnnouncementPanel")?.classList.toggle("hidden",currentProfile?.role!=="admin");
+  status.textContent=tx("กำลังโหลดการแจ้งเตือน...","Loading notifications...");
+  list.innerHTML="";
+  const {data,error}=await db.from("achi_notifications")
+    .select("id,actor_id,notification_type,title,body,room_id,message_id,profile_id,comment_id,created_at,read_at")
+    .eq("recipient_id",currentUser.id).order("created_at",{ascending:false}).limit(100);
+  if(error){status.textContent=tx("โหลดการแจ้งเตือนไม่สำเร็จ: ","Could not load notifications: ")+error.message;await updateAchiNotificationBadge();return}
+  const rows=data||[];
+  const actorIds=[...new Set(rows.map(x=>x.actor_id).filter(Boolean))];
+  const roomIds=[...new Set(rows.map(x=>x.room_id).filter(Boolean))];
+  const [profileResult,roomResult]=await Promise.all([
+    actorIds.length?db.from("profiles").select("id,display_name,avatar_url").in("id",actorIds):Promise.resolve({data:[]}),
+    roomIds.length?db.from("community_rooms").select("id,name_th,name_en").in("id",roomIds):Promise.resolve({data:[]})
+  ]);
+  const actors={};(profileResult.data||[]).forEach(x=>actors[x.id]=x);
+  const rooms={};(roomResult.data||[]).forEach(x=>rooms[x.id]=x);
+  status.textContent=rows.length?tx("การแจ้งเตือนล่าสุด","Recent notifications"):tx("ยังไม่มีการแจ้งเตือน","No notifications yet");
+  rows.forEach(item=>{
+    const actor=actors[item.actor_id]||{};
+    const room=rooms[item.room_id];
+    const row=document.createElement("button");row.type="button";
+    row.className="achi-notification-row"+(item.read_at?" is-read":" is-unread");
+    row.onclick=()=>openAchiNotification(item);
+    const icon=document.createElement("span");icon.className="achi-notification-kind";
+    icon.textContent=item.notification_type==="profile_comment"?"💬":item.notification_type==="community_message"?"👥":item.notification_type==="admin"?"📢":item.notification_type==="system"?"🔔":"✦";
+    const content=document.createElement("span");content.className="achi-notification-content";
+    const title=document.createElement("strong");title.textContent=item.title||tx("แจ้งเตือนจาก ACHI","ACHI notification");
+    const meta=document.createElement("small");
+    const metaParts=[actor.display_name||((item.notification_type==="system"||item.notification_type==="admin")?"ACHI":tx("สมาชิก ACHI","ACHI member")),room?(currentLanguage==="en"?(room.name_en||room.name_th):(room.name_th||room.name_en)):item.notification_type==="profile_comment"?tx("ความคิดเห็นใต้โปรไฟล์","Profile comment"):item.notification_type==="admin"?tx("ประกาศจากแอดมิน","Admin announcement"):item.notification_type==="system"?tx("ประกาศจากระบบ","System announcement"):""];
+    meta.textContent=metaParts.filter(Boolean).join(" · ");
+    const body=document.createElement("span");body.className="achi-notification-preview";body.textContent=item.body||"";
+    const time=document.createElement("time");time.textContent=item.created_at?new Date(item.created_at).toLocaleString(currentLanguage==="en"?"en-US":"th-TH",{dateStyle:"short",timeStyle:"short"}):"";
+    content.append(title,meta,body,time);row.append(icon,content);
+    if(!item.read_at){const dot=document.createElement("span");dot.className="achi-notification-unread-dot";dot.setAttribute("aria-label",tx("ยังไม่ได้อ่าน","Unread"));row.append(dot)}
+    list.append(row);
+  });
+  await updateAchiNotificationBadge();
+}
+async function openAchiNotification(item){
+  if(!currentUser||!item)return;
+  if(!item.read_at){
+    const {error}=await db.from("achi_notifications").update({read_at:new Date().toISOString()}).eq("id",item.id).eq("recipient_id",currentUser.id);
+    if(error)console.warn("Could not mark notification read:",error.message);
+  }
+  await updateAchiNotificationBadge();
+  if(item.notification_type==="community_message"&&item.room_id){
+    if(!communityRooms.length)await loadCommunityRooms();
+    await openCommunityRoom(item.room_id);
+    return;
+  }
+  if(item.notification_type==="profile_comment"&&item.profile_id){
+    await showPerson(item.profile_id,null,"discover");
+    return;
+  }
+  await loadAchiNotifications();
+}
+async function markAllAchiNotificationsRead(){
+  if(!currentUser)return;
+  const {error}=await db.from("achi_notifications").update({read_at:new Date().toISOString()})
+    .eq("recipient_id",currentUser.id).is("read_at",null);
+  if(error){el("achiNotificationsStatus").textContent=tx("ทำเครื่องหมายอ่านแล้วไม่สำเร็จ: ","Could not mark all as read: ")+error.message;return}
+  await loadAchiNotifications();
+}
+async function publishAchiAnnouncement(){
+  if(!currentUser||currentProfile?.role!=="admin")return;
+  const title=el("adminAnnouncementTitle").value.trim();
+  const body=el("adminAnnouncementBody").value.trim();
+  const type=el("adminAnnouncementType").value==="system"?"system":"admin";
+  const status=el("adminAnnouncementStatus");
+  if(!title||!body){status.textContent=tx("กรุณากรอกหัวข้อและรายละเอียดประกาศ","Please enter an announcement title and message");return}
+  status.textContent=tx("กำลังส่งประกาศ...","Publishing announcement...");
+  const {data:members,error:memberError}=await db.from("profiles").select("id");
+  if(memberError){status.textContent=memberError.message;return}
+  const rows=(members||[]).filter(p=>p.id!==currentUser.id).map(p=>({
+    recipient_id:p.id,actor_id:currentUser.id,notification_type:type,title:title.slice(0,120),body:body.slice(0,1000)
+  }));
+  if(!rows.length){status.textContent=tx("ยังไม่มีสมาชิกอื่นให้ส่งประกาศ","There are no other members to notify");return}
+  const {error}=await db.from("achi_notifications").insert(rows);
+  if(error){status.textContent=tx("ส่งประกาศไม่สำเร็จ: ","Could not publish: ")+error.message;return}
+  el("adminAnnouncementTitle").value="";el("adminAnnouncementBody").value="";
+  status.textContent=tx("ส่งประกาศถึงสมาชิก "+rows.length+" คนแล้ว","Announcement sent to "+rows.length+" members");
+  await loadAchiNotifications();
+}
+function subscribeAchiNotifications(){
+  if(!currentUser)return;
+  if(achiNotificationsChannel)db.removeChannel(achiNotificationsChannel);
+  achiNotificationsChannel=db.channel("achi-notifications-"+currentUser.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"achi_notifications",filter:"recipient_id=eq."+currentUser.id},()=>{
+      updateAchiNotificationBadge();
+      if(!el("notificationsPage").classList.contains("hidden"))loadAchiNotifications();
+    }).subscribe();
+}
 async function updatePrivateUnreadBadge(){
   if(!currentUser)return;
   const {data:conversations,error}=await db.from("conversations").select("id").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).limit(100);
@@ -1351,7 +1517,7 @@ async function updatePrivateUnreadBadge(){
     });
   }
   const total=Object.values(unreadByConversation).reduce((sum,count)=>sum+count,0);
-  [el("privateUnreadBadge"),el("notificationUnreadBadge"),el("bottomChatUnreadBadge")].filter(Boolean).forEach(badge=>{badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0)});
+  [el("privateUnreadBadge"),el("privateTopUnreadBadge"),el("bottomChatUnreadBadge")].filter(Boolean).forEach(badge=>{badge.textContent=total>99?"99+":String(total);badge.classList.toggle("hidden",total===0)});
   document.querySelectorAll("[data-conversation-id]").forEach(row=>{
     const count=unreadByConversation[row.dataset.conversationId]||0;
     const rowBadge=row.querySelector(".conversation-unread-badge");
@@ -2207,12 +2373,16 @@ async function loadProfiles(userIds){
 
 async function markCommunityRoomRead(roomId){
   if(!currentUser||!roomId)return;
+  const readAt=new Date().toISOString();
   const {error}=await db.from("community_room_reads").upsert({
     user_id:currentUser.id,
     room_id:roomId,
-    last_read_at:new Date().toISOString()
+    last_read_at:readAt
   },{onConflict:"user_id,room_id"});
   if(error)console.warn("Could not mark community room as read:",error.message);
+  const {error:notificationError}=await db.from("achi_notifications").update({read_at:new Date().toISOString()}).eq("recipient_id",currentUser.id).eq("notification_type","community_message").eq("room_id",roomId).is("read_at",null);
+  if(notificationError)console.warn("Could not mark community notifications read:",notificationError.message);
+  await updateAchiNotificationBadge();
 }
 
 async function getCommunityUnreadCount(roomId,joinedAt,lastReadAt){
@@ -2447,6 +2617,7 @@ async function logout(){
   await endDirectCall(true);
   if(callChannel){await db.removeChannel(callChannel);callChannel=null;callChannelConversationId=null}
   if(realtimeChannel){await db.removeChannel(realtimeChannel);realtimeChannel=null}
+  if(achiNotificationsChannel){await db.removeChannel(achiNotificationsChannel);achiNotificationsChannel=null}
   if(supportRealtimeChannel){await db.removeChannel(supportRealtimeChannel);supportRealtimeChannel=null}
   await db.auth.signOut();
   currentUser=null;currentProfile=null;profileCache={};peopleResults=[];
