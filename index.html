@@ -652,6 +652,13 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
  #communityRoomsList .community-room-card>button{padding:7px 8px;font-size:10px;border-radius:9px}
 }
 @media(max-width:360px){#communityRoomsList .community-room-card{min-height:140px;padding:7px}#communityRoomsList .community-room-card .person-name{font-size:11px}}
+@media(max-width:600px){
+ #peopleList.members-count-8,#nearbyList.members-count-8{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #peopleList.members-count-12,#nearbyList.members-count-12{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ #peopleList.members-count-16,#nearbyList.members-count-16{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ #peopleList.members-count-20,#nearbyList.members-count-20{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+ #peopleList.members-count-all,#nearbyList.members-count-all{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))!important}
+}
 </style>
 </head>
 <body>
@@ -3022,6 +3029,7 @@ el("achiMenuToggle")?.addEventListener("click",()=>toggleAchiMenu());
 el("authButton").onclick=login;
 setLanguage(currentLanguage);
 applyAchiMascotBranding();
+setNearbyLimit((()=>{try{return localStorage.getItem("achiNearbyDisplayLimit")||"12"}catch(_){return "12"}})());
 init();
 </script>
 </body>
