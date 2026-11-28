@@ -659,6 +659,61 @@ input:focus,textarea:focus{outline:2px solid #B9C9FF;border-color:#7467F0}
  #peopleList.members-count-all,#nearbyList.members-count-all{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))!important}
 }
 </style>
+
+<style id="achi-mascot-purple-refresh">
+:root{
+  --achi-purple:#6958ee;
+  --achi-violet:#8778ff;
+  --achi-lilac:#b7aaff;
+  --achi-deep:#252b83;
+  --achi-ice:#f5f4ff;
+  --achi-ink:#24264f;
+  --achi-pink:#ff9fc7;
+  --blue:var(--achi-purple);
+  --ink:var(--achi-ink);
+}
+html,body{background:linear-gradient(180deg,#f3f1ff 0%,#fbfaff 46%,#fff 100%);color:var(--achi-ink)}
+header{background:rgba(255,255,255,.92);border-bottom:1px solid #e5e0ff;box-shadow:0 7px 26px #30258b12}
+.logo,.achi-topbar-brand,.achi-menu-account-brand{color:var(--achi-purple)}
+button{background:linear-gradient(135deg,#8b7bff 0%,#6855ed 55%,#5143ce 100%);color:#fff;box-shadow:0 7px 18px #6958ee35}
+button:hover{box-shadow:0 10px 23px #6958ee45}
+button.active{background:linear-gradient(135deg,#5146cf,#292d91)}
+button.secondary{background:linear-gradient(135deg,#f0edff,#e5e1ff);color:#5145c7;box-shadow:none}
+.card,.person,.feature{border-color:#e8e3ff;box-shadow:0 12px 34px #39309a12}
+h2,.person-name,.msg-name{color:#39358c}
+input,textarea,select{border-color:#dedaff;background:#fdfcff;color:#29294f}
+input:focus,textarea:focus,select:focus{outline:2px solid #b8adff;border-color:#7665f3}
+#messages,#directMessages{background:linear-gradient(145deg,#f1efff,#f8f7ff)}
+.msg-content{border-color:#e4dfff;box-shadow:0 3px 10px #5143ce0b}
+.msg-avatar,.avatar,.person-avatar{background:#e9e5ff;border-color:#cfc7ff}
+.notice,.chip{background:#eeebff;color:#5145c7}
+.hero{background:radial-gradient(circle at 82% 18%,#c9c0ff 0 8%,transparent 29%),radial-gradient(circle at 12% 88%,#dce5ff 0 7%,transparent 27%),linear-gradient(125deg,#e6e1ff 0%,#f3f0ff 53%,#e8edff 100%);box-shadow:0 22px 55px #5143ce20}
+.hero h1{color:#28265d}
+.hero h1 span{background:linear-gradient(90deg,#5144d1 0%,#8b79ff 48%,#4d69db 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p,.section-heading p,.feature p{color:#55577b}
+.eyebrow{background:#ffffffd9;color:#5145c7;border:1px solid #e3ddff}
+.mascot-scene,.hero-mascot-cloud img{filter:drop-shadow(0 13px 17px #4137b52c)}
+.feature:nth-child(1){background:linear-gradient(145deg,#f0edff,#fff)}
+.feature:nth-child(2){background:linear-gradient(145deg,#edf0ff,#fff)}
+.feature:nth-child(3){background:linear-gradient(145deg,#f4efff,#fff)}
+.feature:nth-child(4){background:linear-gradient(145deg,#eef3ff,#fff)}
+.lang-switch,.achi-side-nav button:hover,.achi-side-nav button.active{background:#eeebff;color:#5145c7}
+.achi-side-nav{border-color:#e5e0ff!important;box-shadow:0 8px 26px #30258b12!important}
+.achi-side-nav button{color:#49476e}
+.achi-side-nav .achi-side-brand{color:#6958ee}
+.achi-side-limit,.achi-menu-account{background:linear-gradient(145deg,#f4f1ff,#fff);border-color:#e6e0ff}
+.achi-member-music .achi-music-panel{background:#f6f4ff!important;border-color:#e4dfff!important}
+.achi-notification-row.is-unread{background:#f2efff;border-color:#d8d0ff}
+.achi-notification-kind{background:#e9e4ff}
+.room-latest{background:#f5f3ff;border-color:#e8e2ff}
+#peopleList .discover-person-visual{background:#e9e5ff}
+.landing-bottom{background:linear-gradient(120deg,#292b83,#5143ce)}
+@media(max-width:800px){
+ .hero{background:linear-gradient(145deg,#e9e4ff,#f5f2ff 65%,#e9efff)}
+ #app .achi-side-nav{background:#fbfaff!important;border-right:1px solid #e4dfff!important}
+}
+</style>
+
 </head>
 <body>
 
